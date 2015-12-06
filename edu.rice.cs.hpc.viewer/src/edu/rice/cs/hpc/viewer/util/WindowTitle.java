@@ -9,6 +9,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -86,12 +87,15 @@ public class WindowTitle extends BaseWindowTitle {
 	 * @param window
 	 */
 	public void refreshViewTitles(IWorkbenchWindow window) {
-		final IViewReference viewRefs[] = window.getActivePage().getViewReferences();
-		for (IViewReference viewRef: viewRefs) {
-			final IViewPart view = viewRef.getView(false);
-			setTitle(window, view);
+		IWorkbenchPage page = window.getActivePage();
+		if (page != null)
+		{
+			final IViewReference viewRefs[] = page.getViewReferences();
+			for (IViewReference viewRef: viewRefs) {
+				final IViewPart view = viewRef.getView(false);
+				setTitle(window, view);
+			}
 		}
-		return;
 	}
 
 	/***
@@ -100,12 +104,15 @@ public class WindowTitle extends BaseWindowTitle {
 	 * @param window
 	 */
 	public void refreshEditorTitles(IWorkbenchWindow window) {
-		final IEditorReference editors[] = window.getActivePage().getEditorReferences();
-		for (IEditorReference editor: editors) {
-			final IEditorPart editorPart = editor.getEditor(false);
-			setEditorTitle(window, editorPart);
+		IWorkbenchPage page = window.getActivePage();
+		if (page != null)
+		{
+			final IEditorReference editors[] = page.getEditorReferences();
+			for (IEditorReference editor: editors) {
+				final IEditorPart editorPart = editor.getEditor(false);
+				setEditorTitle(window, editorPart);
+			}
 		}
-		return;
 	}
 
 	/***

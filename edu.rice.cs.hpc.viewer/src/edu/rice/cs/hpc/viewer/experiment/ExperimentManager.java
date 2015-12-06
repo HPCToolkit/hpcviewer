@@ -140,16 +140,19 @@ public class ExperimentManager {
 					
 					// check if the database has been opened in this window
 					ViewerWindow vw = ViewerWindowManager.getViewerWindow(window);
-					Database db = vw.getDb(vw.getDatabasePath(sFile));
-					
-					if (db == null) {						
-						// check if we can open the database successfully
-						bContinue = (!setExperiment(sFile, flag));
-					} else {
-						MessageDialog.openError(window.getShell(), "Database is already opened", 
-								"The database is already opened in this window.\n" +
-								"There is no need to open the same database twice in the same window.");
-						bContinue = false;
+					if (vw != null)
+					{
+						Database db = vw.getDb(vw.getDatabasePath(sFile));
+						
+						if (db == null) {						
+							// check if we can open the database successfully
+							bContinue = (!setExperiment(sFile, flag));
+						} else {
+							MessageDialog.openError(window.getShell(), "Database is already opened", 
+									"The database is already opened in this window.\n" +
+									"There is no need to open the same database twice in the same window.");
+							bContinue = false;
+						}
 					}
 				}
 			}
