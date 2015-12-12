@@ -3,17 +3,6 @@ package edu.rice.cs.hpc.viewer.editor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.EditorSashContainer;
-import org.eclipse.ui.internal.EditorStack;
-import org.eclipse.ui.internal.ILayoutContainer;
-import org.eclipse.ui.internal.LayoutPart;
-import org.eclipse.ui.internal.PartPane;
-import org.eclipse.ui.internal.PartSashContainer;
-import org.eclipse.ui.internal.PartSite;
-import org.eclipse.ui.internal.PartStack;
-import org.eclipse.ui.internal.WorkbenchPage;
-
 import edu.rice.cs.hpc.data.experiment.Experiment;
 
 public abstract class BaseEditorManager {
@@ -94,34 +83,6 @@ public abstract class BaseEditorManager {
 	 */
 //	@SuppressWarnings("restriction")
 	private static void splitEditorArea(IEditorPart iep) {
-		PartPane partPane = ((PartSite) iep.getSite()).getPane();
-		// Get PartPane that correspond to the active editor
-		PartPane currentEditorPartPane = ((PartSite) iep.getSite()).getPane();
-		EditorSashContainer editorSashContainer = null;
-		ILayoutContainer rootLayoutContainer = partPane.getPart().getContainer();
-		if (rootLayoutContainer instanceof LayoutPart) {
-			ILayoutContainer editorSashLayoutContainer = ((LayoutPart) rootLayoutContainer).getContainer();
-			if (editorSashLayoutContainer instanceof EditorSashContainer) {
-				editorSashContainer = ((EditorSashContainer) editorSashLayoutContainer);
-			}
-		}
-
-		/*
-		 * Create a new part stack (i.e. a workbook) to home the
-		 * currentEditorPartPane which hold the active editor
-		 */
-		PartStack newPart = createStack(editorSashContainer);
-		
-		if (editorSashContainer != null)
-			editorSashContainer.stack(currentEditorPartPane, newPart);
-
-		if (rootLayoutContainer instanceof LayoutPart) {
-			ILayoutContainer cont = ((LayoutPart) rootLayoutContainer).getContainer();
-			if (cont instanceof PartSashContainer) {
-				// "Split" the editor area by adding the new part
-				((PartSashContainer) cont).add(newPart);
-			}
-		}
 	}
 	/**
 	 * A method to create a part stack container (a new workbook)
@@ -129,11 +90,4 @@ public abstract class BaseEditorManager {
 	 * @param editorSashContainer the <code>EditorSashContainer</code> to set for the returned <code>PartStack</code>
 	 * @return a new part stack container
 	 */
-//	@SuppressWarnings("restriction")
-	private static PartStack createStack(EditorSashContainer editorSashContainer) {
-		IWorkbenchPage workbenchPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		EditorStack newWorkbook = EditorStack.newEditorWorkbook(editorSashContainer, (WorkbenchPage)workbenchPage);
-		return newWorkbook;
-	}
-
 }

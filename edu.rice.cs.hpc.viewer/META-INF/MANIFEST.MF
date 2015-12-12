@@ -5,13 +5,28 @@ Bundle-SymbolicName: edu.rice.cs.hpc.viewer; singleton:=true
 Bundle-Version: 5.4.1.qualifier
 Bundle-Activator: edu.rice.cs.hpc.viewer.framework.Activator
 Bundle-Vendor: Rice University
-Require-Bundle: org.eclipse.ui,
- edu.rice.cs.hpc.data
+Require-Bundle: org.eclipse.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Import-Package: 
+Import-Package:
+ com.graphbuilder.math,
+ com.graphbuilder.math.func,
+ com.graphbuilder.struc,
  edu.rice.cs.hpc.common.ui,
  edu.rice.cs.hpc.common.util,
+ edu.rice.cs.hpc.data.db,
+ edu.rice.cs.hpc.data.experiment,
+ edu.rice.cs.hpc.data.experiment.extdata,
+ edu.rice.cs.hpc.data.experiment.merge,
+ edu.rice.cs.hpc.data.experiment.metric,
+ edu.rice.cs.hpc.data.experiment.scope,
+ edu.rice.cs.hpc.data.experiment.scope.filters,
+ edu.rice.cs.hpc.data.experiment.scope.visitors,
+ edu.rice.cs.hpc.data.experiment.source,
+ edu.rice.cs.hpc.data.experiment.xml,
+ edu.rice.cs.hpc.data.filter,
+ edu.rice.cs.hpc.data.framework,
+ edu.rice.cs.hpc.data.util,
  edu.rice.cs.hpc.filter,
  edu.rice.cs.hpc.filter.service,
  edu.rice.cs.hpc.filter.view,
@@ -33,16 +48,8 @@ Import-Package:
  org.eclipse.ui.plugin,
  org.eclipse.ui.preferences,
  org.eclipse.ui.texteditor,
- org.osgi.framework,
- org.osgi.service.prefs,
+ org.osgi.framework;version="1.6.0",
+ org.osgi.service.prefs;version="1.1.1",
  org.swtchart,
  org.swtchart.ext
 Bundle-ClassPath: hpcviewer.jar
-Export-Package: edu.rice.cs.hpc.viewer.editor,
- edu.rice.cs.hpc.viewer.experiment,
- edu.rice.cs.hpc.viewer.framework,
- edu.rice.cs.hpc.viewer.help,
- edu.rice.cs.hpc.viewer.metric,
- edu.rice.cs.hpc.viewer.scope,
- edu.rice.cs.hpc.viewer.util,
- edu.rice.cs.hpc.viewer.window
