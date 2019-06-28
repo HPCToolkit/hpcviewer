@@ -270,17 +270,25 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         TreeViewerColumn []colMetrics = new TreeViewerColumn[numMetric];
         {
             // Update metric title labels
-            String[] titles = new String[numMetric+1];
-            titles[0] = "Scope";	// unused element. Already defined
+            String[] titles  = new String[numMetric+1];
+            titles[0] 		 = "Scope";	 // unused element. Already defined
+            
+            boolean alreadySorted = false;
+            
             // add table column for each metric
         	for (int i=0; i<numMetric; i++)
         	{
         		final BaseMetric metric = myExperiment.getMetric(i);
         		if (metric != null) {
             		titles[i+1] = metric.getDisplayName();	// get the title
-            		colMetrics[i] = this.treeViewer.addTreeColumn(metric, (i==0));
+            		
+            		// find the first visible metric
+                    boolean toBeSorted = false;
             		
             		// bug fix: for view initialization, we need to reset the status of hide/view
+                    // a column is automatically hidden if it has no metrics even if 
+                    //  its status in experiment.xml is to show
+                    
             		if (!keepColumnStatus) {
                 		status[i] = metric.getDisplayed();
                 		
@@ -288,6 +296,15 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
                 			status[i] = myRootScope.getMetricValue(metric) != MetricValue.NONE;
                 		}
             		}
+                    
+            		// A column is sorted if it is the first displayed column
+            		
+            		if (!alreadySorted && status[i]) {
+            			toBeSorted    = true;
+            			alreadySorted = true;
+            		}
+            		
+            		colMetrics[i] = this.treeViewer.addTreeColumn(metric, toBeSorted);
         		}
         	}
             treeViewer.setColumnProperties(titles); // do we need this ??

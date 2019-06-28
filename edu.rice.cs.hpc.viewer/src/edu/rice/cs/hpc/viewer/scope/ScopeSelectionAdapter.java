@@ -27,7 +27,6 @@ public class ScopeSelectionAdapter extends SelectionAdapter
     ScopeSelectionAdapter(ScopeTreeViewer viewer, TreeViewerColumn column) {
 		this.viewer 	= viewer;
 		this.column     = column;
-    	new ScopeComparator();
 	}
 	
 	public void widgetSelected(SelectionEvent e) {
@@ -92,12 +91,12 @@ public class ScopeSelectionAdapter extends SelectionAdapter
 			direction = 0;
 		}
 		
-		// prepare the sorting for this column with a specific direction
-		ISortContentProvider sortProvider = (ISortContentProvider) viewer.getContentProvider();
-		
 		TreeColumn col = column.getColumn();
 		col.getParent().setSortDirection(swt_direction);		
 		col.getParent().setSortColumn(col);
+		
+		// prepare the sorting for this column with a specific direction
+		ISortContentProvider sortProvider = (ISortContentProvider) viewer.getContentProvider();
 		
 		 // start sorting
 		sortProvider.sort_column(column, direction);
