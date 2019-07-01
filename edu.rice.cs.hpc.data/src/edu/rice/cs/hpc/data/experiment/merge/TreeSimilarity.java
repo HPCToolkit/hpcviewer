@@ -315,10 +315,13 @@ public class TreeSimilarity
 	
 	/****
 	 * merge 2 nodes if they have similarity
-	 * @param scope1 : 
-	 * @param scope2
-	 * @param offsetScope2
-	 * @return
+	 * @param scope1 : target scope
+	 * @param scope2 : source scope
+	 * @param offsetScope2 : offset of scope 2
+	 * @param siblingsScope2 : list of siblings of scope 2
+	 * @param metricOffset : the metric offset to be compared
+	 * 
+	 * @return {@code CoupleNodes}
 	 */
 	private CoupleNodes mergeNode(
 			Scope scope1, 
@@ -407,7 +410,13 @@ public class TreeSimilarity
 	private int getScopeSimilarityScore ( Scope s1, Scope s2 )
 	{
 		// check the adjacency of the location
-		final int loc_distance = Math.abs(s1.getFirstLineNumber() - s2.getFirstLineNumber());
+		int loc_distance = 0;
+		
+		// we can only compare the location if both has the information of
+		// line number. Otherwise, we just gives up.
+		
+		if (s1.getFirstLineNumber() > 0 && s2.getFirstLineNumber() > 0)
+			Math.abs(s1.getFirstLineNumber() - s2.getFirstLineNumber());
 		
 		// check the type
 		final boolean same_type = areSameType( s1, s2 );
