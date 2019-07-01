@@ -9,7 +9,10 @@ import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
 import edu.rice.cs.hpc.data.experiment.scope.Scope;
 import edu.rice.cs.hpc.viewer.window.Database;
 
-public class GraphEditorInput implements IEditorInput {
+public class GraphEditorInput implements IEditorInput 
+{
+	static public final int MAX_TITLE_CHARS = 100; // maximum charaters for a title
+
 	private final Database _database;
 	private final Scope _scope;
 	private final BaseMetric _metric;
@@ -42,7 +45,12 @@ public class GraphEditorInput implements IEditorInput {
 	}
 
 	public String getName() {
-		final String sOrignalTitle = "[" + GraphType.toString(_type) + "] " + _scope.getName()+": " + _metric.getDisplayName();
+		String scopeName = _scope.getName();
+		if (scopeName.length() > MAX_TITLE_CHARS) {
+			scopeName = _scope.getName().substring(0, MAX_TITLE_CHARS) + "...";
+		}
+		
+		final String sOrignalTitle = "[" + GraphType.toString(_type) + "] " + scopeName +": " + _metric.getDisplayName();
 		return sOrignalTitle;
 	}
 

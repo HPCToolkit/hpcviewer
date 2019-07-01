@@ -168,12 +168,10 @@ public class ScopeTreeViewer extends TreeViewer
 	
     /**
      * Add new tree column for derived metric
-     * @param treeViewer
-     * @param objMetric
-     * @param iPosition
-     * @param bSorted
-     * @param b: flag to indicate if this column should be displayed or not (default should be true)
-     * @return
+     * @param objMetric metric associated with the column
+     * @param bSorted flag indicating if the column will be sorted or not
+     * 
+     * @return a column
      */
     public TreeViewerColumn addTreeColumn(BaseMetric objMetric,  
     		boolean bSorted) {

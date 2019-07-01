@@ -60,18 +60,17 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 		// -----------------------------------------------------------------------------
 		workbench.addWindowListener( new IWindowListener() {
 
-			public void windowActivated(IWorkbenchWindow window) 
-			{
+			public void windowActivated(IWorkbenchWindow window){}
+			public void windowDeactivated(IWorkbenchWindow window) {}
+			public void windowClosed(IWorkbenchWindow window) {}
+			
+			public void windowOpened(IWorkbenchWindow window) {
 				ViewerWindow vWin = ViewerWindowManager.getViewerWindow(window);
 				if (vWin != null)
 				{
 					vWin.checkService();
 				}
 			}
-
-			public void windowDeactivated(IWorkbenchWindow window) {}
-			public void windowClosed(IWorkbenchWindow window) {}
-			public void windowOpened(IWorkbenchWindow window) {}
 			
 		});
 	}
