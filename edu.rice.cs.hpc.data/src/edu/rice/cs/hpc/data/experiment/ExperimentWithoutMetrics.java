@@ -1,8 +1,6 @@
 package edu.rice.cs.hpc.data.experiment;
 
 import java.io.File;
-import java.util.List;
-
 import edu.rice.cs.hpc.data.experiment.extdata.TraceAttribute;
 import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.filter.IFilterData;

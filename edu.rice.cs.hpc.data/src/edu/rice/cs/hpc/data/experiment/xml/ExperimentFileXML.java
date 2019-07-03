@@ -25,6 +25,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.management.RuntimeErrorException;
+
 
 
 
@@ -167,6 +169,12 @@ public File parse(File location, BaseExperiment experiment, boolean need_metrics
 			File callpathFile = new File(callpathLoc);
 			if (!callpathFile.exists())
 			{
+				// check if the directory is writable
+				File dir = new File(directory);
+				if (!dir.canWrite()) {
+					throw new RuntimeException("Directory is not writable: " + directory);
+				}
+				
 				Grep.grep(xmlFilePath, callpathLoc, "<M ", false);
 				callpathFile = new File(callpathLoc);
 			}
