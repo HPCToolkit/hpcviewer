@@ -10,7 +10,6 @@ import edu.rice.cs.hpc.data.experiment.scope.LoopScope;
 import edu.rice.cs.hpc.data.experiment.scope.ProcedureScope;
 import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.experiment.scope.Scope;
-import edu.rice.cs.hpc.data.experiment.scope.filters.EmptyMetricValuePropagationFilter;
 import edu.rice.cs.hpc.data.experiment.scope.visitors.DuplicateScopeTreesVisitor;
 import edu.rice.cs.hpc.data.experiment.scope.visitors.IScopeVisitor;
 import edu.rice.cs.hpc.data.experiment.scope.visitors.PercentScopeVisitor;
@@ -34,7 +33,7 @@ public class TreeSimilarity
 	int numSiblingMatches = 0;
 	
 	private enum SimilarityType{ SAME, SIMILAR, DIFF }
-	private EmptyMetricValuePropagationFilter emptyFilter;
+	
 	
 	/********
 	 * construct similarity class
@@ -50,9 +49,7 @@ public class TreeSimilarity
 		// reset counter
 		IScopeVisitor visitor = new ResetCounterVisitor();
 		source.dfsVisitScopeTree(visitor);
-		
-		emptyFilter = new EmptyMetricValuePropagationFilter();
-		
+				
 		// merge the root scope
 		mergeMetrics(target, source, offset);
 		
@@ -222,8 +219,12 @@ public class TreeSimilarity
 								if (candidate != null)
 								{
 									numMerges += 2;
+								
+									// Fix issue #38: https://github.com/HPCToolkit/hpcviewer/issues/38
+									// incorrect inclusive time occurred when propagating metrics from the children to the parent
+									// there is no need to do that.
 									
-									// we merged the kid, so we need to merge just the metric to the parent
+/*									// we merged the kid, so we need to merge just the metric to the parent
 									Scope parent = candidate.target.getParentScope();
 									parent.accumulateMetric(candidate.source, 0, metricOffset, emptyFilter);
 									
@@ -234,7 +235,7 @@ public class TreeSimilarity
 
 									// the kid matches with an inlined code. let's mark the parent to be merged as well
 									parent.incrementCounter();
-									
+*/									
 									// DFS: recursively, merge the children if they are similar
 									// the recursion will stop when all children are different
 									mergeTree( candidate.target, candidate.source, metricOffset );
@@ -256,7 +257,7 @@ public class TreeSimilarity
 	 * @param sourceOffset
 	 * @param metricCount
 	 */
-	private void disseminateMetric(Scope target, Scope source, int sourceOffset, int metricCount)
+/*	private void disseminateMetric(Scope target, Scope source, int sourceOffset, int metricCount)
 	{
 		
 		for (int i=sourceOffset; i<metricCount; i++)
@@ -267,7 +268,7 @@ public class TreeSimilarity
 
 			target.setMetricValue(i, mvTarget);
 		}
-	}
+	}*/
 	
 	/****
 	 * retrieve the sorted list of the children of a given scope
