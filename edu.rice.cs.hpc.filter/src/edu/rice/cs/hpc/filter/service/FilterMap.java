@@ -21,9 +21,7 @@ import edu.rice.cs.hpc.data.util.*;
 public class FilterMap extends AliasMap<String, FilterAttribute> 
 implements IFilterData
 {
-
 	static private final String FILE_NAME = "filter.map";
-	//static private final FilterMap filterMap = new FilterMap();
 	
 	public FilterMap() {
 		checkData();
