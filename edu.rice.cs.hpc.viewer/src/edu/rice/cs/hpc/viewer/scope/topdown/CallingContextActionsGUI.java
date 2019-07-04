@@ -115,13 +115,8 @@ public class CallingContextActionsGUI extends ScopeViewActionsGUI
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				final Scope scope = getSelectedScope();
-				RootScope rootScope;
-				if (scope instanceof RootScope) {
-					rootScope = (RootScope) scope;
-				} else {
-					rootScope = scope.getRootScope();
-				}
+				
+				final RootScope rootScope = objViewActions.getRootScope();;
 				ThreadView.showView(objWindow, rootScope, null);
 			}
 			
@@ -178,6 +173,9 @@ public class CallingContextActionsGUI extends ScopeViewActionsGUI
 			boolean available = ThreadDataCollectionFactory.isThreadDataAvailable(database.getExperiment());
 			String value = available ? DatabaseState.ENABLED : DatabaseState.DISABLED;
 			dbState.setState(DatabaseState.DATABASE_THREAD_STATE, value);
+			
+			tiThreadView.setEnabled(available);
+			
 			return;
 		}
 		dbState.setState(DatabaseState.DATABASE_THREAD_STATE, DatabaseState.DISABLED);
@@ -194,7 +192,6 @@ public class CallingContextActionsGUI extends ScopeViewActionsGUI
 	{
 		super.disableNodeButtons();
 		tiGraph.setEnabled(false);
-		tiThreadView.setEnabled(false);
 		if (experimental)
 			tiThreadMap.setEnabled(false);
 	}

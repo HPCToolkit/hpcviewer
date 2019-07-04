@@ -508,7 +508,9 @@ public abstract class ScopeViewActions /*extends ScopeActions /* implements IToo
     	objActionsGUI.disableNodeButtons();
     }
     
-    
+    public RootScope getRootScope() {
+    	return myRootScope;
+    }
     
     /**
      * An abstract method to be implemented: check the state of buttons for the selected node
