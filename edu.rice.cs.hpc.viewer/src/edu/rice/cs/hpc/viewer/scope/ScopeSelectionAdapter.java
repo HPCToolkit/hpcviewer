@@ -42,7 +42,7 @@ public class ScopeSelectionAdapter extends SelectionAdapter
 		if (tree.getItemCount()==0)
 			return; // no items: no need to sort
 		
-		TreeItem item = viewer.getTree().getItem(0);
+		TreeItem item = tree.getItem(0);
 		Image imgItem = item.getImage(0);
 		String []sText = Utilities.getTopRowItems(viewer);
 		
@@ -66,6 +66,13 @@ public class ScopeSelectionAdapter extends SelectionAdapter
 		// ----------------
 		if(sText != null) {
 			Utilities.insertTopRow(viewer, imgItem, sText);
+		}
+		// if there is no selection, we scroll to the top
+		// see issue #28
+		// https://github.com/HPCToolkit/hpcviewer/issues/28
+		
+		if (tree.getSelectionCount() == 0) {
+			tree.showItem(tree.getItem(0));
 		}
 	}
 	
