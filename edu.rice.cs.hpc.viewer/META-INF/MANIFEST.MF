@@ -57,4 +57,4 @@ Bundle-ClassPath: hpcviewer.jar,
  org.swtchart,
  org.swtchart.ext
 Automatic-Module-Name: edu.rice.cs.hpc.viewer
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
