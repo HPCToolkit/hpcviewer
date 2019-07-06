@@ -184,7 +184,7 @@
                   commandId="edu.rice.cs.hpc.traceviewer.actions.OptionMidpoint"
                   id="edu.rice.cs.hpc.traceviewer.actions.OptionMidpoint"
                   label="Using midpoint painting"
-                  mnemonic="u"
+                  mnemonic="U"
                   style="toggle"
                   tooltip="Enable using midpoint painting to present  a paint line as a midpoint between two samples  ">
             </command>
@@ -209,7 +209,7 @@
             <command
                   commandId="edu.rice.cs.hpc.traceviewer.actions.FilterRanks"
                   label="Filter ranks"
-                  mnemonic="f"
+                  mnemonic="F"
                   style="push"
                   tooltip="Filter displayed ranks">
                <visibleWhen
@@ -239,12 +239,12 @@
          <menu
                id="edu.rice.cs.hpc.traceviewer.menu.help"
                label="Help"
-               mnemonic="h"
+               mnemonic="H"
                tooltip="Help menu">
             <command
                   commandId="org.eclipse.ui.help.aboutAction"
                   label="About"
-                  mnemonic="a"
+                  mnemonic="A"
                   style="push"
                   tooltip="About hpctraceviewer">
             </command>
