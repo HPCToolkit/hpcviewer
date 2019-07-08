@@ -52,6 +52,27 @@ public class ThreadDataCollection3 extends AbstractThreadDataCollection
 		return labels;
 	}
 
+
+	@Override
+	public String[] getRankStringLabels() throws IOException {
+		int []ranks = data_thread.getParallelismRank();
+		final int num_labels = ranks.length / data_thread.getParallelismLevel();
+		String []labels = new String[num_labels];
+		
+		for(int i=0; i<num_labels; i++)
+		{
+			labels[i] = "";
+			for(int j=0; j<data_thread.getParallelismLevel(); j++) 
+			{
+				if (j>0) labels[i] += ".";
+				
+				int k = i*data_thread.getParallelismLevel() + j;
+				labels[i] += ranks[k]; 
+			}
+		}
+		return labels;
+	}
+
 	@Override
 	public int getParallelismLevel() {
 		return data_thread.getParallelismLevel();

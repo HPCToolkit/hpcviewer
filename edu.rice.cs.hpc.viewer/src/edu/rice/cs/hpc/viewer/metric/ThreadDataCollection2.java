@@ -87,6 +87,13 @@ public class ThreadDataCollection2 extends AbstractThreadDataCollection
 		return rankLabels;
 	}
 
+
+	@Override
+	public String[] getRankStringLabels() throws IOException {
+		ensureDataFile(0);
+		return data_file[0].getRankLabels();
+	}
+
 	@Override
 	public int getParallelismLevel() throws IOException {
 		ensureDataFile(0);

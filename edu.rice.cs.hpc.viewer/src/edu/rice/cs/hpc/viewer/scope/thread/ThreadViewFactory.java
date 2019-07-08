@@ -127,12 +127,8 @@ class ThreadViewFactory
 			throws NumberFormatException, IOException 
 	{
 		IThreadDataCollection threadData = db.getThreadDataCollection();
-		double []ids = threadData.getRankLabels();
-		String []labels = new String [ids.length];
-		for(int i=0; i<ids.length; i++) 
-		{
-			labels[i] = String.valueOf(ids[i]);
-		}
+		String []labels = threadData.getRankStringLabels();
+
 		ThreadFilterDialog dialog = new ThreadFilterDialog(window.getShell(), labels);
 		if (dialog.open() == Window.OK) {
 			boolean []result = dialog.getResult();

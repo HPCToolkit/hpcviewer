@@ -31,7 +31,10 @@ public interface IThreadDataCollection
 	 * @throws IOException 
 	 */
 	public double[]	getRankLabels() throws IOException;	
+
 	
+	public String[]	getRankStringLabels() throws IOException;	
+
 	/*****
 	 * Similar to {@link getRankLabels()}, but the labels are evenly sparsed
 	 * which is ideal for a plot graph.

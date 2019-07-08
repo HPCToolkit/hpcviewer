@@ -218,9 +218,9 @@ public class ThreadView extends AbstractBaseScopeView
 		}
 		else {
 			IThreadDataCollection threadData = database.getThreadDataCollection();
-			double[] labels;
+			String[] labels;
 			try {
-				labels = threadData.getRankLabels();
+				labels = threadData.getRankStringLabels();
 				
 				// duplicate "raw metrics" before setting them into the column. The reason for duplication is: 
 				// Although metric A in column X is the same as metric A in column Y (they are both metric A),
