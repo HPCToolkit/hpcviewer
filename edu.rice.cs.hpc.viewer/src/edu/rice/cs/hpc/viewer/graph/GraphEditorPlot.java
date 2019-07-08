@@ -38,20 +38,23 @@ public class GraphEditorPlot extends GraphEditor {
 	@Override
 	protected String getXAxisTitle() {
 		IAxisSet axisSet = this.getChart().getAxisSet();
-		IAxisTick xTick = axisSet.getXAxis(0).getTick();
+		IAxisTick xTick  = axisSet.getXAxis(0).getTick();
+		String title 	 = "Rank";
 
 		xTick.setFormat(new DecimalFormat("##########"));
-
+		
 		try {
+			title = threadData.getRankTitle();
+			
 			if (threadData.getParallelismLevel()>1) 
 			{
 				xTick.setFormat(new DecimalFormat("######00.00##"));
-				return threadData.getRankTitle();
+				return title;
 			}
 		} catch (IOException e) {			
 			e.printStackTrace();
 		}
-		return "Rank";
+		return title;
 	}
 
 	@Override
