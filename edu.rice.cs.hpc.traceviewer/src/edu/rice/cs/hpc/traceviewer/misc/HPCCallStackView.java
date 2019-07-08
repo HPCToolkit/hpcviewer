@@ -3,8 +3,8 @@ package edu.rice.cs.hpc.traceviewer.misc;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -55,13 +55,17 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 		depthEditor = new Spinner(master, SWT.EMBEDDED);
 		depthEditor.setMinimum(0);
 		depthEditor.setPageIncrement(1);
+		
 		depthEditor.setLayout(new GridLayout());
 		GridData depthData = new GridData(SWT.CENTER, SWT.TOP, true, false);
-		depthData.widthHint = 140;
+		depthData.widthHint = 100;
 		depthEditor.setLayoutData(depthData);
 		depthEditor.setVisible(false);
-		depthEditor.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
+		
+		depthEditor.addModifyListener(new ModifyListener() {
+			
+			@Override
+			public void modifyText(ModifyEvent e) {
 				String string = depthEditor.getText();
 				int value;
 				if (string.length()<1)
@@ -72,16 +76,17 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 					return;
 				else
 					value = Integer.valueOf(string);
+				
 				int maximum = depthEditor.getMaximum();
 				int minimum = 0;
-				if (value > maximum)
-					value = maximum;
-				if (value < minimum)
-					value = minimum;
-				csViewer.setDepth(value);
-			}
 
-			public void widgetDefaultSelected(SelectionEvent e) {
+				if (value > maximum) {
+					value = maximum;
+				}
+				if (value < minimum) {
+					value = minimum;
+				}
+				csViewer.setDepth(value);
 			}
 		});
 		
@@ -140,7 +145,7 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 		depthEditor.setMaximum(_stData.getMaxDepth());
 		depthEditor.setSelection(0);
 		depthEditor.setVisible(true);
-
+		depthEditor.setToolTipText("Change the current depth.\nMax depth is " + _stData.getMaxDepth());
 		//this.csViewer.updateView();
 		
 		// instead of updating the content of the view, we just make the table
