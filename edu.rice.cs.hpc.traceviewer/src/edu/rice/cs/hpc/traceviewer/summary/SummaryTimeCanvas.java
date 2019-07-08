@@ -341,6 +341,8 @@ implements IOperationHistoryListener
 		if (event.getOperation().hasContext(BufferRefreshOperation.context)) {
 			if (event.getEventType() == OperationHistoryEvent.DONE) {
 				Debugger.printDebug(1, "STC attributes: ");
+				if (isDisposed()) return;
+					
 				getDisplay().syncExec(new Runnable() {
 					@Override
 					public void run() {

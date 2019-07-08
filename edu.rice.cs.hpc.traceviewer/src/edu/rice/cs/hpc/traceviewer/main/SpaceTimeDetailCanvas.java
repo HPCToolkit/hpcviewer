@@ -510,6 +510,8 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	 **************************************************************************/
 	public void setDepth(int newDepth)
 	{
+		if (isDisposed()) return;
+		
 		stData.getAttributes().setDepth(newDepth);
 		refresh(false);
     }
@@ -915,6 +917,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		// the size of the final image is the same of the size of the canvas
 		// -----------------------------------------------------------------------
 
+		
 		final Rectangle view = getClientArea();
 		final ImageTraceAttributes attributes = stData.getAttributes();
 		

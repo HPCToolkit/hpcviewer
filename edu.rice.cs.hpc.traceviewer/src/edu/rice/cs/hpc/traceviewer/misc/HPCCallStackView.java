@@ -2,6 +2,7 @@ package edu.rice.cs.hpc.traceviewer.misc;
 
 import java.util.Map;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -67,21 +68,43 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 			@Override
 			public void modifyText(ModifyEvent e) {
 				String string = depthEditor.getText();
-				int value;
-				if (string.length()<1)
+				int value = 0;
+				if (string.length()<1) {
 					// be careful: on linux/GTK, any change in the spinner will consists of two steps:
 					//  1) empty the string
 					//  2) set with the specified value
 					// therefore, we consider any empty string to be illegal
 					return;
-				else
-					value = Integer.valueOf(string);
+				} else {
+					try {
+						value = Integer.valueOf(string);
+					} catch (NumberFormatException errorException) {
+						e.display.syncExec(new Runnable() {
+							
+							@Override
+							public void run() {
+								MessageDialog.openError(getSite().getShell(), "Incorrect input", 
+										"Error: " + errorException.getMessage());
+							}
+						});
+						return;
+					}
+				}
 				
 				int maximum = depthEditor.getMaximum();
 				int minimum = 0;
 
 				if (value > maximum) {
 					value = maximum;
+					
+					e.display.asyncExec(new Runnable() {
+						
+						@Override
+						public void run() {
+							MessageDialog.openWarning(getSite().getShell(), "Value not allowed", 
+									  "The value is higher than the maximum depth (" + maximum +").");
+						}
+					});
 				}
 				if (value < minimum) {
 					value = minimum;
