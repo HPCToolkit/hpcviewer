@@ -456,7 +456,13 @@ public abstract class ScopeViewActions /*extends ScopeActions /* implements IToo
 				if (obj != null && obj instanceof BaseMetric) {
 					// the column is not hidden
 					BaseMetric metric = (BaseMetric) obj;
-					sbText.append(sSeparator + objScope.getMetricValue(metric).getValue());
+					MetricValue value = objScope.getMetricValue(metric);
+					if (value == MetricValue.NONE) {
+						// no value: write empty space
+						sbText.append(sSeparator + " ");
+					} else {
+						sbText.append(sSeparator + value.getValue());
+					}
 				}
 			}
 		}
