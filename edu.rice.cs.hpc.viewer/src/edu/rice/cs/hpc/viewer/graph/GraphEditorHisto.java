@@ -21,7 +21,7 @@ public class GraphEditorHisto extends GraphEditorBase {
     
 
 	@Override
-	protected void plotData(Scope scope, MetricRaw metric) {
+	protected int plotData(Scope scope, MetricRaw metric) {
 		final int bins = 10;
 		
 		double y_values[], x_values[];
@@ -30,7 +30,7 @@ public class GraphEditorHisto extends GraphEditorBase {
 
 		} catch (IOException e) {
 			MessageDialog.openError(this.getSite().getShell(), "Error reading file !", e.getMessage());
-			return;
+			return -1;
 		}			
 
 		Histogram histo = new Histogram(bins, y_values);
@@ -60,6 +60,8 @@ public class GraphEditorHisto extends GraphEditorBase {
 
 		chart.getAxisSet().getXAxis(0).getTitle().setText( "Metric Value" );
 		chart.getAxisSet().getYAxis(0).getTitle().setText( "Frequency" );
+		
+		return 0;
 	}
 
 

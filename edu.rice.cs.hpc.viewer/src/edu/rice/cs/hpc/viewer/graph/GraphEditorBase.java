@@ -192,7 +192,12 @@ public abstract class GraphEditorBase extends EditorPart implements IViewerEdito
 		Scope scope = editor_input.getScope();
 		BaseMetric metric = editor_input.getMetric();
 		
-		this.plotData(scope, (MetricRaw) metric);
+		if (plotData(scope, (MetricRaw) metric) != 0) {
+			final String title_error = "*Failed to display the graph*";
+			
+			setEditorPartName(title_error);
+			chart.getTitle().setText(title_error);
+		}
 	}
 
 
@@ -227,7 +232,7 @@ public abstract class GraphEditorBase extends EditorPart implements IViewerEdito
 	 * @param scope: the scope to plot
 	 * @param metric: the raw metric to plot
 	 */
-	protected abstract void plotData(Scope scope, MetricRaw metric );
+	protected abstract int plotData(Scope scope, MetricRaw metric );
 	
 	/****
 	 * Translate a set of thread-index selections into the original set of

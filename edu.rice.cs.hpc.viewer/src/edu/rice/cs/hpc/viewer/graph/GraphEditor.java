@@ -101,7 +101,7 @@ public abstract class GraphEditor extends GraphEditorBase {
 	 * @param scope
 	 * @param metric
 	 */
-	protected void plotData(Scope scope, MetricRaw metric ) {
+	protected int plotData(Scope scope, MetricRaw metric ) {
 		
 		double y_values[];
 		try {
@@ -135,9 +135,17 @@ public abstract class GraphEditor extends GraphEditorBase {
 			xTick.setFormat(new DecimalFormat("#############"));
 
 		} catch (IOException e) {
-			MessageDialog.openError(getSite().getShell(), "File to open the file", 
+			MessageDialog.openError(getSite().getShell(), "Fail to open the file", 
 					"Error while openging the file: " + e.getMessage());
+			return -2;
+			
+		} catch (Exception e) {
+			MessageDialog.openError(getSite().getShell(), "Fail to display the graph", 
+					 "Error while opening thread level data metric file.\n"+ e.getMessage());
+			
+			return -1;
 		}
+		return 0;
 	}
 
 	/***
