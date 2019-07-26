@@ -603,11 +603,20 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 							objBuffer.write(sTitle + Utilities.NEW_LINE);
 
 							// write the top row items
-							String sTopRow[] = Utilities.getTopRowItems(treeViewer);
-							// tricky: add '"' for uniting the text in the spreadsheet
-							sTopRow[0] = "\"" + sTopRow[0] + "\"";	
-							sTitle = treeViewer.getTextBasedOnColumnStatus(sTopRow, COMMA_SEPARATOR, 0, 0);
-							objBuffer.write(sTitle + Utilities.NEW_LINE);
+							Object root = treeViewer.getInput();
+							if (root instanceof Scope) {
+								StringBuffer sb = new StringBuffer();
+								objViewActions.saveContent((Scope)root, COMMA_SEPARATOR, sb);
+								objBuffer.write(sb.toString());
+								objBuffer.write(Utilities.NEW_LINE);
+								
+							} else {
+								String sTopRow[] = Utilities.getTopRowItems(treeViewer);
+								// tricky: add '"' for uniting the text in the spreadsheet
+								sTopRow[0] = "\"" + sTopRow[0] + "\"";	
+								sTitle = treeViewer.getTextBasedOnColumnStatus(sTopRow, COMMA_SEPARATOR, 0, 0);
+								objBuffer.write(sTitle + Utilities.NEW_LINE);
+							}
 
 							// write the content text
 							ArrayList<TreeItem> items = new ArrayList<TreeItem>();
