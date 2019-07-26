@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="hpctraceviewer" id="edu.rice.cs.hpc.traceviewer.product" application="edu.rice.cs.hpc.traceviewer.application" version="2019.04" useFeatures="false" includeLaunchers="true">
+<product name="hpctraceviewer" id="edu.rice.cs.hpc.traceviewer.product" application="edu.rice.cs.hpc.traceviewer.application" version="2019.07" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/edu.rice.cs.hpc.traceviewer/icons/hpctraceviewer048.png"/>
@@ -42,7 +42,6 @@ Release 2019.07   (C) Copyright 2019, Rice University.
             winLargeHigh="/edu.rice.cs.hpc.traceviewer/icons/hpctraceviewer048.BMP"/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>

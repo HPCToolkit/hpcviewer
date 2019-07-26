@@ -77,7 +77,10 @@ public class BaseScopeViewActions extends ScopeViewActions {
 		//objTreeViewer.refresh();	// we refresh to update the data model of the table
 		
 		// notify the GUI that we have added a new column
-    	int width 			    = colDerived.getColumn().getWidth();
+    	int width 			    = (int) colDerived.getColumn().getData(ScopeTreeViewer.COLUMN_DATA_WIDTH);
+    	
+    	colDerived.getColumn().setWidth(width);
+    	
     	ColumnPixelData colData = new ColumnPixelData(width, true);
     	TreeColumnLayout layout = (TreeColumnLayout) treeViewer.getTree().getParent().getLayout();
     	
@@ -87,8 +90,9 @@ public class BaseScopeViewActions extends ScopeViewActions {
     	
 		//this.objActionsGUI.addMetricColumns(colDerived); 
     	treeViewer.getTree().setRedraw(true);
-		// adjust the column width 
-		//colDerived.getColumn().pack();
+		
+    	// adjust the column width 
+    	treeViewer.getTree().pack();
 		
 		// instead of refresh, we use update which will reset the input and
 		//	reinitialize the table. It isn't elegant, but works in all platforms
