@@ -271,7 +271,7 @@ abstract public class AbstractBaseScopeView  extends ViewPart
     	// only selected items that are copied into clipboard
     	TreeItem []itemsSelected = this.treeViewer.getTree().getSelection();
     	// convert the table into a string
-    	String sText = this.objViewActions.getContent(itemsSelected, " \t");
+    	String sText = this.objViewActions.getDisplayContent(itemsSelected, " \t");
     	// send the string into clipboard
     	TextTransfer textTransfer = TextTransfer.getInstance();
     	if (this.cb == null)

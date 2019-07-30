@@ -408,7 +408,6 @@ public abstract class ScopeViewActions /*extends ScopeActions /* implements IToo
 	/**
 	 * Retrieve the content of the table into a string
 	 * @param items (list of items to be exported)
-	 * @param colMetrics (hidden column not included)
 	 * @param sSeparator (separator)
 	 * @return String: content of the table
 	 */
@@ -422,7 +421,7 @@ public abstract class ScopeViewActions /*extends ScopeActions /* implements IToo
     		// let get the metrics if the selected item is a scope node
     		if (o instanceof Scope) {
     			Scope objScope = (Scope) o;
-    			this.getContent(objScope, sSeparator, sbText);
+    			this.saveContent(objScope, sSeparator, sbText);
     		} else {
     			// in case user click the first row, we need a special treatment
     			// first row of the table is supposed to be a sub-header, but at the moment we allow user
@@ -436,15 +435,44 @@ public abstract class ScopeViewActions /*extends ScopeActions /* implements IToo
     	}
     	return sbText.toString();
 	}
+
+	/**
+	 * Retrieve the content of the table into a string
+	 * @param items (list of items to be exported)
+	 * @param sSeparator (separator)
+	 * @return String: content of the table
+	 */
+	public String getDisplayContent(TreeItem []items, String sSeparator) {
+    	StringBuffer sbText  = new StringBuffer();
+    	TreeColumn columns[] = treeViewer.getTree().getColumns();
+    	
+    	// get all selected items
+    	for (int i=0; i< items.length; i++) {
+    		TreeItem objItem = items[i];
+    		
+    		// get text of the displayed columns
+    		// hidden columns will not be copied
+    		for(int j=0; j<columns.length; j++) {
+    			if (columns[j].getWidth() > 0) {
+    				if (j>0)
+                		sbText.append(sSeparator);
+
+            		String text = objItem.getText(j);
+            		sbText.append(text);
+    			}
+    		}
+    		sbText.append(Utilities.NEW_LINE);
+    	}
+    	return sbText.toString();
+	}
 	
 	/**
 	 * private function to copy a scope node into a buffer string
-	 * @param objScope
-	 * @param colMetrics
-	 * @param sSeparator
-	 * @param sbText
+	 * @param objScope current scope
+	 * @param sSeparator string separator between different metric column
+	 * @param sbText output saved content
 	 */
-	private void getContent( Scope objScope, String sSeparator, StringBuffer sbText ) {
+	public void saveContent( Scope objScope, String sSeparator, StringBuffer sbText ) {
 
 		final TreeColumn []columns = treeViewer.getTree().getColumns();
 		sbText.append( "\"" + objScope.getName() + "\"" );
