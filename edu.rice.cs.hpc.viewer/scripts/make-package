@@ -10,13 +10,14 @@
 
 # example of variable initialization
 viewer="hpctraceviewer"
+release=`date -Idate`
 
 if [ $# -eq 1 ]; then
   viewer=$1
 else
-  echo "Syntax: $0 viewer_name "
+  echo "Syntax: $0 viewer_name release"
   echo "viewer_name is either 'hpcviewer' or 'hpctraceviewer'"
-  echo "Example: $0 $viewer"
+  echo "Example: $0 $viewer $release"
   exit
 fi
 
@@ -65,7 +66,7 @@ for i in *; do echo $i
      mv ${f}/scripts . 
      cd scripts 
      bash make-dist ../$viewer >/tmp/out
-     mv $viewer.tar.gz ../../$viewer-$i.tgz
+     mv $viewer.tar.gz ../../$viewer-$i-$release.tgz
      cd ../../ 
      ls -l $viewer-$i.tgz
   else
