@@ -37,6 +37,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.scope.Scope;
+import edu.rice.cs.hpc.data.util.OSValidator;
 import edu.rice.cs.hpc.viewer.metric.MetricColumnDialog;
 import edu.rice.cs.hpc.viewer.provider.TableMetricState;
 import edu.rice.cs.hpc.viewer.resources.Icons;
@@ -362,7 +363,13 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 					}
 				}
 	   			treeLayout.setColumnData(column, new ColumnPixelData(iWidth));
-       			column.setWidth(iWidth);
+	   			// eclipse performance bug
+	   			// this code is very slow on windows 
+	   			// For OS other than Linux, it isn't important to set the width here,  
+	   			// since we already have setup the layout using data layout
+	   			
+	   			if (OSValidator.isUnix())
+	   				column.setWidth(iWidth);
 
 				i++;
 			}
