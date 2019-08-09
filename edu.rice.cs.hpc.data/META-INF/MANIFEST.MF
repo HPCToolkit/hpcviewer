@@ -23,5 +23,4 @@ Export-Package: edu.rice.cs.hpc.data.db,
  edu.rice.cs.hpc.data.util.string
 Main-Class: edu.rice.cs.hpc.data.framework.Application
 Require-Bundle: com.graphbuilder
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: edu.rice.cs.hpc.data

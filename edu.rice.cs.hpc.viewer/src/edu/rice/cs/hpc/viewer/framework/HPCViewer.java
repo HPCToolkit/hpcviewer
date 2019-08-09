@@ -1,6 +1,8 @@
 package edu.rice.cs.hpc.viewer.framework;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 
 import org.eclipse.core.runtime.IPath;
@@ -42,10 +44,17 @@ public class HPCViewer implements IApplication
 		String filename = path.append(FILE_NAME).makeAbsolute().toString();
 		
 		try {
+			File file = new File(filename);
+			if (!file.exists()) {
+				file.createNewFile();
+			}
 			System.setErr(new PrintStream(filename));
 			
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		// create the application

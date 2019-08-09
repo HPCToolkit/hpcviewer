@@ -19,5 +19,4 @@ Import-Package: edu.rice.cs.hpc.data.experiment,
  edu.rice.cs.hpc.data.experiment.scope.visitors,
  edu.rice.cs.hpc.data.filter,
  edu.rice.cs.hpc.data.util
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: edu.rice.cs.hpc.filter

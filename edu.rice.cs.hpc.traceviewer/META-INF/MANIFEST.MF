@@ -10,7 +10,6 @@ Require-Bundle: edu.rice.cs.hpc.data,
  edu.rice.cs.hpc.traceviewer.data,
  edu.rice.cs.hpc.common,
  org.eclipse.ui.workbench
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: com.jcraft.jsch;version="0.1.44",
  org.eclipse.core.commands,

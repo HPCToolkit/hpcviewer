@@ -1,5 +1,7 @@
 package edu.rice.cs.hpc.viewer.scope.bottomup;
 
+import org.eclipse.jface.viewers.Viewer;
+
 import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.scope.CallSiteScopeCallerView;
 import edu.rice.cs.hpc.data.experiment.scope.IMergedScope;
@@ -77,5 +79,18 @@ public class CallerViewContentProvider extends AbstractContentProvider
     public void setDatabase(Experiment experiment) {
     	exclusiveOnly = new ExclusiveOnlyMetricPropagationFilter(experiment);
     	inclusiveOnly = new InclusiveOnlyMetricPropagationFilter(experiment);
-    }    
+    }
+
+
+	@Override
+	public void dispose() {
+		inclusiveOnly = null;
+		exclusiveOnly = null;
+	}
+
+
+	@Override
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+
+	}    
 }

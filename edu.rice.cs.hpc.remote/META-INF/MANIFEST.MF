@@ -3,7 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: hpcremote
 Bundle-SymbolicName: edu.rice.cs.hpc.remote
 Bundle-Version: 5.5.1.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: edu.rice.cs.hpc.data,
  edu.rice.cs.hpc.traceviewer.data,
  com.jcraft.jzlib

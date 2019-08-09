@@ -78,7 +78,7 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 				} else {
 					try {
 						value = Integer.valueOf(string);
-					} catch (NumberFormatException errorException) {
+					} catch (final NumberFormatException errorException) {
 						e.display.syncExec(new Runnable() {
 							
 							@Override
@@ -91,7 +91,7 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 					}
 				}
 				
-				int maximum = depthEditor.getMaximum();
+				final int maximum = depthEditor.getMaximum();
 				int minimum = 0;
 
 				if (value > maximum) {

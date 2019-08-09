@@ -13,4 +13,3 @@ Export-Package:  edu.rice.cs.hpc.common.ui,
  edu.rice.cs.hpc.common.util
 Import-Package: edu.rice.cs.hpc.data.util
 Automatic-Module-Name: edu.rice.cs.hpc.common
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
