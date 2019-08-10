@@ -2,7 +2,10 @@ package edu.rice.cs.hpc.viewer.scope;
 
 import java.util.Map;
 
+import org.eclipse.jface.layout.TreeColumnLayout;
+import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.ISourceProvider;
@@ -233,9 +236,17 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         tree.setRedraw(false);
         
         if (!keepColumnStatus) {
+        	boolean root_has_children = myRootScope != null && myRootScope.hasChildren();
         	int i=0;
         	for(BaseMetric metric: myExperiment.getMetrics()) {
         		status[i] = metric.getDisplayed();
+        		        		
+        		// bug fix: for view initialization, we need to reset the status of hide/view
+                // a column is automatically hidden if it has no metrics even if 
+                //  its status in experiment.xml is to show
+        		if (status[i] && root_has_children) {
+        			status[i] = myRootScope.getMetricValue(metric) != MetricValue.NONE;
+        		}
         		i++;
         	}
         }
@@ -257,15 +268,24 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
     	
     	// remove the metric columns blindly
     	// TODO we need to have a more elegant solution here
-    	for(int i=1;i<iColCount;i++) {
+    	for(int i=0;i<iColCount;i++) {
     		TreeColumn column = columns[i]; //treeViewer.getTree().getColumn(1);
     		column.dispose();
     	}
 
-    	// prepare the data for the sorter class for tree
-        // ScopeComparator sorterTreeColumn = (ScopeComparator) treeViewer.getComparator();
-        // sorterTreeColumn.setMetric(myExperiment.getMetric(0));
-
+        //----------------- create the column tree
+        final TreeViewerColumn colTree = new TreeViewerColumn(treeViewer,SWT.LEFT, 0);
+        colTree.getColumn().setText("Scope");
+        colTree.setLabelProvider( getLabelProvider() ); 
+        
+        TreeColumnLayout treeLayout = (TreeColumnLayout) tree.getParent().getLayout();
+    			
+		treeLayout.setColumnData(colTree.getColumn(), new ColumnWeightData(20, 
+				ScopeTreeViewer.COLUMN_DEFAULT_WIDTH, true));
+        
+		ScopeSelectionAdapter selectionAdapter = new ScopeSelectionAdapter(treeViewer, colTree);
+		colTree.getColumn().addSelectionListener(selectionAdapter);
+        
         // dirty solution to update titles
         TreeViewerColumn []colMetrics = new TreeViewerColumn[numMetric];
         {
@@ -282,23 +302,9 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         		if (metric != null) {
             		titles[i+1] = metric.getDisplayName();	// get the title
             		
-            		// find the first visible metric
                     boolean toBeSorted = false;
-            		
-            		// bug fix: for view initialization, we need to reset the status of hide/view
-                    // a column is automatically hidden if it has no metrics even if 
-                    //  its status in experiment.xml is to show
                     
-            		if (!keepColumnStatus) {
-                		status[i] = metric.getDisplayed();
-                		
-                		if (status[i] && myRootScope != null) {
-                			status[i] = myRootScope.getMetricValue(metric) != MetricValue.NONE;
-                		}
-            		}
-                    
-            		// A column is sorted if it is the first displayed column
-            		
+            		// A column is sorted if it is the first displayed column            		
             		if (!alreadySorted && status[i]) {
             			toBeSorted    = true;
             			alreadySorted = true;

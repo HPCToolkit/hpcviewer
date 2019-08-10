@@ -50,11 +50,12 @@ public class HPCViewer implements IApplication
 			}
 			System.setErr(new PrintStream(filename));
 			
+			System.out.println("Standard error is redirected to " + filename);
+			
 		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("File not found: " + e1.getMessage());
+		} catch (IOException e2) {
+			System.err.println("I/O error: " + e2.getMessage());
 		}
 		
 		// create the application

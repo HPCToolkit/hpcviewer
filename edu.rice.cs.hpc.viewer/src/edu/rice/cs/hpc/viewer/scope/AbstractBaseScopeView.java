@@ -27,7 +27,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
-import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -41,7 +40,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.window.ToolTip;
 
@@ -341,6 +339,8 @@ abstract public class AbstractBaseScopeView  extends ViewPart
     	GridDataFactory.fillDefaults().grab(true, true).applyTo(tableComposite);
     	GridDataFactory.fillDefaults().grab(true, true).applyTo(treeViewer.getTree());
     	
+    	tableComposite.setLayout(new TreeColumnLayout());
+
     	final Tree tree = treeViewer.getTree();
         tree.setHeaderVisible(true);
         tree.setLinesVisible(true);
@@ -351,20 +351,6 @@ abstract public class AbstractBaseScopeView  extends ViewPart
         // --------------------------------------------------------------------
         if (OSValidator.isUnix())
         	ColumnViewerToolTipSupport.enableFor(treeViewer, ToolTip.NO_RECREATE);
-        
-        //----------------- create the column tree
-        final TreeViewerColumn colTree = new TreeViewerColumn(treeViewer,SWT.LEFT, 0);
-        colTree.getColumn().setText("Scope");
-        colTree.setLabelProvider( getLabelProvider() ); 
-        
-        TreeColumnLayout treeLayout = new TreeColumnLayout();
-    	tableComposite.setLayout(treeLayout);
-    			
-		treeLayout.setColumnData(colTree.getColumn(), new ColumnWeightData(20, 
-				ScopeTreeViewer.COLUMN_DEFAULT_WIDTH, true));
-        
-		ScopeSelectionAdapter selectionAdapter = new ScopeSelectionAdapter(treeViewer, colTree);
-		colTree.getColumn().addSelectionListener(selectionAdapter);
         
         //-----------------
         // create the context menus

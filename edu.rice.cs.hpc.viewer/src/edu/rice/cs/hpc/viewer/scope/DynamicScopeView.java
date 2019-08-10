@@ -60,7 +60,7 @@ implements IDynamicRootTree
 			Experiment experiment = database.getExperiment();
 			if (experiment.getRootScope() != null) {
 				root = createTree(experiment);
-				setInput(database, root, false);
+				setInput(database, root, true);
 			}
 		} else {
 			// check whether the view has the new created tree.
@@ -72,7 +72,7 @@ implements IDynamicRootTree
 			if (tree.getItemCount() < 2) {
 				// the tree is created, but the view doesn't know it.
 				// let's force to reset the input
-				setInput(database, root, false);
+				setInput(database, root, true);
 			}
 		}
     }
