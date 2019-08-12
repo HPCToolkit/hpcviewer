@@ -8,7 +8,9 @@ import java.util.Map.Entry;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.Event;
@@ -25,6 +27,7 @@ import edu.rice.cs.hpc.viewer.metric.MetricRawManager;
 import edu.rice.cs.hpc.viewer.graph.GraphMenu;
 import edu.rice.cs.hpc.viewer.scope.AbstractBaseScopeView;
 import edu.rice.cs.hpc.viewer.scope.AbstractContentProvider;
+import edu.rice.cs.hpc.viewer.scope.ScopeSelectionAdapter;
 import edu.rice.cs.hpc.viewer.scope.ScopeTreeViewer;
 import edu.rice.cs.hpc.viewer.scope.ScopeViewActions;
 import edu.rice.cs.hpc.viewer.scope.StyledScopeLabelProvider;
@@ -70,52 +73,28 @@ public class ThreadView extends AbstractBaseScopeView
 	 * @param db : database
 	 * @param scope : the root (should be cct root)
 	 */
-	public void setInput(Database db, RootScope scope)
+	public void setInput(Database db, RootScope scope, List<Integer> threads)
 	{
-		if (database != db && myRootScope != scope) {
-	    	database = db;
-	    	myRootScope = scope;// try to get the aggregate value
+		if (database == db || myRootScope == scope)
+			return;
+		
+    	database = db;
+    	myRootScope = scope;// try to get the aggregate value
 
-	        // tell the action class that we have built the tree
-	        objViewActions.setTreeViewer(treeViewer);
-	        ((ThreadScopeViewAction)objViewActions).setMetricManager(getMetricManager());
-	        
-	        // notify the children class to update the display
-	    	updateDisplay();
-		}
-	}
-	
-	@Override
-	public void updateDisplay() {
-		// return immediately when there's no database or the view is closed (disposed)
-        if (database == null || treeViewer == null || treeViewer.getTree().isDisposed())
-        	return;
-
-        final Experiment experiment = getExperiment();
+        // tell the action class that we have built the tree
+        objViewActions.setTreeViewer(treeViewer);
         
-		// reassign root scope
-        if (myRootScope == null) {
-    		RootScope rootCCT = experiment.getRootScope(RootScopeType.CallingContextTree);
-    		myRootScope = createRoot(rootCCT);
-        }
-
-		if (myRootScope.getChildCount()>0) {
-        	treeViewer.setInput(myRootScope);
-        	
-        	objViewActions.updateContent(experiment, myRootScope);        	
-        	objViewActions.checkNodeButtons();
-        }
-	}
-	
-	/*****
-	 * add new columns of metrics for a given list of threads<br/>
-	 * If the threads already displayed in the table, we do nothing.
-	 * Otherwise, we'll add new columns for these threads.
-	 * 
-	 * @param threads : list of threads
-	 */
-	void addTableColumns(List<Integer> threads) {
 		IMetricManager mm = getMetricManager();
+
+        ((ThreadScopeViewAction)objViewActions).setMetricManager(mm);
+        
+    	/*****
+    	 * add new columns of metrics for a given list of threads<br/>
+    	 * If the threads already displayed in the table, we do nothing.
+    	 * Otherwise, we'll add new columns for these threads.
+    	 * 
+    	 */
+
 		BaseMetric []metrics = mm.getMetrics();
 		
 		// 1. check if the threads already exist in the view
@@ -145,10 +124,33 @@ public class ThreadView extends AbstractBaseScopeView
 		// 3. add the new metrics into the table
 		final Experiment experiment = database.getExperiment();
 		initTableColumns(threads, experiment.getMetricRaw());
-		
+
 		// 4. update the table content, including the aggregate experiment
 		updateDisplay();
 	}
+	
+	@Override
+	public void updateDisplay() {
+		// return immediately when there's no database or the view is closed (disposed)
+        if (database == null || treeViewer == null || treeViewer.getTree().isDisposed())
+        	return;
+
+        final Experiment experiment = getExperiment();
+        
+		// reassign root scope
+        if (myRootScope == null) {
+    		RootScope rootCCT = experiment.getRootScope(RootScopeType.CallingContextTree);
+    		myRootScope = createRoot(rootCCT);
+        }
+
+		if (myRootScope.getChildCount()>0) {
+        	treeViewer.setInput(myRootScope);
+        	
+        	objViewActions.updateContent(experiment, myRootScope);        	
+        	objViewActions.checkNodeButtons();
+        }
+	}
+	
 	
 	@Override
 	protected void initTableColumns(boolean keepColumnStatus) {	}
@@ -220,6 +222,13 @@ public class ThreadView extends AbstractBaseScopeView
 		else {
 			IThreadDataCollection threadData = database.getThreadDataCollection();
 			String[] labels;
+			
+	        TreeViewerColumn colTree = createScopeColumn(treeViewer);
+	        colTree.getColumn().setWidth(ScopeTreeViewer.COLUMN_DEFAULT_WIDTH);
+	        
+			ScopeSelectionAdapter selectionAdapter = new ScopeSelectionAdapter(treeViewer, colTree);
+			colTree.getColumn().addSelectionListener(selectionAdapter);
+
 			try {
 				labels = threadData.getRankStringLabels();
 				

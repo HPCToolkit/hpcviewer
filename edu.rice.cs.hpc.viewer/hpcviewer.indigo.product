@@ -32,7 +32,7 @@ Release 2019.08  (C) Copyright 2019, Rice University.
       startupProgressRect="0,275,445,15"
       startupMessageRect="7,252,445,20"
       startupForegroundColor="000000" />
-   <launcher>
+   <launcher name="hpcviewer">
       <linux icon="/edu.rice.cs.hpc.viewer/icons/hpcviewer-icon-32x32-32bit.xpm"/>
       <macosx icon="/edu.rice.cs.hpc.viewer/icons/hpcviewer.icns"/>
       <solaris/>

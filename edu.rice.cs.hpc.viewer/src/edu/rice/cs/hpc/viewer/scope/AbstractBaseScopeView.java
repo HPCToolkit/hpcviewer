@@ -35,12 +35,14 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ITreeViewerListener;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.window.ToolTip;
 
 //HPC
@@ -471,6 +473,28 @@ abstract public class AbstractBaseScopeView  extends ViewPart
     	return coolBar;
     }
     
+    /***
+     * generic method to create column scope tree
+     * Called by children to have uniform way to create a scope tree.
+     * 
+     * @param treeViewer
+     * @return
+     */
+    protected TreeViewerColumn createScopeColumn(TreeViewer treeViewer) {
+
+        //----------------- create the column tree
+        final TreeViewerColumn colTree = new TreeViewerColumn(treeViewer,SWT.LEFT, 0);
+        colTree.getColumn().setText("Scope");
+        colTree.setLabelProvider( getLabelProvider() ); 
+        
+        Tree tree = treeViewer.getTree();
+        TreeColumnLayout treeLayout = (TreeColumnLayout) tree.getParent().getLayout();
+    			
+		treeLayout.setColumnData(colTree.getColumn(), new ColumnWeightData(20, 
+				ScopeTreeViewer.COLUMN_DEFAULT_WIDTH, true));
+
+		return colTree;
+    }
 
     /*
      * (non-Javadoc)

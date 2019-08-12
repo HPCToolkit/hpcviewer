@@ -107,8 +107,8 @@ class ThreadViewFactory
 				}
 				if (view != null) {
 					if (threads != null) {
-						((ThreadView)view).setInput(db, rootScope);
-						((ThreadView)view).addTableColumns(threads);
+						((ThreadView)view).setInput(db, rootScope, threads);
+
 						page.activate(view);
 						return view;
 					}

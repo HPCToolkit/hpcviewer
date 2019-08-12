@@ -24,7 +24,7 @@ public class ScopeSelectionAdapter extends SelectionAdapter
 	final static public int SORT_DESCENDING = 1;  // from high value to lower value
 	final static public int SORT_ASCENDING  = -1; // from low value to higher value
 
-    ScopeSelectionAdapter(ScopeTreeViewer viewer, TreeViewerColumn column) {
+    public ScopeSelectionAdapter(ScopeTreeViewer viewer, TreeViewerColumn column) {
 		this.viewer 	= viewer;
 		this.column     = column;
 	}

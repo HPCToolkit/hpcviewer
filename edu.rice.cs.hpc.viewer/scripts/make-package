@@ -14,6 +14,9 @@ release=`date -Idate`
 
 if [ $# -eq 1 ]; then
   viewer=$1
+elif [ $# -eq 2 ]; then
+  viewer=$1
+  release=$2 
 else
   echo "Syntax: $0 viewer_name release"
   echo "viewer_name is either 'hpcviewer' or 'hpctraceviewer'"
@@ -68,7 +71,7 @@ for i in *; do echo $i
      bash make-dist ../$viewer >/tmp/out
      mv $viewer.tar.gz ../../$viewer-$i-$release.tgz
      cd ../../ 
-     ls -l $viewer-$i.tgz
+     ls -l $viewer-$i-*
   else
      echo "Plugin does not exist: $f"
      exit

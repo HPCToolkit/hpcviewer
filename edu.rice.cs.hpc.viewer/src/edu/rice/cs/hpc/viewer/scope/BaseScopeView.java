@@ -2,10 +2,7 @@ package edu.rice.cs.hpc.viewer.scope;
 
 import java.util.Map;
 
-import org.eclipse.jface.layout.TreeColumnLayout;
-import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.TreeViewerColumn;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.ISourceProvider;
@@ -274,14 +271,7 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
     	}
 
         //----------------- create the column tree
-        final TreeViewerColumn colTree = new TreeViewerColumn(treeViewer,SWT.LEFT, 0);
-        colTree.getColumn().setText("Scope");
-        colTree.setLabelProvider( getLabelProvider() ); 
-        
-        TreeColumnLayout treeLayout = (TreeColumnLayout) tree.getParent().getLayout();
-    			
-		treeLayout.setColumnData(colTree.getColumn(), new ColumnWeightData(20, 
-				ScopeTreeViewer.COLUMN_DEFAULT_WIDTH, true));
+        final TreeViewerColumn colTree = createScopeColumn(treeViewer);
         
 		ScopeSelectionAdapter selectionAdapter = new ScopeSelectionAdapter(treeViewer, colTree);
 		colTree.getColumn().addSelectionListener(selectionAdapter);
