@@ -27,7 +27,7 @@ import edu.rice.cs.hpc.viewer.resources.Icons;
 import edu.rice.cs.hpc.viewer.scope.ScopeViewActions;
 import edu.rice.cs.hpc.viewer.scope.ScopeViewActionsGUI;
 import edu.rice.cs.hpc.viewer.scope.thread.ThreadEditorMenu;
-import edu.rice.cs.hpc.viewer.scope.thread.ThreadView;
+import edu.rice.cs.hpc.viewer.scope.thread.ThreadViewFactory;
 
 /*****************************************************
  * 
@@ -117,7 +117,7 @@ public class CallingContextActionsGUI extends ScopeViewActionsGUI
 			public void widgetSelected(SelectionEvent e) {
 				
 				final RootScope rootScope = objViewActions.getRootScope();;
-				ThreadView.showView(objWindow, rootScope, null);
+				ThreadViewFactory.build(objWindow, rootScope, null);
 			}
 			
 			@Override

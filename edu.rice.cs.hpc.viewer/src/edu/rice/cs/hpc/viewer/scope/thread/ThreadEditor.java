@@ -143,7 +143,7 @@ public class ThreadEditor extends EditorPart implements IViewerEditor
 						// display the view
 						final Experiment experiment = getExperiment();
 						final RootScope rootScope   = experiment.getRootScope(RootScopeType.CallingContextTree);
-						ThreadView.showView(window, rootScope, threads);
+						ThreadViewFactory.build(window, rootScope, threads);
 					}
 				});
 				final Menu menu = menuManager.getMenu();

@@ -10,7 +10,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.Event;
@@ -49,18 +48,6 @@ public class ThreadView extends AbstractBaseScopeView
 	
 	private ThreadContentProvider contentProvider = null;
 	
-	/************
-	 * Activate the thread view
-	 * 
-	 * @param window : current active window
-	 * @param experiment : current experiment
-	 * @param threads : a list of thread indexes to be viewed
-	 ************/
-	static public void showView(IWorkbenchWindow window, 
-			RootScope rootScope, List<Integer> threads)
-	{
-		ThreadViewFactory.build(window, rootScope, threads);
-	}
 
 	@Override
 	public void setInput(Database db, RootScope scope, boolean keepColumnStatus)
@@ -75,19 +62,18 @@ public class ThreadView extends AbstractBaseScopeView
 	 */
 	public void setInput(Database db, RootScope scope, List<Integer> threads)
 	{
-		if (database == db || myRootScope == scope)
-			return;
-		
-    	database = db;
-    	myRootScope = scope;// try to get the aggregate value
+		if (database != db && myRootScope != scope) {
+	    	database = db;
+	    	myRootScope = scope;// try to get the aggregate value
 
-        // tell the action class that we have built the tree
-        objViewActions.setTreeViewer(treeViewer);
-        
-		IMetricManager mm = getMetricManager();
+	        // tell the action class that we have built the tree
+	        objViewActions.setTreeViewer(treeViewer);
+	        
+			IMetricManager mm = getMetricManager();
 
-        ((ThreadScopeViewAction)objViewActions).setMetricManager(mm);
-        
+	        ((ThreadScopeViewAction)objViewActions).setMetricManager(mm);			
+		}
+		        
     	/*****
     	 * add new columns of metrics for a given list of threads<br/>
     	 * If the threads already displayed in the table, we do nothing.
@@ -95,7 +81,7 @@ public class ThreadView extends AbstractBaseScopeView
     	 * 
     	 */
 
-		BaseMetric []metrics = mm.getMetrics();
+		BaseMetric []metrics = getMetricManager().getMetrics();
 		
 		// 1. check if the threads already exist in the view
 		boolean col_exist = false;
@@ -223,11 +209,13 @@ public class ThreadView extends AbstractBaseScopeView
 			IThreadDataCollection threadData = database.getThreadDataCollection();
 			String[] labels;
 			
-	        TreeViewerColumn colTree = createScopeColumn(treeViewer);
-	        colTree.getColumn().setWidth(ScopeTreeViewer.COLUMN_DEFAULT_WIDTH);
-	        
-			ScopeSelectionAdapter selectionAdapter = new ScopeSelectionAdapter(treeViewer, colTree);
-			colTree.getColumn().addSelectionListener(selectionAdapter);
+			if (treeViewer.getTree().getColumnCount() == 0) {
+		        TreeViewerColumn colTree = createScopeColumn(treeViewer);
+		        colTree.getColumn().setWidth(ScopeTreeViewer.COLUMN_DEFAULT_WIDTH);
+		        
+				ScopeSelectionAdapter selectionAdapter = new ScopeSelectionAdapter(treeViewer, colTree);
+				colTree.getColumn().addSelectionListener(selectionAdapter);
+			}
 
 			try {
 				labels = threadData.getRankStringLabels();

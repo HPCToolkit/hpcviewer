@@ -29,6 +29,7 @@ import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.experiment.scope.Scope;
 import edu.rice.cs.hpc.viewer.editor.IViewerEditor;
 import edu.rice.cs.hpc.viewer.scope.thread.ThreadView;
+import edu.rice.cs.hpc.viewer.scope.thread.ThreadViewFactory;
 import edu.rice.cs.hpc.viewer.util.WindowTitle;
 import edu.rice.cs.hpc.viewer.window.Database;
 
@@ -159,7 +160,7 @@ public abstract class GraphEditorBase extends EditorPart implements IViewerEdito
 							} else {
 								root = scope.getRootScope();
 							}
-							ThreadView.showView(window, root, list);
+							ThreadViewFactory.build(window, root, list);
 						}
 					});
 	            	final Menu menu = menuManager.getMenu();

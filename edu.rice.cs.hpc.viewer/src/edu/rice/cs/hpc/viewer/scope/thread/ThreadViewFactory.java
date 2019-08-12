@@ -36,7 +36,7 @@ import edu.rice.cs.hpc.viewer.window.ViewerWindowManager;
  *  <li>if the thread is null, it prompts a dialog box to ask the list of threads to display
  * </ul>
  *****************************************************************************/
-class ThreadViewFactory 
+public class ThreadViewFactory 
 {
 	/****
 	 * Build or activate a thread view. <br>
