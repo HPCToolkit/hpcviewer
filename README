@@ -63,9 +63,17 @@ More information can be found at
 
 Download required software:
 
+For Mac OS:
     * Eclipse 4.6.x (Neon) version or newer
           o Eclipse for RCP and RAP Developers
     * Java JDK (ver 1.8 or above). OpenJDK, Oracle or IBM (IceTea) JDK is recommended
+    * Technically, this version of Eclipse works also on Linux and Windows but with 
+      some bugs on TWM window manager and some performance bugs.
+
+For Linux and Windows platforms:
+    * Eclipse 3.7.x (Indigo) 
+          o Eclipse for RCP and RAP Developers
+    * Java JDK (ver 1.7). Oracle or IBM (IceTea) JDK is recommended
 
 
 Check out the source code
@@ -76,7 +84,9 @@ Check out the source code
 
         https://github.com/HPCToolkit/hpcviewer.git
 
-    * Select master branch 
+    * Select master branch
+          o For Eclipse 3.7.x: select indigo branch
+         
     * Import existing Eclipse projects
     * Make sure all these projects are selected: 
 
@@ -106,8 +116,11 @@ Check out the external libraries
     
 Now, change the perspective into Plug-in or Java perspective to see the source code and launch the application.
 
-Note: there will be many Java warnings, but no error messages. Some test projects (like test.swtchart) may cause 
-error messages on certain platform. If this is the case, it's safe to close the project.
+Note:
+    * there will be many Java warnings, but no error messages. Some test projects (like test.swtchart) may cause 
+      error messages on certain platform. If this is the case, it's safe to close the project.
+    * If you are on Windows or Linux platforms, it's highly suggested to use Eclipse 3.7.x instead of Eclipse 4.x due
+      to performance bugs in Eclipse compatibility layer in Eclipse 4.x.  
 
 
 Testing hpcviewer
@@ -117,6 +130,7 @@ Under edu.rice.cs.hpc.viewer project, launching the application from Eclipse can
 
     * product configurations (recommeded):
           o Under edu.rice.cs.hpc.viewer project:
+	  	- for Eclipse Indigo: open hpcviewer.indigo.product file
 	  	- for Eclipse Neon:   open hpcviewer.plugin.product file
 	  	- for Eclipse Photon: open hpcviewer.photon.product file
 	  	- for Eclipse 2018:   open hpcviewer.simrel.product file
