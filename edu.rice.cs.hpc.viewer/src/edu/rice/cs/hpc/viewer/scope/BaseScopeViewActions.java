@@ -3,9 +3,6 @@
  */
 package edu.rice.cs.hpc.viewer.scope;
 
-import org.eclipse.jface.layout.TreeColumnLayout;
-import org.eclipse.jface.viewers.ColumnPixelData;
-import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.Shell;
@@ -68,36 +65,18 @@ public class BaseScopeViewActions extends ScopeViewActions {
 			return;
 		
 		treeViewer.getTree().setRedraw(false);
-		TreeViewerColumn colDerived = treeViewer.addTreeColumn(objMetric,  false);
 		
-		// update the viewer, to refresh its content and invoke the provider
-		// bug SWT https://bugs.eclipse.org/bugs/show_bug.cgi?id=199811
-		// we need to hold the UI to draw until all the data is available
-		// 2012.09.21: do not refresh. It crashes on linux/gtk/ppc
-		//objTreeViewer.refresh();	// we refresh to update the data model of the table
-		
-		// notify the GUI that we have added a new column
-    	int width 			    = (int) colDerived.getColumn().getData(ScopeTreeViewer.COLUMN_DATA_WIDTH);
+		treeViewer.addTreeColumn(objMetric,  false);
     	
-    	colDerived.getColumn().setWidth(width);
-    	
-    	ColumnPixelData colData = new ColumnPixelData(width, true);
-    	TreeColumnLayout layout = (TreeColumnLayout) treeViewer.getTree().getParent().getLayout();
-    	
-    	layout.setColumnData(colDerived.getColumn(), colData);
-		
     	objActionsGUI.restoreParentNode();
     	
-		//this.objActionsGUI.addMetricColumns(colDerived); 
     	treeViewer.getTree().setRedraw(true);
 		
     	// adjust the column width 
-    	treeViewer.getTree().pack();
+    	// treeViewer.getTree().pack();
 		
 		// instead of refresh, we use update which will reset the input and
 		//	reinitialize the table. It isn't elegant, but works in all platforms
 		view.updateDisplay();
 	}
-	
-
 }

@@ -69,7 +69,8 @@ import edu.rice.cs.hpc.viewer.window.Database;
  */
 abstract public class AbstractBaseScopeView  extends ViewPart 
 {	
-	final int TREE_COLUMN_WIDTH = 200;
+	final int TREE_COLUMN_WIDTH  = 200;
+	final int TREE_COLUMN_WEIGHT = 40; 
 	
 	protected ScopeTreeViewer 	 treeViewer;		// tree for the caller and callees
 	protected Database 			 database;			// experiment data	
@@ -494,8 +495,8 @@ abstract public class AbstractBaseScopeView  extends ViewPart
         Tree tree = treeViewer.getTree();
         TreeColumnLayout treeLayout = (TreeColumnLayout) tree.getParent().getLayout();
     			
-		treeLayout.setColumnData(colTree.getColumn(), new ColumnWeightData(20, 
-				TREE_COLUMN_WIDTH, true));
+		treeLayout.setColumnData(colTree.getColumn(), 
+						new ColumnWeightData(TREE_COLUMN_WIDTH, TREE_COLUMN_WIDTH, true));
 
 		return colTree;
     }

@@ -555,7 +555,7 @@ public abstract class ScopeViewActions /*extends ScopeActions /* implements IToo
      */
     public abstract void checkStates ( Scope nodeSelected );
     
-    abstract public void addMetricColumn(AbstractBaseScopeView view, DerivedMetric objMetric);
+    public abstract void addMetricColumn(AbstractBaseScopeView view, DerivedMetric objMetric);
     
     protected abstract void registerAction( IActionType type );
         

@@ -13,7 +13,6 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.*;
-import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -31,13 +30,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Layout;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.scope.Scope;
-import edu.rice.cs.hpc.data.util.OSValidator;
 import edu.rice.cs.hpc.viewer.metric.MetricColumnDialog;
 import edu.rice.cs.hpc.viewer.provider.TableMetricState;
 import edu.rice.cs.hpc.viewer.resources.Icons;
@@ -335,9 +332,6 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 		
 		assert columns.length > status.length;
 
-		Layout layout = treeViewer.getTree().getParent().getLayout();
-		TreeColumnLayout treeLayout = (TreeColumnLayout) layout;
-		
 		treeViewer.getTree().setRedraw(false);
 
 		int i=0; // index for status
@@ -368,10 +362,7 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 				// the layout will not take affect until users move or resize columns in the table
 				// eclipse bug: forcing to refresh the table has no effect either
 				
-				if (!OSValidator.isUnix())
-					column.setWidth(iWidth);
-				
-	   			treeLayout.setColumnData(column, new ColumnPixelData(iWidth));
+				column.setWidth(iWidth);
 
 				i++;
 			}
