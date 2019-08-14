@@ -337,9 +337,11 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 
 		Layout layout = treeViewer.getTree().getParent().getLayout();
 		TreeColumnLayout treeLayout = (TreeColumnLayout) layout;
+		
+		treeViewer.getTree().setRedraw(false);
 
 		int i=0; // index for status
-		treeViewer.getTree().setRedraw(false);
+
 		for (TreeColumn column : columns) {
 			if (column.getData() != null) {
 				int iWidth = 0;
@@ -362,14 +364,14 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 			   			column.setData(ScopeTreeViewer.COLUMN_DATA_WIDTH, objWidth);
 					}
 				}
+				// for other OS other than Linux, we need to set the width explicitly
+				// the layout will not take affect until users move or resize columns in the table
+				// eclipse bug: forcing to refresh the table has no effect either
+				
+				if (!OSValidator.isUnix())
+					column.setWidth(iWidth);
+				
 	   			treeLayout.setColumnData(column, new ColumnPixelData(iWidth));
-	   			// eclipse performance bug
-	   			// this code is very slow on windows 
-	   			// For OS other than Linux, it isn't important to set the width here,  
-	   			// since we already have setup the layout using data layout
-	   			
-	   			if (OSValidator.isUnix())
-	   				column.setWidth(iWidth);
 
 				i++;
 			}
