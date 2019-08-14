@@ -4,6 +4,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.ui.IWorkbenchWindow;
 
+import edu.rice.cs.hpc.data.experiment.metric.DerivedMetric;
 import edu.rice.cs.hpc.data.experiment.metric.IMetricManager;
 import edu.rice.cs.hpc.data.experiment.scope.Scope;
 import edu.rice.cs.hpc.viewer.scope.AbstractBaseScopeView;
@@ -12,12 +13,17 @@ import edu.rice.cs.hpc.viewer.scope.topdown.CallingContextActionsGUI;
 
 public class ThreadScopeViewAction extends BaseScopeViewActions 
 {
+	final private AbstractBaseScopeView view;
+	
 	private IMetricManager manager;
+	
 	
 	public ThreadScopeViewAction(AbstractBaseScopeView view, IWorkbenchWindow window,
 			Composite parent, CoolBar coolbar, IMetricManager metricManager) {
 		super(window.getShell(), window, parent, coolbar);
+		
 		this.manager = metricManager;
+		this.view    = view;
 	}
 
 	public void setMetricManager(IMetricManager manager)
@@ -43,5 +49,10 @@ public class ThreadScopeViewAction extends BaseScopeViewActions
 	@Override
 	protected IMetricManager getMetricManager() {
 		return manager;
+	}
+	
+	@Override
+	public void notifyNewDerivedMetrics(DerivedMetric objMetric) {
+		addMetricColumn(view, objMetric);
 	}
 }

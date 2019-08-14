@@ -8,7 +8,6 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
-import org.eclipse.ui.services.ISourceProviderService;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Composite;
@@ -22,7 +21,6 @@ import edu.rice.cs.hpc.data.experiment.scope.Scope;
 import edu.rice.cs.hpc.data.experiment.metric.*;
 import edu.rice.cs.hpc.viewer.framework.Activator;
 import edu.rice.cs.hpc.viewer.metric.*;
-import edu.rice.cs.hpc.viewer.provider.TableMetricState;
 import edu.rice.cs.hpc.viewer.util.PreferenceConstants;
 import edu.rice.cs.hpc.viewer.util.Utilities;
 
@@ -390,10 +388,7 @@ public abstract class ScopeViewActions /*extends ScopeActions /* implements IToo
 			
 			getMetricManager().addDerivedMetric(objMetric);
 			
-			final ISourceProviderService service = (ISourceProviderService) objWindow.getService(ISourceProviderService.class);
-			TableMetricState metricStateProvider = (TableMetricState) service.getSourceProvider(TableMetricState.METRIC_COLUMNS_VISIBLE);
-
-			metricStateProvider.notifyMetricAdd(myRootScope.getExperiment(), objMetric);
+			notifyNewDerivedMetrics(objMetric);
 		}
 	}
 
@@ -556,6 +551,8 @@ public abstract class ScopeViewActions /*extends ScopeActions /* implements IToo
     public abstract void checkStates ( Scope nodeSelected );
     
     public abstract void addMetricColumn(AbstractBaseScopeView view, DerivedMetric objMetric);
+    
+    public abstract void notifyNewDerivedMetrics(DerivedMetric objMetric);
     
     protected abstract void registerAction( IActionType type );
         
