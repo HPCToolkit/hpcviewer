@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="hpctraceviewer" id="edu.rice.cs.hpc.traceviewer.product" application="edu.rice.cs.hpc.traceviewer.application" version="2019.08" useFeatures="false" includeLaunchers="true">
+<product name="hpctraceviewer" id="edu.rice.cs.hpc.traceviewer.product" application="edu.rice.cs.hpc.traceviewer.application" version="2019.09" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="icons/hpctraceviewer048.png"/>
@@ -10,7 +10,7 @@
 Development of  HPCToolkit is principally funded by the Department of Energy&apos;s Office of Science, 
 Lawrence Livermore National Laboratory and National Science Foundation.
 
-Release 2019.08   (C) Copyright 2019, Rice University.
+Release 2019.09   (C) Copyright 2019, Rice University.
       </text>
    </aboutInfo>
 
@@ -18,12 +18,15 @@ Release 2019.08   (C) Copyright 2019, Rice University.
    </configIni>
 
    <launcherArgs>
-      <programArgs>-consolLog</programArgs>
+      <programArgs>-consolLog
+      </programArgs>
       <vmArgs>-Dosgi.locking=none
 -XX:MaxPermSize=256m 
 -Xms200m 
--Xmx2412m</vmArgs>
-      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+-Xmx2412m
+      </vmArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
+      </vmArgsMac>
    </launcherArgs>
 
    <windowImages i16="icons/hpctraceviewer016.png" i32="icons/hpctraceviewer032.png" i48="icons/hpctraceviewer048.png" i128="icons/hpctraceviewer128.png"/>
