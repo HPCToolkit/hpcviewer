@@ -7,11 +7,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.metric.DerivedMetric;
 import edu.rice.cs.hpc.data.experiment.metric.IMetricManager;
 import edu.rice.cs.hpc.data.experiment.scope.Scope;
+import edu.rice.cs.hpc.viewer.provider.TableMetricState;
 
 /**
  * 
@@ -78,5 +80,14 @@ public class BaseScopeViewActions extends ScopeViewActions {
 		// instead of refresh, we use update which will reset the input and
 		//	reinitialize the table. It isn't elegant, but works in all platforms
 		view.updateDisplay();
+	}
+
+	@Override
+	public void notifyNewDerivedMetrics(DerivedMetric objMetric) {
+		
+		final ISourceProviderService service = (ISourceProviderService) objWindow.getService(ISourceProviderService.class);
+		TableMetricState metricStateProvider = (TableMetricState) service.getSourceProvider(TableMetricState.METRIC_COLUMNS_VISIBLE);
+
+		metricStateProvider.notifyMetricAdd(myRootScope.getExperiment(), objMetric);		
 	}
 }
