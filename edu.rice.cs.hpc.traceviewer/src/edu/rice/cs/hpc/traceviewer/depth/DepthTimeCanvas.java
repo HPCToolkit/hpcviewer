@@ -215,16 +215,14 @@ public class DepthTimeCanvas extends AbstractTimeCanvas
 				final int viewWidth  = rb.width;
 				final int viewHeight = rb.height;
 
-				if (viewWidth>0 && viewHeight>0) {
-					initBuffer();
-
-					//paints the current screen
-					final Image imageBuffer = new Image(getDisplay(), viewWidth, viewHeight);
-					setBuffer(imageBuffer);
-				} else {
-					// empty canvas to view
+				if (viewWidth <= 0 && viewHeight<= 0) {
 					return;
 				}
+				//paints the current screen
+
+				final Image imageBuffer = new Image(getDisplay(), viewWidth, viewHeight);
+				setBuffer(imageBuffer);
+
 				final GC bufferGC = new GC(getBuffer());
 				bufferGC.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 				bufferGC.fillRectangle(0,0,viewWidth,viewHeight);
@@ -233,7 +231,8 @@ public class DepthTimeCanvas extends AbstractTimeCanvas
 				
 				Debugger.printDebug(1, "DTC rebuffering " + attributes);
 				
-				BaseViewPaint depthPaint = new DepthViewPaint(Util.getActiveWindow(), bufferGC, 
+				BaseViewPaint depthPaint = new DepthViewPaint(Util.getActiveWindow(), 
+						bufferGC, 
 						stData, attributes, true, DepthTimeCanvas.this, threadExecutor);
 				
 				depthPaint.addJobChangeListener(new DepthJobListener());

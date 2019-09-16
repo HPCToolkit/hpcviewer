@@ -80,15 +80,13 @@ public abstract class BufferedCanvas extends Canvas
 	 */
 	protected void initBuffer() 
 	{
-		if (imageBuffer != null && !imageBuffer.isDisposed())  
-		{
-			imageBuffer.dispose();
-		}
-		imageBuffer = null;
 	}
 	
 	protected void setBuffer(Image buffer)
 	{
+		if (imageBuffer != null && !imageBuffer.isDisposed()) {
+			imageBuffer.dispose();
+		}
 		this.imageBuffer = buffer;
 	}
 	
