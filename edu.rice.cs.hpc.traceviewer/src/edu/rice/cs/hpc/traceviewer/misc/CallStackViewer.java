@@ -200,7 +200,16 @@ public class CallStackViewer extends TableViewer
 
 		ProcessTimeline ptl = ptlService.getProcessTimeline(estimatedProcess);
 		if (ptl != null) {
-			int sample = ptl.findMidpointBefore(position.time, stData.isEnableMidpoint());
+			int sample = 0;
+			
+			try {
+				sample = ptl.findMidpointBefore(position.time, stData.isEnableMidpoint());				
+			} catch (Exception e) {
+				// Error: data has changed (resize, zoom-in/out, ...) but we are not notified yet.
+				// let the new thread finish the job
+				Debugger.printTimestampDebug("CSV: Fail to get sample for time " + position.time);
+				return;
+			}
 			final Vector<String> sampleVector;
 			if (sample>=0) {
 				final CallPath cp = ptl.getCallPath(sample, depth);

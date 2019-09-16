@@ -26,11 +26,12 @@ public class TraceDataByRank implements ITraceDataCollector
 										+ Constants.SIZEOF_INT; // call path id
 	
 	//These must be initialized in local mode. They should be considered final unless the data is remote.
-	private AbstractBaseData data;
-	private int numPixelH;
-	int rank;
+	private AbstractBaseData   data;
+	private Vector<DataRecord> listcpid;
 	
-	protected Vector<DataRecord> listcpid;
+	private int numPixelH;
+	private int rank;
+	
 	
 	/***
 	 * Create a new instance of trace data for a given rank of process or thread 
@@ -185,7 +186,7 @@ public class TraceDataByRank implements ITraceDataCollector
 	 * @param time: the requested time
 	 * @return the index of the sample if the time is within the range, -1 otherwise 
 	 * */
-	public int findClosestSample(long time, boolean usingMidpoint)
+	public int findClosestSample(long time, boolean usingMidpoint) throws Exception
 	{
 		if (listcpid.size()==0)
 			return 0;

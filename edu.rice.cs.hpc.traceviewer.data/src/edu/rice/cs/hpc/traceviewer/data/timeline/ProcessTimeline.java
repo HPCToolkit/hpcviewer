@@ -152,7 +152,7 @@ public class ProcessTimeline {
 	 * @param time : the requested time
 	 * @return the index of the sample if the time is within the range, -1  otherwise
 	 * */
-	public int findMidpointBefore(long time, boolean usingMidpoint)
+	public int findMidpointBefore(long time, boolean usingMidpoint)  throws Exception
 	{
 		return data.findClosestSample(time, usingMidpoint);
 	}
