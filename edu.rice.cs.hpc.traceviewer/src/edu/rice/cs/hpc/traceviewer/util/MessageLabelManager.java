@@ -111,11 +111,20 @@ public class MessageLabelManager
 					if (messageLabel == null || messageLabel.isDisposed()) {
 						return;
 					}
-					messageLabel.setText("");
-					
-					if (colorBackground != null)
-						// if color background is null we are doom
-						messageLabel.setBackground(colorBackground);
+					// possible data race:
+					//
+					// When there is a message and suddenly the application exits,
+					// this thread may still exist and try to access disposed messageLabel
+					// 
+					try {
+						messageLabel.setText("");
+						
+						if (colorBackground != null)
+							// if color background is null we are doom
+							messageLabel.setBackground(colorBackground);
+					} catch (Exception e) {
+						System.err.println(e.getMessage());
+					}
 				}
 				
 			});
