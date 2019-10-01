@@ -173,14 +173,6 @@
                mnemonic="V"
                tooltip="View menu">
             <command
-                  commandId="edu.rice.cs.hpc.traceviewer.showRecords"
-                  id="edu.rice.cs.hpc.traceviewer.showRecords"
-                  label="Show debug info "
-                  mnemonic="S"
-                  style="toggle"
-                  tooltip="Show the number of trace records displayed in the trace view (useful for identifying blocking operations and debugging)">
-            </command>
-            <command
                   commandId="edu.rice.cs.hpc.traceviewer.actions.OptionMidpoint"
                   id="edu.rice.cs.hpc.traceviewer.actions.OptionMidpoint"
                   label="Using midpoint painting"
@@ -222,6 +214,19 @@
                   </with>
                </visibleWhen>
             </command>
+            <menu
+                  label="Debug"
+                  mnemonic="&amp;D"
+                  tooltip="Debugging information (only for expert users or tool developers)">
+               <command
+                     commandId="edu.rice.cs.hpc.traceviewer.showRecords"
+                     id="edu.rice.cs.hpc.traceviewer.showRecords"
+                     label="Show debug info "
+                     mnemonic="S"
+                     style="toggle"
+                     tooltip="Show the number of trace records displayed in the trace view (useful for identifying blocking operations and debugging)">
+               </command>
+            </menu>
          </menu>
          <menu
                id="edu.rice.cs.hpc.traceviewer.menu.window"

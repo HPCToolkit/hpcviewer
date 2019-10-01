@@ -3,8 +3,6 @@ package edu.rice.cs.hpc.traceviewer.data.db;
 import org.eclipse.swt.graphics.Color;
 
 import edu.rice.cs.hpc.traceviewer.data.graph.CallPath;
-import edu.rice.cs.hpc.traceviewer.data.graph.ColorTable;
-import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimeline;
 
 /***********************************************************************
  * 
@@ -17,13 +15,7 @@ import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimeline;
  ***********************************************************************/
 public abstract class DataPreparation
 {
-	final protected ProcessTimeline ptl;
-	final protected int depth;
-	final protected int height;
-	final protected double pixelLength;
-	final protected ColorTable colorTable;
-	final private long begTime;
-	final private boolean usingMidpoint;
+	final protected DataLinePainting data;
 		
 	/****
 	 * Abstract class constructor to paint a line (whether it's detail view or depth view) 
@@ -37,16 +29,9 @@ public abstract class DataPreparation
 	 * @param _pixelLength : the length (in pixel)
 	 * @param usingMidpoint : flag whether we should use midpoint or not
 	 */
-	public DataPreparation(ColorTable _colorTable, ProcessTimeline _ptl, 
-			long _begTime, int _depth, int _height, double _pixelLength, boolean _usingMidpoint)
+	public DataPreparation(DataLinePainting data)
 	{
-		this.ptl = _ptl;
-		this.depth = _depth;
-		this.height = _height;
-		this.pixelLength = _pixelLength;
-		this.colorTable = _colorTable;
-		this.begTime = _begTime;
-		this.usingMidpoint = _usingMidpoint;
+		this.data = data;
 	}
 	
 	/**Painting action
@@ -55,21 +40,21 @@ public abstract class DataPreparation
 	 * */
 	public int collect()
 	{
-		if (depth < 0) // eclipse Linux bug: it's possible to force the depth to be negative by typing a character on the table 
+		if (data.depth < 0) // eclipse Linux bug: it's possible to force the depth to be negative by typing a character on the table 
 			return 0;
 		
-		int succSampleMidpoint = (int) Math.max(0, (ptl.getTime(0)-begTime)/pixelLength);
+		int succSampleMidpoint = (int) Math.max(0, (data.ptl.getTime(0)-data.begTime)/data.pixelLength);
 
-		CallPath cp = ptl.getCallPath(0, depth);
+		CallPath cp = data.ptl.getCallPath(0, data.depth);
 		if (cp==null)
 			return 0;
 		
-		String succFunction = cp.getScopeAt(depth).getName(); 
-		Color succColor = colorTable.getColor(succFunction);
-		int last_ptl_index = ptl.size() - 1;
+		String succFunction = cp.getScopeAt(data.depth).getName(); 
+		Color succColor = data.colorTable.getColor(succFunction);
+		int last_ptl_index = data.ptl.size() - 1;
 		int num_invalid_cp = 0;
 
-		for (int index = 0; index < ptl.size(); index++)
+		for (int index = 0; index < data.ptl.size(); index++)
 		{
 			// in case of bad cpid, we just quit painting the view
 			if (cp==null)
@@ -90,11 +75,11 @@ public abstract class DataPreparation
 			
 			while (still_the_same && (++indexSucc <= last_ptl_index))
 			{
-				cp = ptl.getCallPath(indexSucc, depth);
+				cp = data.ptl.getCallPath(indexSucc, data.depth);
 				if(cp != null)
 				{
-					succFunction = cp.getScopeAt(depth).getName(); 
-					succColor = colorTable.getColor(succFunction);
+					succFunction = cp.getScopeAt(data.depth).getName(); 
+					succColor = data.colorTable.getColor(succFunction);
 					
 					// the color will be the same if and only if the two regions have the save function name
 					// regardless they are from different max depth and different call path.
@@ -125,8 +110,8 @@ public abstract class DataPreparation
 				//		in time line: p0 < p1 < p2
 				// a non-midpoint policy then should have a range of p0 to p2 with p0 color.
 				
-				double succ = usingMidpoint ? midpoint(ptl.getTime(end),ptl.getTime(end+1)) : ptl.getTime(end+1);
-				succSampleMidpoint = (int) Math.max(0, ((succ-begTime)/pixelLength));
+				double succ = data.usingMidpoint ? midpoint(data.ptl.getTime(end), data.ptl.getTime(end+1)) : data.ptl.getTime(end+1);
+				succSampleMidpoint = (int) Math.max(0, ((succ-data.begTime)/data.pixelLength));
 			}
 			else
 			{
@@ -136,7 +121,7 @@ public abstract class DataPreparation
 				// --------------------------------------------------------------------
 				// succSampleMidpoint = (int) Math.max(0, ((ptl.getTime(index+1)-begTime)/pixelLength)); 
 				// johnmc: replaced above because it doesn't seem correct
-				succSampleMidpoint = (int) Math.max(0, ((ptl.getTime(end)-begTime)/pixelLength)); 
+				succSampleMidpoint = (int) Math.max(0, ((data.ptl.getTime(end)-data.begTime)/data.pixelLength)); 
 			}
 			
 			finishLine(currSampleMidpoint, succSampleMidpoint, currDepth, currColor, end - index + 1);

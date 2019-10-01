@@ -6,11 +6,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
+import edu.rice.cs.hpc.traceviewer.data.db.DataLinePainting;
 import edu.rice.cs.hpc.traceviewer.data.db.DataPreparation;
 import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
 import edu.rice.cs.hpc.traceviewer.data.db.TimelineDataSet;
-import edu.rice.cs.hpc.traceviewer.data.graph.ColorTable;
-
 import edu.rice.cs.hpc.traceviewer.timeline.BaseTimelineThread;
 
 import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimeline;
@@ -60,12 +59,12 @@ public class TimelineDepthThread
 	}
 
 	@Override
-	protected DataPreparation getData(ColorTable colorTable,
-			ProcessTimeline timeline, long timeBegin, int linenum, int height,
-			double pixelLength, boolean midPoint) {
-
-		return new DepthDataPreparation(stData.getColorTable(), 
-				timeline, timeBegin,
-				linenum, height, pixelLength, midPoint);
+	protected DataPreparation getData( DataLinePainting data ) {
+		
+		// the current depth is the current line to be painted
+		
+		data.depth = data.ptl.line();
+		
+		return new DepthDataPreparation(data);
 	}	
 }

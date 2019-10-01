@@ -171,7 +171,17 @@ public abstract class BaseViewPaint extends Job
 		for (int threadNum = 0; threadNum < launch_threads; threadNum++) {
 			final BaseTimelineThread thread = getTimelineThread(canvas, xscale, yscale, queue, 
 					monitor);
-			ecs.submit(thread);
+			
+			try {
+				// when hpctraceviewer exits while a job is still running,
+				// there will be a sporadic of error messages.
+				// we should just warning the user instead of scaring them with
+				// error message and backtrace
+				
+				ecs.submit(thread);
+			} catch (Exception e) {
+				System.err.println("Warning. Fail to launch job: " + e.getMessage());
+			}
 		}
 		
 		// -------------------------------------------------------------------
