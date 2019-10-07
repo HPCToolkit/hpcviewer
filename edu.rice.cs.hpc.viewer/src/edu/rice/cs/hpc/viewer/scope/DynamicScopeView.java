@@ -61,17 +61,11 @@ implements IDynamicRootTree
 			if (experiment.getRootScope() != null) {
 				root = createTree(experiment);
 				
-				// temporary bug fix: to hide empty columns, we need the 3rd argument
-				// to be false so that setInput() method will check if a column has metric
-				// or not.
-				//  however, if a user hide or show columns BEFORE activating 
-				//  a dynamic view, it will ignore the user hide/show setting and
-				//  recompute which columns need to be shown/hidden.
-				// The reson of this mess is because dynamic view has no information
-				// about root's metrics (they are not computed yet, even the children
-				//  are not created yet).
+				// fix issue #51
+				// https://github.com/HPCToolkit/hpcviewer/issues/51
+				// set the 3rd argument to true to keep the existing column width
 				
-				setInput(database, root, false);
+				setInput(database, root, true);
 			}
 		} else {
 			// check whether the view has the new created tree.

@@ -13,7 +13,6 @@ import edu.rice.cs.hpc.common.ui.Util;
 import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
 import edu.rice.cs.hpc.data.experiment.metric.DerivedMetric;
-import edu.rice.cs.hpc.data.experiment.metric.MetricValue;
 import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.experiment.scope.RootScopeType;
 import edu.rice.cs.hpc.data.experiment.scope.visitors.FilterScopeVisitor;
@@ -233,17 +232,9 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         tree.setRedraw(false);
         
         if (!keepColumnStatus) {
-        	boolean root_has_children = myRootScope != null && myRootScope.hasChildren();
         	int i=0;
         	for(BaseMetric metric: myExperiment.getMetrics()) {
         		status[i] = metric.getDisplayed();
-        		        		
-        		// bug fix: for view initialization, we need to reset the status of hide/view
-                // a column is automatically hidden if it has no metrics even if 
-                //  its status in experiment.xml is to show
-        		if (status[i] && root_has_children) {
-        			status[i] = myRootScope.getMetricValue(metric) != MetricValue.NONE;
-        		}
         		i++;
         	}
         }
