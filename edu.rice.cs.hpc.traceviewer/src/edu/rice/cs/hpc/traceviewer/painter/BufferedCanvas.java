@@ -82,10 +82,21 @@ public abstract class BufferedCanvas extends Canvas
 	{
 	}
 	
+	/***
+	 * Set a new image buffer.
+	 * The old buffer will be destroyed automatically.
+	 * 
+	 * @param buffer
+	 */
 	protected void setBuffer(Image buffer)
 	{
 		if (imageBuffer != null && !imageBuffer.isDisposed()) {
-			imageBuffer.dispose();
+			try {
+				imageBuffer.dispose();
+			} catch (Exception e) {
+				System.err.println("Data race: disposing an already destroyed image.");
+				e.printStackTrace();
+			}
 		}
 		this.imageBuffer = buffer;
 	}

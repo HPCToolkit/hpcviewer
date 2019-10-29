@@ -681,7 +681,7 @@ public class BaseExperimentBuilder extends Builder {
 					return;
 					
 				} else {
-					throw new RuntimeException(cct_id + ": Procedure status invalid:" + statusProc);
+					throw new RuntimeException(cct_id + ": Procedure status invalid: " + statusProc);
 				}
 			}
 							

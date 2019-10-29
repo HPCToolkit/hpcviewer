@@ -26,11 +26,20 @@ public class MessageLabelManager
 		this.messageLabel   = messageLabel;
 		this.display 		= display;
 		
-		display.asyncExec(new Runnable() {
+		// not to use asynchronous Eclipse job
+		// we need to make sure the background color is initialized
+		// before we use it.
+		
+		display.syncExec(new Runnable() {
 
 			@Override
 			public void run() {
-				colorBackground     = display.getActiveShell().getBackground();	
+				// sometimes the application exits without cleaning up
+				// the message
+				// we need to be careful not to use disposed display
+				
+				if (display != null && !display.isDisposed())
+					colorBackground = display.getActiveShell().getBackground();	
 			}
 			
 		});
@@ -111,11 +120,20 @@ public class MessageLabelManager
 					if (messageLabel == null || messageLabel.isDisposed()) {
 						return;
 					}
-					messageLabel.setText("");
-					
-					if (colorBackground != null)
-						// if color background is null we are doom
-						messageLabel.setBackground(colorBackground);
+					// possible data race:
+					//
+					// When there is a message and suddenly the application exits,
+					// this thread may still exist and try to access disposed messageLabel
+					// 
+					try {
+						messageLabel.setText("");
+						
+						if (colorBackground != null)
+							// if color background is null we are doom
+							messageLabel.setBackground(colorBackground);
+					} catch (Exception e) {
+						System.err.println(e.getMessage());
+					}
 				}
 				
 			});

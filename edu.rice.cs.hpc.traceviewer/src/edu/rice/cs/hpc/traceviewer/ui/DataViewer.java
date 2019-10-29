@@ -150,7 +150,15 @@ public class DataViewer extends TableViewer
 		ProcessTimeline ptl = ptlService.getProcessTimeline(proc);
 
 		if (ptl != null) {
-			int sample = ptl.findMidpointBefore(position.time, stData.isEnableMidpoint());
+			int sample = 0;
+			
+			try {
+				ptl.findMidpointBefore(position.time, stData.isEnableMidpoint());
+			} catch (Exception e) {
+				// Error: data has changed (resize, zoom-in/out, ...) but we are not notified yet.
+				// let the new thread finish the job
+				return;
+			}
 			
 			Vector<String> dataVec = new Vector<String>();
 			if (sample >= 0) {

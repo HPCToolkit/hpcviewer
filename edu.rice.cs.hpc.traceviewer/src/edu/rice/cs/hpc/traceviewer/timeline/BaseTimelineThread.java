@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
+import edu.rice.cs.hpc.traceviewer.data.db.DataLinePainting;
 import edu.rice.cs.hpc.traceviewer.data.db.DataPreparation;
 import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
 import edu.rice.cs.hpc.traceviewer.data.db.TimelineDataSet;
@@ -68,6 +69,14 @@ public abstract class BaseTimelineThread implements Callable<Integer> {
 		final long timeBegin = attributes.getTimeBegin();
 		int num_invalid_samples = 0;
 		
+		DataLinePainting data = new DataLinePainting();
+		
+		data.colorTable    = stData.getColorTable();
+		data.usingMidpoint = usingMidpoint;
+		data.pixelLength   = pixelLength;
+		data.begTime       = timeBegin;
+		data.depth		   = stData.getAttributes().getDepth();
+		
 		while (trace != null)
 		{
 			// ---------------------------------
@@ -89,14 +98,14 @@ public abstract class BaseTimelineThread implements Callable<Integer> {
     			// ---------------------------------
     			// do the data preparation
     			// ---------------------------------
+				data.ptl    = trace;
+				data.height = imageHeight;
 
-				final DataPreparation data = getData(stData.getColorTable(),
-						trace, timeBegin, trace.line(),
-						imageHeight, pixelLength, usingMidpoint);
+				final DataPreparation dataTo = getData(data);
 				
-				num_invalid_samples += data.collect();
+				num_invalid_samples += dataTo.collect();
 				
-				final TimelineDataSet dataSet = data.getList();
+				final TimelineDataSet dataSet = dataTo.getList();
 				queue.add(dataSet);				
 			} else {
 				// empty trace, we need to notify the BasePaintThread class
@@ -133,7 +142,5 @@ public abstract class BaseTimelineThread implements Callable<Integer> {
 	
 	abstract protected void finalize();
 	
-	abstract protected DataPreparation getData(ColorTable colorTable, ProcessTimeline timeline,
-			long timeBegin, int linenum,
-			int height, double pixelLength, boolean midPoint);
+	abstract protected DataPreparation getData( DataLinePainting data);
 }

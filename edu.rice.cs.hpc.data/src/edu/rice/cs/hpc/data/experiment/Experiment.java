@@ -326,8 +326,13 @@ public class Experiment extends BaseExperimentWithMetrics
 
 		} else if (firstRootType.equals(RootScopeType.Flat)) {
 			addPercents(firstSubTree, (RootScope) firstSubTree);
-		} else {
-			// ignore; do no nothing
+		}
+		
+		// hide columns if the metric has no value
+		for(BaseMetric metric: metrics) {
+			if (metric.getValue(firstSubTree) == MetricValue.NONE) {
+				metric.setDisplayed(false);
+			}
 		}
 	}
 

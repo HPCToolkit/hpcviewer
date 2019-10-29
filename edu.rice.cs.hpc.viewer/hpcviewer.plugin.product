@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="hpcviewer" id="edu.rice.cs.hpc.viewer.product" application="edu.rice.cs.hpc.viewer.application" version="2019.09" useFeatures="false" includeLaunchers="true">
+<product name="hpcviewer" id="edu.rice.cs.hpc.viewer.product" application="edu.rice.cs.hpc.viewer.application" version="2019.10" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="icons/hpcviewerEclipseShadow128.png"/>
@@ -10,7 +10,7 @@
 
 hpcviewer is part of Rice University&apos;s HPCToolkit project. Development of HPCToolkit is principally funded by the Department of Energy&apos;s Office of Science, Lawrence Livermore National Laboratory and National Science Foundation.
 
-Release 2019.09  (C) Copyright 2019, Rice University.
+Release 2019.10  (C) Copyright 2019, Rice University.
       </text>
    </aboutInfo>
 

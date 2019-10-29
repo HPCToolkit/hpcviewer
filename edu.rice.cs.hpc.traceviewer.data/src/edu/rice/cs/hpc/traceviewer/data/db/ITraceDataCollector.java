@@ -5,7 +5,7 @@ import java.io.IOException;
 public interface ITraceDataCollector 
 {
 	public boolean isEmpty();
-	public int findClosestSample(long time, boolean usingMidpoint);
+	public int findClosestSample(long time, boolean usingMidpoint)  throws Exception;
 	public void readInData(int rank, long timeStart, long timeRange, double pixelLength) throws IOException;
 	public long getTime(int sample);
 	public int getCpid(int sample);
