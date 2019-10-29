@@ -13,6 +13,7 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.*;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -24,6 +25,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Control;
@@ -44,6 +46,7 @@ import edu.rice.cs.hpc.viewer.window.Database;
 import edu.rice.cs.hpc.viewer.window.ViewerWindow;
 import edu.rice.cs.hpc.viewer.window.ViewerWindowManager;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
+import edu.rice.cs.hpc.data.util.OSValidator;
 
 /**
  * General actions GUI for basic scope views like caller view and calling context view
@@ -325,12 +328,14 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
     	if (treeViewer.getTree().isDisposed())
     		return;
     	
-		TreeColumn []columns = treeViewer.getTree().getColumns();
+    	Tree tree = treeViewer.getTree();
+		TreeColumn []columns = tree.getColumns();
 		
 		// the number of table columns have to be bigger than the number of status
 		// since the table also contains tree scope column
 		
 		assert columns.length > status.length;
+        TreeColumnLayout treeLayout = (TreeColumnLayout) tree.getParent().getLayout();
 
 		treeViewer.getTree().setRedraw(false);
 
@@ -356,6 +361,9 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 			   			Integer objWidth = Integer.valueOf(currentWidth); 
 			   			// Laks: bug no 131: we need to have special key for storing the column width
 			   			column.setData(ScopeTreeViewer.COLUMN_DATA_WIDTH, objWidth);
+			   			
+			   			if (OSValidator.isUnix())
+			   				treeLayout.setColumnData(column, new ColumnPixelData(0, false));
 					}
 				}
 				// for other OS other than Linux, we need to set the width explicitly
