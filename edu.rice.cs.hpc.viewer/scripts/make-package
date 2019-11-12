@@ -92,6 +92,11 @@ zipper ()
       tar xzf $f
       z=`echo $f | sed -e "s/tgz/zip/g" `
       echo "new file: $z"
+      
+      # Windows and Mac platform doesn't need installation procedure
+      # remove anything related to bash script and install
+      
+      rm $viewer/install $viewer/hpcviewer.sh
       zip -r $z $viewer/*
       ls -l $z
       rm -rf $viewer $f
