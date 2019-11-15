@@ -9,6 +9,7 @@ import org.osgi.service.prefs.Preferences;
 
 import edu.rice.cs.hpc.common.util.UserInputHistory;
 import edu.rice.cs.hpc.viewer.util.AbstractFilterDialog;
+import edu.rice.cs.hpc.viewer.util.FilterDataItem;
 
 /*************************************************************
  * 
@@ -31,10 +32,10 @@ public class MetricColumnDialog extends AbstractFilterDialog
 	 * @param label : set of labels of the metrics
 	 * @param checked : set of boolean whether the metric is hidden/showed
 	 */
-	public MetricColumnDialog(Shell parentShell, String[] label, boolean[] checked) {
+	public MetricColumnDialog(Shell parentShell, FilterDataItem items[]) {
 		super(parentShell, "Column Selection", 
 				"Check columns to be shown and uncheck columns to be hidden", 
-				label, checked);
+				items);
 	}
 	
 	
@@ -90,5 +91,4 @@ public class MetricColumnDialog extends AbstractFilterDialog
 		pref.putBoolean(HISTORY_APPLY_ALL, value);
 		UserInputHistory.setPreference(pref);
 	}
-
 }

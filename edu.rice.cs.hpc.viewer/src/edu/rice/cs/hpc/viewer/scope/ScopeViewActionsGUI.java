@@ -39,11 +39,13 @@ import edu.rice.cs.hpc.viewer.metric.MetricColumnDialog;
 import edu.rice.cs.hpc.viewer.provider.TableMetricState;
 import edu.rice.cs.hpc.viewer.resources.Icons;
 import edu.rice.cs.hpc.data.experiment.scope.RootScope;
+import edu.rice.cs.hpc.viewer.util.FilterDataItem;
 import edu.rice.cs.hpc.viewer.util.Utilities;
 import edu.rice.cs.hpc.viewer.window.Database;
 import edu.rice.cs.hpc.viewer.window.ViewerWindow;
 import edu.rice.cs.hpc.viewer.window.ViewerWindowManager;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
+import edu.rice.cs.hpc.data.experiment.metric.DerivedMetric;
 
 /**
  * General actions GUI for basic scope views like caller view and calling context view
@@ -284,21 +286,68 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
      */
     protected void showColumnsProperties() {
 
-    	TreeColumn []column = treeViewer.getTree().getColumns();
-    	String []label = new String[column.length-1];
-    	boolean []checked = new boolean[column.length-1];
-    	
-    	for(int i=1; i<column.length; i++) {
-    		if (column[i].getData() != null) {
-    			checked[i-1] = column[i].getWidth()>1;
-    			label[i-1]	 = column[i].getText();
-    		}
-    	}
-    	MetricColumnDialog dialog = new MetricColumnDialog(shell, label, checked);
+    	TreeColumn []columns = treeViewer.getTree().getColumns();    	
+		BaseMetric []metrics = database.getExperiment().getMetrics();
+		ArrayList<FilterDataItem> listOfItems = new ArrayList<FilterDataItem>(metrics.length);
+		
+		for(BaseMetric metric: metrics) {
+			
+			FilterDataItem item = new FilterDataItem(metric.getDisplayName(), false, false);
+			
+			// looking for associated metric in the column
+			// a metric may not exit in table viewer because
+			// it has no metric value (empty metric)
+			
+			for(TreeColumn column: columns) {
+				Object data = column.getData();
+				
+				if (data != null) {
+					BaseMetric m = (BaseMetric) data;
+					if (m == metric) {
+						item.enabled = true;
+						item.checked = column.getWidth() > 1;
+						item.setData(column);
+						
+						break;
+					}
+				}
+			}
+			listOfItems.add(item);
+		}
+
+		// looking for derived metric columns
+		for (TreeColumn column: columns) {
+			if (column.getData() != null) {
+				Object o = column.getData();
+				
+				if (o instanceof DerivedMetric) {
+					FilterDataItem item = new FilterDataItem(column.getText(), false, true);
+					item.checked = column.getWidth() > 1;
+					item.setData(column);
+					
+					listOfItems.add(item);
+				}
+			}
+		}
+
+		FilterDataItem []arrayOfItems = new FilterDataItem[listOfItems.size()];
+		listOfItems.toArray(arrayOfItems);
+				
+    	MetricColumnDialog dialog = new MetricColumnDialog(shell, arrayOfItems);
     	dialog.enableAllViewOption(affectOtherViews);
     	if (dialog.open() == Dialog.OK) {
     		boolean isAppliedToAllViews = dialog.isAppliedToAllViews();
-    		checked = dialog.getResult();
+    		arrayOfItems = dialog.getResult();
+    		
+    		boolean []checked = new boolean[columns.length];
+    		int i=0;
+    		for (FilterDataItem item : arrayOfItems) {
+    			if (item.data != null) {
+    				checked[i] = item.checked;
+    				i++;
+    			}
+    		}
+    		
     		if (isAppliedToAllViews) {
     			
     			// send message to all registered views, that there is a change of column properties
