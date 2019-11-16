@@ -138,13 +138,16 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         if (myRootScope != null && myRootScope.getChildCount() > 0) {
             treeViewer.setInput(myRootScope);
             
-            this.objViewActions.updateContent(getExperiment(), myRootScope);
-
             // Try select the first scope
             /*TreeItem objItem = treeViewer.getTree().getItem(1);            
             treeViewer.getTree().showItem(objItem);
             this.treeViewer.getTree().setSelection(objItem);*/
-            
+    		
+            // Finalize the content of the table: 
+    		// - update the root scope of the actions
+    		// - insert the parent node (aggregate metric)
+    		objViewActions.finalizeContent(myRootScope);
+
             // reset the button
             this.objViewActions.checkNodeButtons();
             
@@ -173,13 +176,12 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
 		
 		if (treeViewer == null) return;
 		
+        objViewActions.updateContent(database.getExperiment(), myRootScope);
+		
     	Tree tree = treeViewer.getTree();
     	if (tree == null || tree.isDisposed()) return;
     	
 		addMetricColumnsToTable(tree, keepColumnStatus);
-		
-        // update the root scope of the actions !
-        this.objViewActions.updateContent(database.getExperiment(), myRootScope);
 	}
 
 	/***
@@ -241,17 +243,14 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         tree.setRedraw(false);
         
         if (!keepColumnStatus) {
-        	int i=0, j=0;
+        	int i=0;
         	
         	// empty metric: if the root scope has no metric value
         	// displayable: if the metric is to be displayed and not empty
         	for(BaseMetric metric: myExperiment.getMetrics()) {
         		
         		empty[i]  = myRootScope.getMetricValue(metric) == MetricValue.NONE;
-        		if (!empty[i]) {
-        			status[j] = metric.getDisplayed();
-        			j++;
-        		}
+    			status[i] = !empty[i] && metric.getDisplayed();
         		i++;
         	}
         }

@@ -45,7 +45,6 @@ import edu.rice.cs.hpc.viewer.window.Database;
 import edu.rice.cs.hpc.viewer.window.ViewerWindow;
 import edu.rice.cs.hpc.viewer.window.ViewerWindowManager;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
-import edu.rice.cs.hpc.data.experiment.metric.DerivedMetric;
 
 /**
  * General actions GUI for basic scope views like caller view and calling context view
@@ -146,13 +145,17 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 			return;
 		}
 		database = vWin.getDb(sFilename);
+	}
+	
+	
+	public void finalizeContent(RootScope root) {
 		
 		// actions needed when a new experiment is loaded
 		//this.resizeTableColumns();	// we assume the data has been populated
         this.enableActions();
         // since we have a new content of experiment, we need to display 
         // the aggregate metrics
-    	insertParentNode(scope);
+    	insertParentNode(root);
 	}
 	
     //======================================================
@@ -288,7 +291,8 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 
     	TreeColumn []columns = treeViewer.getTree().getColumns();    	
 		BaseMetric []metrics = database.getExperiment().getMetrics();
-		ArrayList<FilterDataItem> listOfItems = new ArrayList<FilterDataItem>(metrics.length);
+		FilterDataItem []arrayOfItems = new FilterDataItem[metrics.length];
+		int i= 0;
 		
 		for(BaseMetric metric: metrics) {
 			
@@ -312,26 +316,9 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 					}
 				}
 			}
-			listOfItems.add(item);
+			arrayOfItems[i]=item;
+			i++;
 		}
-
-		// looking for derived metric columns
-		for (TreeColumn column: columns) {
-			if (column.getData() != null) {
-				Object o = column.getData();
-				
-				if (o instanceof DerivedMetric) {
-					FilterDataItem item = new FilterDataItem(column.getText(), false, true);
-					item.checked = column.getWidth() > 1;
-					item.setData(column);
-					
-					listOfItems.add(item);
-				}
-			}
-		}
-
-		FilterDataItem []arrayOfItems = new FilterDataItem[listOfItems.size()];
-		listOfItems.toArray(arrayOfItems);
 				
     	MetricColumnDialog dialog = new MetricColumnDialog(shell, arrayOfItems);
     	dialog.enableAllViewOption(affectOtherViews);
@@ -339,13 +326,11 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
     		boolean isAppliedToAllViews = dialog.isAppliedToAllViews();
     		arrayOfItems = dialog.getResult();
     		
-    		boolean []checked = new boolean[columns.length];
-    		int i=0;
+    		boolean []checked = new boolean[arrayOfItems.length];
+    		i = 0;
     		for (FilterDataItem item : arrayOfItems) {
-    			if (item.data != null) {
-    				checked[i] = item.checked;
-    				i++;
-    			}
+				checked[i] = item.checked && item.enabled;
+				i++;
     		}
     		
     		if (isAppliedToAllViews) {
@@ -367,7 +352,7 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
     
     /**
      * Change the column status (hide/show) in this view only
-     * @param status : array of boolean column status.
+     * @param status : array of boolean column status based on metrics (not on column).
      * 	true means the column is shown, hidden otherwise.
      */
     public void setColumnsStatus(boolean []status) {
@@ -379,42 +364,65 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 		// the number of table columns have to be bigger than the number of status
 		// since the table also contains tree scope column
 		
-		assert columns.length > status.length;
-
+		assert status.length == database.getExperiment().getMetricCount();
+		
 		treeViewer.getTree().setRedraw(false);
 
-		int i=0; // index for status
-
-		for (TreeColumn column : columns) {
-			if (column.getData() != null) {
-				int iWidth = 0;
-				// it must be metric column
-				if (i<status.length && status[i]) {
-					// display column
-	       			// Laks: bug no 131: we need to have special key for storing the column width
-	        		Object o = column.getData(ScopeTreeViewer.COLUMN_DATA_WIDTH);
-	       			if((o != null) && (o instanceof Integer) ) {
-	       				iWidth = ((Integer)o).intValue();
-	       			} else {
-		        		iWidth = ScopeTreeViewer.COLUMN_DEFAULT_WIDTH;
-	       			}
-				} else {
-					// hide column					
-					int currentWidth = column.getWidth();
-					if(currentWidth > 0) {
-			   			Integer objWidth = Integer.valueOf(currentWidth); 
-			   			// Laks: bug no 131: we need to have special key for storing the column width
-			   			column.setData(ScopeTreeViewer.COLUMN_DATA_WIDTH, objWidth);
-					}
-				}
-				// for other OS other than Linux, we need to set the width explicitly
-				// the layout will not take affect until users move or resize columns in the table
-				// eclipse bug: forcing to refresh the table has no effect either
-				
-				column.setWidth(iWidth);
-
-				i++;
+		boolean []toShow = new boolean[columns.length];
+		int numColumn = 0;
+		
+		// list of metrics and list of columns are not the same
+		// columns only has "enabled" metrics (i.e. metrics that are not null)
+		// hence the number of column is always <= number of metrics
+		//
+		// here we try to correspond between metrics to show and the columns
+		
+		Experiment experiment = database.getExperiment();
+		for (TreeColumn column: columns) {
+			int i=0;
+			Object metric = column.getData();
+			if (metric == null || !(metric instanceof BaseMetric))
+				continue; // not a metric column
+			
+			for (i=0; i<experiment.getMetricCount() && 
+					  experiment.getMetric(i) != metric; i++);
+			
+			if (i<experiment.getMetricCount() && metric == experiment.getMetric(i)) {
+				toShow[numColumn] = status[i];
+				numColumn++;
 			}
+		}
+		
+		int i = 0;
+		for (TreeColumn column : columns) {
+			if (column.getData() == null) continue; // not a metric column 
+
+			int iWidth = 0;
+			if (toShow[i]) {
+				// display column
+       			// Laks: bug no 131: we need to have special key for storing the column width
+        		Object o = column.getData(ScopeTreeViewer.COLUMN_DATA_WIDTH);
+       			if((o != null) && (o instanceof Integer) ) {
+       				iWidth = ((Integer)o).intValue();
+       			} else {
+	        		iWidth = ScopeTreeViewer.COLUMN_DEFAULT_WIDTH;
+       			}
+			} else {
+				// hide column					
+				int currentWidth = column.getWidth();
+				if(currentWidth > 0) {
+		   			Integer objWidth = Integer.valueOf(currentWidth); 
+		   			// Laks: bug no 131: we need to have special key for storing the column width
+		   			column.setData(ScopeTreeViewer.COLUMN_DATA_WIDTH, objWidth);
+				}
+			}
+			// for other OS other than Linux, we need to set the width explicitly
+			// the layout will not take affect until users move or resize columns in the table
+			// eclipse bug: forcing to refresh the table has no effect either
+			
+			column.setWidth(iWidth);
+
+			i++;
 		}
 		treeViewer.getTree().setRedraw(true);
     }

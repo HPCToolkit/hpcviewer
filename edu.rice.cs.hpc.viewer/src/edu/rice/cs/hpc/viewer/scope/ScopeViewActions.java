@@ -88,6 +88,10 @@ public abstract class ScopeViewActions /*extends ScopeActions /* implements IToo
     	this.objActionsGUI.updateContent(exp, scope);
     }
 	
+	public void finalizeContent(RootScope root) {
+		objActionsGUI.finalizeContent(root);
+	}
+	
     /**
      * Update the content of tree viewer
      * @param tree

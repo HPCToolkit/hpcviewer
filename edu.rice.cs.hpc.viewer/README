@@ -1,0 +1,30 @@
+edu.rice.cs.hpc.viewer  (hpcviewer)
+======================
+
+hpcviewer supports multiple views:
+- top-down view
+- bottom-up view
+- flat view
+- data-centric view
+- thread view
+
+All the views are the descendant of AbstractBaseScopeView class.
+
+   ViewPart
+      |
+      |
+      V
+  AbstractBaseScopeView
+      |     |
+      |     +----> ThreadView
+      V
+  BaseScopeView
+      |  |  |
+      |  |  +-----> DataView  (data-centric view)
+      |  +--------> ScopeView (top-down view)
+      V
+  DynamicScopeView
+      |     |
+      |     +----> FlatScopeView (flat view)
+      V
+  CallerScopeView (bottom-up view)
