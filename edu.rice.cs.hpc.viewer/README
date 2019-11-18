@@ -28,3 +28,10 @@ All the views are the descendant of AbstractBaseScopeView class.
       |     +----> FlatScopeView (flat view)
       V
   CallerScopeView (bottom-up view)
+
+  ExperimentView is the first main control when a database is loaded:
+  - it reads the experiment.xml file
+  - it creates (or opens) views based on the information from the database: 
+    top-down, bottom-up, flat and datacentric views.
+   
+  

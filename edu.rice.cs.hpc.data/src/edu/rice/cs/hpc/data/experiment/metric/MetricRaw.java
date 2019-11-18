@@ -199,7 +199,8 @@ public class MetricRaw  extends BaseMetric
 			}
 			if (value == MetricValue.NONE && s instanceof RootScope 
 					&& metricType == MetricType.EXCLUSIVE) {
-				value = partner.getValue(s, threads);
+				if (partner != null)
+					value = partner.getValue(s, threads);
 			}
 		}
 		return value;
@@ -230,19 +231,6 @@ public class MetricRaw  extends BaseMetric
 	}
 	
 
-	/*****
-	 * compute the average value of a scope for certain threads.
-	 * The number of threads cannot be null.
-	 * @param s
-	 * @return
-	 * @throws IOException
-	 */
-	private MetricValue getAverageValue(IMetricScope s, List<Integer> threads) throws IOException
-	{
-		double value = getSumValue(s, threads).value / threads.size(); 
-		return setValue(value);
-	}
-	
 	/****
 	 * get the metric value of a give scope on a given thread
 	 * 

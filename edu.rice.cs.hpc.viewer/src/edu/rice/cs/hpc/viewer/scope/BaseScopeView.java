@@ -255,23 +255,21 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         	}
         }
         else if(iColCount>1) {
+        	
+        	TreeColumn []columns = tree.getColumns();
         	int i=0;
         	for(BaseMetric metric: myExperiment.getMetrics()) {
         		empty[i]  = myRootScope.getMetricValue(metric) == MetricValue.NONE;
-        		i++;
-        	}
-        	
-        	TreeColumn []columns = tree.getColumns();
-        	
-        	// this is Eclipse Indigo bug: when a column is disposed, the next column will have
-        	//	zero as its width. Somehow they didn't preserve the width of the columns.
-        	// Hence, we have to retrieve the information of column width before the dispose action
-        	for(i=1;i<iColCount;i++) {        		
-        		// bug fix: for callers view activation, we have to reserve the current status
-        		if (keepColumnStatus && i-1<status.length) {
-        			int width = columns[i].getWidth();
-        			status[i-1] = (width > 0);
+        		
+        		int j;
+        		for (j=1; j<columns.length && columns[j].getData() != metric; j++) ;
+        		
+        		if (j<columns.length && columns[j].getData() == metric) {
+        			status[i] = columns[j].getWidth() > 1;
+        		} else {
+        			status[i] = false;
         		}
+        		i++;
         	}
         }
     	TreeColumn []columns = tree.getColumns();

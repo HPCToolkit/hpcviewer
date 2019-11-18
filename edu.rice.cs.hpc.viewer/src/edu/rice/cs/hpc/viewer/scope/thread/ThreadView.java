@@ -19,6 +19,7 @@ import edu.rice.cs.hpc.data.experiment.extdata.IThreadDataCollection;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
 import edu.rice.cs.hpc.data.experiment.metric.IMetricManager;
 import edu.rice.cs.hpc.data.experiment.metric.MetricRaw;
+import edu.rice.cs.hpc.data.experiment.metric.MetricValue;
 import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.experiment.scope.RootScopeType;
 import edu.rice.cs.hpc.data.experiment.scope.Scope;
@@ -132,7 +133,8 @@ public class ThreadView extends AbstractBaseScopeView
 		if (myRootScope.getChildCount()>0) {
         	treeViewer.setInput(myRootScope);
         	
-        	objViewActions.updateContent(experiment, myRootScope);        	
+        	objViewActions.updateContent(experiment, myRootScope);
+        	objViewActions.finalizeContent(myRootScope);
         	objViewActions.checkNodeButtons();
         }
 	}
@@ -259,11 +261,16 @@ public class ThreadView extends AbstractBaseScopeView
 					mdup.setShortName(metricID);
 					listOfDuplicates.put(mr[j].getIndex(), mdup);
 					
+					MetricValue value = mdup.getValue(myRootScope);
+					if (value == MetricValue.NONE || value.getValue() == 0.0)
+						continue;
+					
 					treeViewer.addTreeColumn(mdup, sort);
 					
 					// sort initially the first column metric
 					sort = false;
 				}
+				
 				Iterator<Entry<Integer, BaseMetric>> iterator = listOfDuplicates.entrySet().iterator();
 				while(iterator.hasNext()) {
 					Entry<Integer, BaseMetric> entry = iterator.next();
@@ -312,7 +319,8 @@ public class ThreadView extends AbstractBaseScopeView
 			return metricManager;
 		
 		// create a new metric manager for this view
-		return new MetricRawManager(treeViewer);
+		metricManager = new MetricRawManager(treeViewer);
+		return metricManager;
 	}
 	
 	/************************************

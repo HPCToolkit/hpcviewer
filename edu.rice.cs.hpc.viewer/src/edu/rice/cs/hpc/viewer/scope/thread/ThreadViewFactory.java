@@ -117,7 +117,8 @@ public class ThreadViewFactory
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				MessageDialog.openError(window.getShell(), "Error", e.getMessage());
+				String msg = e.getMessage() == null ? e.getClass().getCanonicalName() : e.getMessage();
+				MessageDialog.openError(window.getShell(), "Error", msg);
 			}
 		}
 		return null;

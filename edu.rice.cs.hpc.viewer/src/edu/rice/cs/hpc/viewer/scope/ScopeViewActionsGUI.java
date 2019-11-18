@@ -45,6 +45,7 @@ import edu.rice.cs.hpc.viewer.window.Database;
 import edu.rice.cs.hpc.viewer.window.ViewerWindow;
 import edu.rice.cs.hpc.viewer.window.ViewerWindowManager;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
+import edu.rice.cs.hpc.data.experiment.metric.IMetricManager;
 
 /**
  * General actions GUI for basic scope views like caller view and calling context view
@@ -290,7 +291,7 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
     protected void showColumnsProperties() {
 
     	TreeColumn []columns = treeViewer.getTree().getColumns();    	
-		BaseMetric []metrics = database.getExperiment().getMetrics();
+		BaseMetric []metrics = objViewActions.getMetricManager().getMetrics();
 		FilterDataItem []arrayOfItems = new FilterDataItem[metrics.length];
 		int i= 0;
 		
@@ -353,20 +354,21 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
     /**
      * Change the column status (hide/show) in this view only
      * @param status : array of boolean column status based on metrics (not on column).
+     *  The number of items in status has to be the same as the number of metrics<br>
      * 	true means the column is shown, hidden otherwise.
      */
     public void setColumnsStatus(boolean []status) {
     	if (treeViewer.getTree().isDisposed())
     		return;
-    	
-		TreeColumn []columns = treeViewer.getTree().getColumns();
 		
 		// the number of table columns have to be bigger than the number of status
 		// since the table also contains tree scope column
 		
-		assert status.length == database.getExperiment().getMetricCount();
+		assert status.length == objViewActions.getMetricManager().getMetricCount();
 		
 		treeViewer.getTree().setRedraw(false);
+    	
+		TreeColumn []columns = treeViewer.getTree().getColumns();
 
 		boolean []toShow = new boolean[columns.length];
 		int numColumn = 0;
@@ -377,17 +379,20 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 		//
 		// here we try to correspond between metrics to show and the columns
 		
-		Experiment experiment = database.getExperiment();
+		IMetricManager metricMgr = objViewActions.getMetricManager();
+		BaseMetric []metrics = metricMgr.getMetrics();
+		int numMetrics = metrics.length;
+		
 		for (TreeColumn column: columns) {
-			int i=0;
+
 			Object metric = column.getData();
 			if (metric == null || !(metric instanceof BaseMetric))
 				continue; // not a metric column
 			
-			for (i=0; i<experiment.getMetricCount() && 
-					  experiment.getMetric(i) != metric; i++);
+			int i=0;			
+			for (i=0; i<numMetrics && metrics[i] != metric; i++);
 			
-			if (i<experiment.getMetricCount() && metric == experiment.getMetric(i)) {
+			if (i<numMetrics && metric == metrics[i]) {
 				toShow[numColumn] = status[i];
 				numColumn++;
 			}

@@ -329,7 +329,6 @@ abstract public class AbstractBaseScopeView  extends ViewPart
     	Composite objCompositeParent;
     	objCompositeParent = this.createToolBarArea(aParent);
     	this.objCoolbar = this.initToolbar(objCompositeParent);
-		this.objViewActions =  createActions(objCompositeParent, this.objCoolbar); //actions of the tree
 		
 		final Composite tableComposite = new Composite(aParent, SWT.NONE);
 		
@@ -337,7 +336,9 @@ abstract public class AbstractBaseScopeView  extends ViewPart
 		//  multi-selection for enabling copying into clipboard 
     	treeViewer = new ScopeTreeViewer(tableComposite,SWT.BORDER|SWT.FULL_SELECTION | SWT.VIRTUAL | SWT.MULTI);
 
-    	// ask the child class to create the content provider. 
+		this.objViewActions =  createActions(objCompositeParent, this.objCoolbar); //actions of the tree
+
+		// ask the child class to create the content provider. 
     	// each class may have different type of content provider.
     	treeViewer.setContentProvider(getScopeContentProvider());
     	
