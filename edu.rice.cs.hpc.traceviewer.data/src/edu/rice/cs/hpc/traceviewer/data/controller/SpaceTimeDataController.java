@@ -11,6 +11,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.services.ISourceProviderService;
 import org.eclipse.core.runtime.IProgressMonitor;
 import edu.rice.cs.hpc.common.util.ProcedureAliasMap;
+import edu.rice.cs.hpc.data.experiment.BaseExperiment;
 import edu.rice.cs.hpc.data.experiment.ExperimentWithoutMetrics;
 import edu.rice.cs.hpc.data.experiment.InvalExperimentException;
 import edu.rice.cs.hpc.data.experiment.extdata.IBaseData;
@@ -268,7 +269,9 @@ public abstract class SpaceTimeDataController
 		return attributes.numPixelsH;
 	}
 	
-	
+	public BaseExperiment getExperiment() {
+		return exp;
+	}
 
 	public ImageTraceAttributes getAttributes() {
 		return attributes;

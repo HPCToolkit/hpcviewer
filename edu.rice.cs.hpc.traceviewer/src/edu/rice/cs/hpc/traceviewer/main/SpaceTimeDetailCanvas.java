@@ -62,6 +62,9 @@ import edu.rice.cs.hpc.traceviewer.data.util.Debugger;
 public class SpaceTimeDetailCanvas extends AbstractTimeCanvas 
 	implements IOperationHistoryListener, ISpaceTimeCanvas
 {	
+	final double PER_MICRO_SECOND = 1000000.0;
+	final double PER_NANO_SECOND  = 1000000000.0;
+	
 	/**The SpaceTimeData corresponding to this canvas.*/
 	protected SpaceTimeDataController stData;
 
@@ -542,6 +545,22 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		restoreMessage.showWarning(message);
 	}
 	
+	/**************************************************************************
+	 * retrieve the unit time per second of the trace
+	 * The information is from experiment.xml
+	 * 
+	 * @return double unit time oer second
+	 **************************************************************************/
+	private double getUnitTimePerSecond() 
+	{
+		double unit_time = PER_NANO_SECOND;
+		
+		if (stData.getExperiment().getMajorVersion() == 2 &&
+			stData.getExperiment().getMinorVersion() < 2) {
+			unit_time = PER_MICRO_SECOND;
+		}
+		return unit_time;
+	}
 	
 	/**************************************************************************
 	 * Updates what the labels display to the viewer's current state.
@@ -549,9 +568,15 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	private void adjustLabels()
     {
 		final ImageTraceAttributes attributes = stData.getAttributes();
-		final String timeStart = formatTime.format(attributes.getTimeBegin()/1000000.0);
-		final String timeEnd   = formatTime.format(attributes.getTimeEnd()/1000000.0);
-        timeLabel.setText("Time Range: [" + timeStart + "s, " + timeEnd +  "s]");
+		double unit_time = getUnitTimePerSecond();
+		
+		double timeInSec = attributes.getTimeBegin()/unit_time;
+		final String timeStart = formatTime.format(timeInSec);
+		
+		timeInSec = attributes.getTimeEnd()/unit_time;
+		final String timeEnd   = formatTime.format(timeInSec);
+        
+		timeLabel.setText("Time Range: [" + timeStart + "s, " + timeEnd +  "s]");
         timeLabel.setSize(timeLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT));
         
 
@@ -610,7 +635,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
             	//crossHairLabel.setText("Cross Hair: (" + (selectedTime/1000)/1000.0 + "s, " + processes[rank] + ")");
     		} else {
     			// in case of incorrect filtering where user may have empty ranks or incorrect filters, we don't display the rank
-    			crossHairLabel.setText("Cross Hair: (" + (selectedTime/1000)/1000.0 + "s, ?)");
+    			crossHairLabel.setText("Cross Hair: (" + (selectedTime/getUnitTimePerSecond())/.0 + "s, ?)");
     		}
         }
         
@@ -628,7 +653,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	 **************************************************************************/
 	private String getCrossHairText(long closeTime, int selectedProcess) 
 	{
-		final float selectedTime = (float) ((float)closeTime / 1000000.0);
+		final float selectedTime = (float) ((float)closeTime / getUnitTimePerSecond());
         final IBaseData traceData = stData.getBaseData();
         final String processes[] = traceData.getListOfRanks();
 

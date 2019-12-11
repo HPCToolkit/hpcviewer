@@ -120,7 +120,11 @@ public class ScopeTreeViewer extends TreeViewer
 	public void refreshColumnTitle() {
 		
 		String []sText = Utilities.getTopRowItems(this);
-
+		
+		// corner case; empty top row for initial state of dynamic views
+		if (sText == null)
+			return;
+		
 		TreeColumn columns[] = this.getTree().getColumns();
 		boolean need_to_refresh = false;
 		

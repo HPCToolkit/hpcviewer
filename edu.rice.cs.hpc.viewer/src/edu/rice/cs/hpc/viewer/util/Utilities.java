@@ -450,6 +450,10 @@ public class Utilities {
 	 * @return
 	 */
 	public static String[] getTopRowItems( TreeViewer treeViewer ) {
+		// for dynamic views, the table is initially empty
+		if (treeViewer.getTree().getItemCount() == 0)
+			return null;
+		
 		TreeItem item = treeViewer.getTree().getItem(0);
 		String []sText= null; // have to do this to avoid error in compilation;
 		if(item.getData() instanceof Scope) {

@@ -13,6 +13,7 @@ import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.ExperimentConfiguration;
 import edu.rice.cs.hpc.data.experiment.ExperimentWithoutMetrics;
 import edu.rice.cs.hpc.data.experiment.extdata.TraceAttribute;
+import edu.rice.cs.hpc.data.experiment.extdata.TraceAttribute.UnitTime;
 import edu.rice.cs.hpc.data.experiment.scope.AlienScope;
 import edu.rice.cs.hpc.data.experiment.scope.CallSiteScope;
 import edu.rice.cs.hpc.data.experiment.scope.CallSiteScopeType;
@@ -1121,6 +1122,13 @@ public class BaseExperimentBuilder extends Builder {
 		for (int i=0; i<attributes.length; i++) {
 			
 			if (attributes[i].charAt(0) == 'i') {
+			} else if (attributes[i].charAt(0) == 'u') {
+				// unit time
+				if (values[i].charAt(0) == 'u') 
+					attribute.dbUnitTime = UnitTime.MicroSecond;
+				else if (values[i].charAt(0) == 'n')
+					attribute.dbUnitTime = UnitTime.NanoSecond;
+				
 			} else if (attributes[i].equals("db-glob")) {
 				attribute.dbGlob = values[i];
 				

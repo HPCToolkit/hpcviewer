@@ -115,6 +115,14 @@ public abstract class BaseExperiment implements IExperiment
 		return Integer.parseInt(this.version.substring(0, ip));
 	}
 
+	public int getMinorVersion() 
+	{
+		if (version == null) return 1;
+		
+		int ip = version.indexOf('.');
+		return Integer.parseInt(version.substring(ip+1));
+	}
+	
 
 	static public String getDefaultDatabaseName(Db_File_Type type)
 	{
