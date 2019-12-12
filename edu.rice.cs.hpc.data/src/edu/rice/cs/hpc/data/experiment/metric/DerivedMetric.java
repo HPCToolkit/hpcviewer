@@ -31,7 +31,7 @@ public class DerivedMetric extends BaseMetric {
 	
 	private MetricValue rootValue;
 	
-	final private RootScope root;
+	private RootScope root;
 	
 	//===================================================================================
 	// CONSTRUCTORS
@@ -78,6 +78,35 @@ public class DerivedMetric extends BaseMetric {
 			this.annotationType = AnnotationType.NONE ;*/
 	}
 	
+	
+	/**
+	 * Constructor to create a derived metric from hpcrun's formula
+	 * Since this metric is created during XML parsing, there is no way we can find
+	 * the root and the experiment.<br/> 
+	 * We need to allow to delay setting the root and the experiment,
+	 *  
+	 * @param formulaExpression : math formula 
+	 * @param sName : name of the metric
+	 * @param sID : ID
+	 * @param index : metric index
+	 * @param annotationType : type of annotation (percent, ...)
+	 * @param objType : metric type (inclusive/exclusive)
+	 */
+	public DerivedMetric(String sName, String sID, int index, 
+			AnnotationType annotationType, MetricType objType) {
+		
+		super(sID, sName, true, null, annotationType, index, index, objType);
+		
+		this.experiment = null; // to be defined later
+		this.root 		= null; // to be defined later
+		this.varMap		= null; // to be defined later
+		this.expression = null; // to be defined later
+		
+		this.fctMap     = new ExtFuncMap();
+		
+	}
+	
+	
 	/****
 	 * Set the new expression
 	 * 
@@ -86,8 +115,6 @@ public class DerivedMetric extends BaseMetric {
 	public void setExpression( String expr ) {
 		expression = ExpressionTree.parse(expr);
 		rootValue  = setRootValue(root);
-		// new formula has been set, refresh the root value used for computing percent
-		//dRootValue = getDoubleValue(root);
 	}
 
 	static public boolean evaluateExpression(String expression, 
@@ -177,8 +204,24 @@ public class DerivedMetric extends BaseMetric {
 		varMap.setMetricManager(experiment);
 	}
 	
+	public void resetMetric(Experiment experiment, RootScope root)
+	{
+		this.experiment = experiment;
+		this.root 		= root;
+		
+		varMap = new MetricVarMap(root, experiment);
+		varMap.setMetric(this);
+		
+		fctMap.init(experiment.getMetrics());
+		
+		rootValue = null; //setRootValue(root);
+	}
+	
 	private MetricValue setRootValue(RootScope rootScope) 
 	{
+		if (rootScope == null)
+			return MetricValue.NONE;
+		
 		double rootVal = getDoubleValue(rootScope);
 		double rootAnn = 1.0d;
 		return new MetricValue(rootVal, rootAnn);
