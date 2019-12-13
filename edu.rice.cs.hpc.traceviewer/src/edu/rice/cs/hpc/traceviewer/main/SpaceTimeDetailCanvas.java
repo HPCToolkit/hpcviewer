@@ -30,7 +30,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.services.ISourceProviderService;
 
+import edu.rice.cs.hpc.data.experiment.BaseExperiment;
+import edu.rice.cs.hpc.data.experiment.ExperimentWithoutMetrics;
 import edu.rice.cs.hpc.data.experiment.extdata.IBaseData;
+import edu.rice.cs.hpc.data.experiment.extdata.TraceAttribute;
 import edu.rice.cs.hpc.traceviewer.operation.BufferRefreshOperation;
 import edu.rice.cs.hpc.traceviewer.operation.DepthOperation;
 import edu.rice.cs.hpc.traceviewer.operation.PositionOperation;
@@ -62,8 +65,7 @@ import edu.rice.cs.hpc.traceviewer.data.util.Debugger;
 public class SpaceTimeDetailCanvas extends AbstractTimeCanvas 
 	implements IOperationHistoryListener, ISpaceTimeCanvas
 {	
-	final double PER_MICRO_SECOND = 1000000.0;
-	final double PER_NANO_SECOND  = 1000000000.0;
+	final long PER_MICRO_SECOND = 1000000;
 	
 	/**The SpaceTimeData corresponding to this canvas.*/
 	protected SpaceTimeDataController stData;
@@ -553,13 +555,23 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	 **************************************************************************/
 	private double getUnitTimePerSecond() 
 	{
-		double unit_time = PER_NANO_SECOND;
+		long unit_time = TraceAttribute.PER_NANO_SECOND;
 		
-		if (stData.getExperiment().getMajorVersion() == 2 &&
-			stData.getExperiment().getMinorVersion() < 2) {
-			unit_time = PER_MICRO_SECOND;
+		if (stData.getExperiment().getMajorVersion() == 2) {
+			if (stData.getExperiment().getMinorVersion() < 2) {
+				// old version of database: always microsecond
+				unit_time = PER_MICRO_SECOND;
+			} else {
+				// new version of database:
+				// - if the measurement is from old hpcrun: microsecond
+				// - if the measurement is from new hpcrun: nanosecond
+				
+				BaseExperiment be = this.stData.getExperiment();
+				ExperimentWithoutMetrics exp = (ExperimentWithoutMetrics) be;
+				unit_time = exp.getTraceAttribute().dbUnitTime;
+			}
 		}
-		return unit_time;
+		return (double)unit_time;
 	}
 	
 	/**************************************************************************

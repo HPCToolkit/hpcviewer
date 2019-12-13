@@ -13,7 +13,6 @@ import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.ExperimentConfiguration;
 import edu.rice.cs.hpc.data.experiment.ExperimentWithoutMetrics;
 import edu.rice.cs.hpc.data.experiment.extdata.TraceAttribute;
-import edu.rice.cs.hpc.data.experiment.extdata.TraceAttribute.UnitTime;
 import edu.rice.cs.hpc.data.experiment.scope.AlienScope;
 import edu.rice.cs.hpc.data.experiment.scope.CallSiteScope;
 import edu.rice.cs.hpc.data.experiment.scope.CallSiteScopeType;
@@ -1118,16 +1117,20 @@ public class BaseExperimentBuilder extends Builder {
 			return;
 		
 		TraceAttribute attribute = new TraceAttribute();
+		
+		attribute.dbUnitTime = TraceAttribute.PER_NANO_SECOND;
+		
 		// tallent: Note that the DTD currently only permits one instance of <TraceDB>
 		for (int i=0; i<attributes.length; i++) {
 			
 			if (attributes[i].charAt(0) == 'i') {
 			} else if (attributes[i].charAt(0) == 'u') {
 				// unit time
-				if (values[i].charAt(0) == 'u') 
-					attribute.dbUnitTime = UnitTime.MicroSecond;
-				else if (values[i].charAt(0) == 'n')
-					attribute.dbUnitTime = UnitTime.NanoSecond;
+				try {
+					attribute.dbUnitTime = Long.parseLong(values[i]);
+				} catch (Exception e) {
+					attribute.dbUnitTime = TraceAttribute.PER_NANO_SECOND;
+				}
 				
 			} else if (attributes[i].equals("db-glob")) {
 				attribute.dbGlob = values[i];
