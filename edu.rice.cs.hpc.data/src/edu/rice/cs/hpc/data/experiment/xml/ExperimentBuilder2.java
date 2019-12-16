@@ -246,6 +246,9 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 		final char ATTRIBUTE_EVENT   = 'e';
 		final char ATTRIBUTE_ORDER   = 'o';
 		
+		final char ATTRIBUTE_METRIC_EXT      = 'm';
+		final char ATTRIBUTE_METRIC_EXT_DESC = 'd';
+		
 		int nbMetrics = this.metricList.size();
 		int iSelf = -1;
 		int partner = 0;	// 2010.06.28: new feature to add partner
@@ -253,7 +256,8 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 		
 		String sID = null;// = values[nID];
 		String sDisplayName = null;
-		String sNativeName = null;
+		String sNativeName  = null;
+		String sDescription = null;
 		
 		AnnotationType percent = AnnotationType.NONE;
 		MetricType objType = MetricType.UNKNOWN;
@@ -281,6 +285,11 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 			} else if (attributes[i].charAt(0) == ATTRIBUTE_NAME) {
 				// name ?
 				sNativeName = values[i];
+			} else if (attributes[i].charAt(0) == ATTRIBUTE_METRIC_EXT) {
+				if (attributes[i].charAt(1) == ATTRIBUTE_METRIC_EXT_DESC) {
+					sDescription = values[i];
+				}
+				
 			} else if (attributes[i].charAt(0) == ATTRIBUTE_VALUE) {
 				// value: raw|final|derived-incr|derived
 				if (values[i].equals("final")) {
@@ -336,20 +345,23 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 			sDisplayName = sNativeName;
 		}
 		
+		if (sDescription == null) sDescription = sDisplayName;
+		
 		// set the metric
 		BaseMetric metricInc;
 		switch (mDesc) {
 			case Final:
 				metricInc = new FinalMetric(
 						String.valueOf(iSelf),			// short name
-						sNativeName,			// native name
+						sDescription,			// native name
 						sDisplayName, 	// display name
 						toShow, format, percent, 			// displayed ? percent ?
 						"",						// period (not defined at the moment)
 						nbMetrics, objType, partner);
 				break;
 			case Derived_Incr:
-				metricInc = new AggregateMetric(sID, sDisplayName, toShow, format, percent, nbMetrics, partner, objType);
+				metricInc = new AggregateMetric(sID, sDisplayName, sDescription,
+									toShow, format, percent, nbMetrics, partner, objType);
 				((AggregateMetric) metricInc).init( (BaseExperimentWithMetrics) this.experiment );
 				break;
 			case Derived:
@@ -368,6 +380,7 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 						nbMetrics, objType, partner);
 				break;
 		}
+		metricInc.setDescription(sDescription);
 		metricInc.setOrder(order);
 		
 		this.metricList.add(metricInc);
@@ -384,7 +397,7 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 			String sSelfDisplayName = sNativeName + " (E)";
 			Metric metricExc = new Metric(
 					sSelfName,			// short name
-					sSelfDisplayName,	// native name
+					sDescription,		// metric description
 					sSelfDisplayName, 	// display name
 					toShow, format, AnnotationType.PERCENT, 		// displayed ? percent ?
 					"",					// period (not defined at the moment)
@@ -428,7 +441,7 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 			}
 		}
 		
-		MetricRaw metric = new MetricRaw(ID, title, db_glob, db_id, 
+		MetricRaw metric = new MetricRaw(ID, title, title, db_glob, db_id, 
 				partner_index, type, num_metrics);
 		this.metricRawList.add(db_id, metric);
 	}

@@ -16,6 +16,8 @@ public class StringUtil
 	// line following the next embedded space.
 	static public String wrapScopeName(String s, int desiredLineLength)
 	{
+		if (s == null) return null;
+		
 		String out = ""; 
 		if (!s.isEmpty()) {
 			String indent = "  "; // prefix for lines 1..N

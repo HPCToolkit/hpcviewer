@@ -42,12 +42,12 @@ public class MetricRaw  extends BaseMetric
 	 * @param type
 	 * @param metrics
 	 */
-	public MetricRaw(int id, String title, String db_pattern, int db_num, int partner_index, 
+	public MetricRaw(int id, String title, String description, String db_pattern, int db_num, int partner_index, 
 			MetricType type, int metrics) {
 		// raw metric has no partner
 		// default annotation: percentage, although some metrics may have no percent due to missing value
 		// on its root (such as exclusive metric)
-		super( String.valueOf(id), title, true, null, AnnotationType.PERCENT, db_num, partner_index, type);
+		super( String.valueOf(id), title, description, true, null, AnnotationType.PERCENT, db_num, partner_index, type);
 		this.ID 	 = id;
 		this.db_glob = db_pattern;
 		this.db_id 	 = db_num;
@@ -167,7 +167,7 @@ public class MetricRaw  extends BaseMetric
 
 	@Override
 	public BaseMetric duplicate() {
-		MetricRaw dup = new MetricRaw(ID, displayName, db_glob, db_id, 
+		MetricRaw dup = new MetricRaw(ID, displayName, description, db_glob, db_id, 
 				partner_index, metricType, num_metrics);
 		// TODO: hack to duplicate also the thread data
 		dup.threadData = threadData;

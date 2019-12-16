@@ -41,8 +41,8 @@ public abstract class BaseMetric {
 	 *  derived incremental metric */
 	protected String shortName;
 
-	/** The native (target OS toolset) name of this metric. */
-	protected String nativeName;
+	/** metric description (optional, just for display to users). */
+	protected String description;
 
 	/** The user-visible name of this metric. */
 	protected String displayName;
@@ -78,6 +78,7 @@ public abstract class BaseMetric {
 	 * 
 	 * @param sID : Unique ID of the metric
 	 * @param sDisplayName : the name of the title
+	 * @param sDescription : metric description (it's okay to be null)
 	 * @param displayed : will metric be displayed ?
 	 * @param format : format of the display
 	 * @param annotationType : show the percent or process number ?
@@ -86,7 +87,8 @@ public abstract class BaseMetric {
 	 * 		IT HAS TO BE NEGATIVE IF IT DOESNT HAVE A PARTNER !!
 	 * @param type : type of the metric
 	 *************************************************************************/
-	public BaseMetric(String sID, String sDisplayName, boolean displayed, String format, 
+	public BaseMetric(String sID, String sDisplayName, String sDescription,
+			boolean displayed, String format, 
 			AnnotationType annotationType, int index, int partner_index, MetricType type) 
 	{
 		// in case of instantiation from duplicate() method, we need to make sure there is
@@ -112,7 +114,7 @@ public abstract class BaseMetric {
 
 		this.unit = '0';
 		this.shortName = sID;
-
+		this.description = sDescription;
 		this.metricType = type;
 	}
 
@@ -163,6 +165,16 @@ public abstract class BaseMetric {
 		return order;
 	}
 
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+	
+	public String getDescription()
+	{
+		return description;
+	}
+	
 	//=================================================================================
 	//		ACCESS TO METRIC
 	//=================================================================================
@@ -184,13 +196,6 @@ public abstract class BaseMetric {
 		this.shortName = newName;
 	}
 
-	/*************************************************************************
-	 *	Returns the metric's native (target OS toolset) name.
-	 ************************************************************************/
-	public String getNativeName()
-	{
-		return this.nativeName;
-	}
 
 	/*************************************************************************
 	 *	Returns the metric's user-visible name.
