@@ -13,6 +13,7 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.*;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -35,6 +36,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.scope.Scope;
+import edu.rice.cs.hpc.data.util.OSValidator;
 import edu.rice.cs.hpc.viewer.metric.MetricColumnDialog;
 import edu.rice.cs.hpc.viewer.provider.TableMetricState;
 import edu.rice.cs.hpc.viewer.resources.Icons;
@@ -397,6 +399,7 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 				numColumn++;
 			}
 		}
+		TreeColumnLayout layout = (TreeColumnLayout) treeViewer.getTree().getParent().getLayout();
 		
 		int i = 0;
 		for (TreeColumn column : columns) {
@@ -420,6 +423,11 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 		   			// Laks: bug no 131: we need to have special key for storing the column width
 		   			column.setData(ScopeTreeViewer.COLUMN_DATA_WIDTH, objWidth);
 				}
+				// need a special treatment for Linux/GTK platform:
+				// Explicitly set column pixel into zero due to SWT/GTK implementation that
+				// inhibit changes for the last column
+				if (OSValidator.isUnix())
+					layout.setColumnData(column, new ColumnPixelData(0, false));
 			}
 			// for other OS other than Linux, we need to set the width explicitly
 			// the layout will not take affect until users move or resize columns in the table
