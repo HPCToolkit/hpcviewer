@@ -10,7 +10,6 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -21,7 +20,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -227,11 +225,18 @@ public class MetricPropertyDialog extends TitleAreaDialog
 		final TableColumn colName = columnName.getColumn();
 		colName.setText("Metric");
 		colName.setWidth(200);
-		columnName.setLabelProvider(new CellLabelProvider() {
+		columnName.setLabelProvider(new ColumnLabelProvider() {
 			
 			@Override
-			public void update(ViewerCell cell) {
-				cell.setText( ((PropertiesModel)cell.getElement()).sTitle );
+			public String getText(Object element) {
+				final PropertiesModel obj = (PropertiesModel) element;
+				return obj.sTitle;
+			}
+			
+			@Override
+			public String getToolTipText(Object element) {
+				final PropertiesModel obj = (PropertiesModel) element;
+				return obj.sTitle;
 			}
 		});
 		
@@ -242,11 +247,15 @@ public class MetricPropertyDialog extends TitleAreaDialog
 		colDesc.setWidth(100);
 		columnDesc.setLabelProvider(new ColumnLabelProvider() {
 			
+			@Override
 			public String getText(Object element) {
 				final PropertiesModel obj = (PropertiesModel) element;
-				return StringUtil.wrapScopeName(obj.metric.getDescription(), 80);
+				// wrap the description into 70 characters. This number is completely heuristic
+				// and may not fit properly in the column if using different font
+				return StringUtil.wrapScopeName(obj.metric.getDescription(), 70);
 			}
 			
+			@Override
 			public String getToolTipText(Object element) {
 				final PropertiesModel obj = (PropertiesModel) element;
 				final String description  = StringUtil.wrapScopeName(obj.metric.getDescription(), 100);
