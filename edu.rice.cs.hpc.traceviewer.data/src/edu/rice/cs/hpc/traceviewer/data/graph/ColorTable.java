@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Display;
 
 import edu.rice.cs.hpc.common.ui.Util;
 import edu.rice.cs.hpc.common.util.ProcedureClassData;
+import edu.rice.cs.hpc.data.util.OSValidator;
 import edu.rice.cs.hpc.traceviewer.data.util.ProcedureClassMap;
 
 /**************************************************************
@@ -39,7 +40,7 @@ public class ColorTable
 	// data members
 
 	private ColorImagePair IMAGE_WHITE;
-	private	HashMap<String, ColorImagePair> colorMatcher;
+	private	HashMap<String, ColorImagePair> mapRGBtoProcedure;
 	private	HashMap<String, ColorImagePair> predefinedColorMatcher;
 
 	/**Creates a new ColorTable with Display _display.*/
@@ -53,7 +54,7 @@ public class ColorTable
 		// initialize the procedure-color map (user-defined color)
 		classMap = new ProcedureClassMap(display);
 		
-		colorMatcher 		   = new HashMap<String, ColorTable.ColorImagePair>();
+		mapRGBtoProcedure 		   = new HashMap<String, ColorTable.ColorImagePair>();
 		predefinedColorMatcher = new HashMap<String, ColorTable.ColorImagePair>();
 		
 		initializeWhiteColor();
@@ -63,11 +64,11 @@ public class ColorTable
 	 * Dispose the allocated resources
 	 */
 	public void dispose() {
-		for (ColorImagePair pair: colorMatcher.values()) {
+		for (ColorImagePair pair: mapRGBtoProcedure.values()) {
 			if (pair != null) pair.dispose();
 		}
 		
-		colorMatcher.clear();
+		mapRGBtoProcedure.clear();
 		
 		for (ColorImagePair pair: predefinedColorMatcher.values()) {
 			if (pair != null) pair.dispose();
@@ -183,30 +184,32 @@ public class ColorTable
 		}
 		
 		// 2. check duplicates
-		cip = colorMatcher.get(procName);
+		cip = mapRGBtoProcedure.get(procName);
 		if (cip != null) {
 			return cip;
 		}
 		
 		// 3. generate a new color-image if we have enough handles
-		if (colorMatcher.size() < MAX_NUM_DIFFERENT_COLORS) {
+		if (mapRGBtoProcedure.size() < MAX_NUM_DIFFERENT_COLORS || 
+				! OSValidator.isWindows()) {
+			
 			RGB rgb = getProcedureColor( procName, COLOR_MIN, COLOR_MAX, random_generator );
 			cip = createColorImagePair(procName, rgb);
 		} else {			
 			
-			// 4. we have more procedures than the limit
+			// 4. Windows only: we have more procedures than the limit
 			// this may not work on some OS like Windows that limits the number of handles
 			// we need to reuse existing color randomly to this procedure to avoid system crash
 
 			if (listDefinedColorImagePair == null) {
-				listDefinedColorImagePair = new ColorImagePair[colorMatcher.size()];
-				colorMatcher.values().toArray(listDefinedColorImagePair);
+				listDefinedColorImagePair = new ColorImagePair[mapRGBtoProcedure.size()];
+				mapRGBtoProcedure.values().toArray(listDefinedColorImagePair);
 			}
 			// get a random index within the range 1..MAX-1
 			int index = random_generator.nextInt(MAX_NUM_DIFFERENT_COLORS-2)+1;
 			cip = listDefinedColorImagePair[index];
 		}
-		colorMatcher.put(procName, cip);
+		mapRGBtoProcedure.put(procName, cip);
 
 		return cip;
 	}
@@ -263,7 +266,7 @@ public class ColorTable
 			
 			IMAGE_WHITE = new ColorImagePair(col_white, img_white );
 			
-			colorMatcher.put(CallPath.NULL_FUNCTION, IMAGE_WHITE);
+			mapRGBtoProcedure.put(CallPath.NULL_FUNCTION, IMAGE_WHITE);
 		}
 	}
 	

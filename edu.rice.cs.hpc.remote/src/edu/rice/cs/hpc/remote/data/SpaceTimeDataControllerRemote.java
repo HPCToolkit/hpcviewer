@@ -110,7 +110,7 @@ public class SpaceTimeDataControllerRemote extends SpaceTimeDataController
 		}
 	}
 
-	@Override
+
 	public ProcessTimeline getNextTrace(AtomicInteger lineNum, int totalLines, 
 			ImageTraceAttributes attributes, boolean changedBounds, IProgressMonitor monitor) {
 		Integer nextIndex;
