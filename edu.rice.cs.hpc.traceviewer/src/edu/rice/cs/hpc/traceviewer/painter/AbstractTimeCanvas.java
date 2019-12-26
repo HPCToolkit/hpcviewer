@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 
 import edu.rice.cs.hpc.data.util.OSValidator;
+import edu.rice.cs.hpc.data.util.string.StringUtil;
 import edu.rice.cs.hpc.traceviewer.data.graph.ColorTable;
 import edu.rice.cs.hpc.traceviewer.data.util.Constants;
 
@@ -243,6 +244,9 @@ implements ITraceCanvas, PaintListener
 				return null;
 			
 			String proc = canvas.getColorTable().getProcedureNameByColorHash( rgb.hashCode() );
+			if (proc != null) {
+				proc = StringUtil.wrapScopeName(proc, 80);
+			}
 			
 			String addText = canvas.tooltipText(pixel, rgb);
 			if (addText != null)

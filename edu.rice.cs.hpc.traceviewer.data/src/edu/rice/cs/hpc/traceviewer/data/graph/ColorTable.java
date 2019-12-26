@@ -30,6 +30,7 @@ public class ColorTable
 	static private final long RANDOM_SEED = 612543231L;
 	
 	static final private String SEPARATOR_PROCNAME = "\n";
+	static final public String  UNKNOWN_PROCNAME   = "???";
 	
 	/**The display this ColorTable uses to generate the random colors.*/
 	final private Display display;
@@ -150,6 +151,9 @@ public class ColorTable
 	public String getProcedureNameByColorHash(int hashcode) 
 	{
 		String proc = mapRGBtoProcedure.get(Integer.valueOf(hashcode));
+		if (proc == null)
+			return UNKNOWN_PROCNAME;
+		
 		return proc;
 	}
 	
