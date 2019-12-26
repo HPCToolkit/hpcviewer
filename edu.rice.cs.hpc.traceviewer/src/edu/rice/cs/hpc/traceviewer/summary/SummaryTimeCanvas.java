@@ -8,30 +8,31 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IOperationHistoryListener;
 import org.eclipse.core.commands.operations.OperationHistoryEvent;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
-import org.eclipse.jface.window.DefaultToolTip;
-import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.rice.cs.hpc.traceviewer.operation.BufferRefreshOperation;
 import edu.rice.cs.hpc.traceviewer.operation.TraceOperation;
 import edu.rice.cs.hpc.traceviewer.operation.ZoomOperation;
 import edu.rice.cs.hpc.traceviewer.painter.AbstractTimeCanvas;
-
+import edu.rice.cs.hpc.traceviewer.services.SummaryDataService;
 import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
 import edu.rice.cs.hpc.traceviewer.data.db.Frame;
 import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
 import edu.rice.cs.hpc.traceviewer.data.db.Position;
+import edu.rice.cs.hpc.traceviewer.data.graph.ColorTable;
 import edu.rice.cs.hpc.traceviewer.data.util.Constants;
 import edu.rice.cs.hpc.traceviewer.data.util.Debugger;
 
@@ -44,11 +45,9 @@ public class SummaryTimeCanvas extends AbstractTimeCanvas
 implements IOperationHistoryListener
 {	
 	private SpaceTimeDataController dataTraces = null;
-	private TreeMap<Integer, Integer> mapStatistics;
+	private TreeMap<Integer /* pixel*/, Integer /* percent*/> mapPixelToPercent;
 	private int totPixels;
 	private ImageData detailData;
-	private boolean needToRedraw = false;
-	private ToolTip tooltip;
 	
 	/**********************************
 	 * Construct a summary canvas without background nor scrollbar
@@ -60,33 +59,15 @@ implements IOperationHistoryListener
 		super(composite, SWT.NO_BACKGROUND);
 		
 		OperationHistoryFactory.getOperationHistory().addOperationHistoryListener(this);
-		
-		// ------------------------------------------------------------------------------------------
-		// setup tooltip information about the percentage of the color appointed by the mouse
-		// ------------------------------------------------------------------------------------------
-		tooltip = new SummaryTooltip(this) ;
-		tooltip.deactivate();
 	}
 	
 	@Override
 	public void paintControl(PaintEvent event)
 	{
 		super.paintControl(event);
-		if (needToRedraw) {
-			refreshWithCondition();
-			needToRedraw = false;
-		}
+		refreshWithCondition();
 	}
 	
-	/****
-	 * called to be notify when the canvas is visible and needs to be activated
-	 * 
-	 * @param isActivated
-	 */
-	public void activate(boolean isActivated)
-	{
-		needToRedraw = isActivated;
-	}
 
 	private void refreshWithCondition()
 	{
@@ -124,7 +105,7 @@ implements IOperationHistoryListener
 		// store the original image data for further usage such as when the painting is needed.
 		this.detailData = detailData;
 		
-		if (detailData == null || !isVisible())
+		if (detailData == null)
 			return;
 
 		// ------------------------------------------------------------------------------------------
@@ -148,7 +129,7 @@ implements IOperationHistoryListener
 		float xScale = ((float)viewWidth / (float)detailData.width);
 		int xOffset = 0;
 
-		mapStatistics = new TreeMap<Integer, Integer>();
+		mapPixelToPercent = new TreeMap<Integer, Integer>();
 		
 		//---------------------------------------------------------------------------
 		// needs to be optimized:
@@ -161,19 +142,19 @@ implements IOperationHistoryListener
 			// use tree map to sort the key of color map
 			// without sort, it can be confusing
 			//---------------------------------------------------------------------------
-			TreeMap<Integer, Integer> sortedColorMap = new TreeMap<Integer, Integer>();
+			TreeMap<Integer, Integer> mapPixelToCount = new TreeMap<Integer, Integer>();
 
 			for (int y = 0; y < detailData.height; ++y)
 			{
 				int pixelValue = detailData.getPixel(x,y);
 				
-				Integer count  = sortedColorMap.get(pixelValue);
+				Integer count  = mapPixelToCount.get(pixelValue);
 				if (count != null)
-					sortedColorMap.put( pixelValue , count+1 );
+					mapPixelToCount.put( pixelValue , count+1 );
 				else
-					sortedColorMap.put( pixelValue , 1);
+					mapPixelToCount.put( pixelValue , 1);
 			}
-			Set<Integer> set = sortedColorMap.keySet();
+			Set<Integer> set = mapPixelToCount.keySet();
 			int yOffset = viewHeight;
 			
 			int h = 0;
@@ -187,7 +168,7 @@ implements IOperationHistoryListener
 				final RGB rgb = detailData.palette.getRGB(pixel);
 
 				final Color c = new Color(getDisplay(), rgb);
-				final Integer numCounts = sortedColorMap.get(pixel);
+				final Integer numCounts = mapPixelToCount.get(pixel);
 				final int height = (int) Math.ceil(numCounts * yScale);
 
 				buffer.setBackground(c);
@@ -205,9 +186,9 @@ implements IOperationHistoryListener
 				c.dispose();
 				
 				// accumulate the statistics of this pixel
-				Integer val = mapStatistics.get(pixel);
+				Integer val = mapPixelToPercent.get(pixel);
 				Integer acc = (val==null?  numCounts : val + numCounts);
-				mapStatistics.put(pixel, acc);
+				mapPixelToPercent.put(pixel, acc);
 				
 				h += height;
 			}
@@ -216,10 +197,10 @@ implements IOperationHistoryListener
 		totPixels = detailData.width * detailData.height;
 
 		buffer.dispose();
-		
-		tooltip.activate();
 
 		redraw();
+		
+		broadcast(detailData.palette, totPixels);
 	}
 	
 	/****
@@ -241,7 +222,6 @@ implements IOperationHistoryListener
 	public void updateData(SpaceTimeDataController data)
 	{
 		dataTraces = data;
-		needToRedraw = true; // new data
 		setVisible(true);
 	}
 
@@ -267,67 +247,15 @@ implements IOperationHistoryListener
 	}
 
 
-	/******************************************************************
-	 * 
-	 * Customized tooltip for summary canvas
-	 *
-	 ******************************************************************/
-	private class SummaryTooltip extends DefaultToolTip
-	{
-		public SummaryTooltip(Control control) {
-			super(control);
-		}
-
-		@Override
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.window.DefaultToolTip#getText(org.eclipse.swt.widgets.Event)
-		 */
-		protected String getText(Event event) {
-			if (mapStatistics != null ) 
-			{
-				Image img = SummaryTimeCanvas.this.getBuffer();
-				if (img == null) 
-					return null;
-				
-				ImageData imgData = img.getImageData();
-				if (imgData == null) 
-					return null;
-				
-				if (event.x >= imgData.width || event.y >= imgData.height || event.x < 0 || event.y < 0)
-					// corner case: when resizing is faster than rendering
-					return null;
-				
-				int pixel = imgData.getPixel(event.x, event.y);
-				
-				// ------------------------------------------------
-				// get the number of counts of this pixel
-				// ------------------------------------------------
-				Integer stat = mapStatistics.get(pixel);
-				
-				if (stat != null) {
-					// ------------------------------------------------
-					// compute the percentage
-					// ------------------------------------------------
-					float percent = (float)100.0 * ((float)stat / (float) totPixels);
-
-					if (percent > 0) {
-						final String percent_str = String.format("%.2f %%", percent);
-						return percent_str;
-					}
-				}
-			}
-			return null;
-		}
+	private void broadcast(
+			PaletteData palette,
+			int totalPixels) {
 		
-		@Override
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.window.ToolTip#getLocation(org.eclipse.swt.graphics.Point, org.eclipse.swt.widgets.Event)
-		 */
-		public Point getLocation(Point tipSize, Event event) {
-			return SummaryTimeCanvas.this.toDisplay(event.x + 5, event.y - 15);
-		}
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		ISourceProviderService provider = window.getService(ISourceProviderService.class);
+		
+		SummaryDataService service = (SummaryDataService) provider.getSourceProvider(SummaryDataService.DATA_PROVIDER);
+		service.broadcastUpdate(palette, mapPixelToPercent, getColorTable(), totalPixels);
 	}
 	
 	//---------------------------------------------------------------------------------------
@@ -385,5 +313,32 @@ implements IOperationHistoryListener
 			e.printStackTrace();
 		}
 
+	}
+
+	@Override
+	protected String tooltipText(int pixel, RGB rgb) {
+
+		// ------------------------------------------------
+		// get the number of counts of this pixel
+		// ------------------------------------------------
+		Integer stat = mapPixelToPercent.get(pixel);
+		
+		if (stat != null) {
+			// ------------------------------------------------
+			// compute the percentage
+			// ------------------------------------------------
+			float percent = (float)100.0 * ((float)stat / (float) totPixels);
+
+			if (percent > 0) {
+				final String percent_str = String.format("%.2f %%\n", percent);
+				return percent_str;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	protected ColorTable getColorTable() {
+		return dataTraces.getColorTable();
 	}
 }

@@ -7,6 +7,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 import edu.rice.cs.hpc.traceviewer.depth.HPCDepthView;
 import edu.rice.cs.hpc.traceviewer.main.HPCTraceView;
 import edu.rice.cs.hpc.traceviewer.misc.HPCCallStackView;
+import edu.rice.cs.hpc.traceviewer.statistic.HPCStatView;
 import edu.rice.cs.hpc.traceviewer.summary.HPCSummaryView;
 
 public class Perspective implements IPerspectiveFactory
@@ -31,10 +32,12 @@ public class Perspective implements IPerspectiveFactory
 		IFolderLayout right = 
 			layout.createFolder("right", IPageLayout.BOTTOM,  CALLSTACK_VIEW_WIDTH_FRACTION, editorArea);
 		right.addView(HPCCallStackView.ID);
+		right.addView(HPCStatView.ID);
 		
 		layout.getViewLayout(HPCTraceView.ID).setCloseable(false);
 		layout.getViewLayout(HPCDepthView.ID).setCloseable(false);
 		layout.getViewLayout(HPCCallStackView.ID).setCloseable(false);
 		layout.getViewLayout(HPCSummaryView.ID).setCloseable(false);
+		layout.getViewLayout(HPCStatView.ID).setCloseable(false);
 	}
 }

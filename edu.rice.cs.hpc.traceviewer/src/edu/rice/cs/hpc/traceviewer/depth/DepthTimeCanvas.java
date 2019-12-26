@@ -16,6 +16,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -34,6 +35,7 @@ import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
 import edu.rice.cs.hpc.traceviewer.data.db.Frame;
 import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
 import edu.rice.cs.hpc.traceviewer.data.db.Position;
+import edu.rice.cs.hpc.traceviewer.data.graph.ColorTable;
 import edu.rice.cs.hpc.traceviewer.data.util.Constants;
 import edu.rice.cs.hpc.traceviewer.data.util.Debugger;
 
@@ -369,7 +371,16 @@ public class DepthTimeCanvas extends AbstractTimeCanvas
 
 	@Override
 	public void setMessage(String message) {
-		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	protected String tooltipText(int pixel, RGB rgb) {
+		return null;
+	}
+
+	@Override
+	protected ColorTable getColorTable() {
+		return stData.getColorTable();
 	}
 }

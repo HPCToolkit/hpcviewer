@@ -9,7 +9,8 @@ import org.eclipse.ui.ISources;
 import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
 
 
-public class DataService extends AbstractSourceProvider {
+public class DataService extends AbstractSourceProvider 
+{
 
 	final static public String DATA_PROVIDER = "edu.rice.cs.hpc.traceviewer.services.DataService.data";
 	final static public String DATA_UPDATE = "edu.rice.cs.hpc.traceviewer.services.DataService.update";
@@ -32,7 +33,7 @@ public class DataService extends AbstractSourceProvider {
 	 */
 	public Map getCurrentState() {
 
-		Map<String, Object> map = new HashMap<String, Object>(1);
+		Map<String, Object> map = new HashMap<String, Object>(2);
 		map.put(DATA_PROVIDER, getValue());
 		map.put(DATA_UPDATE, data);
 		
