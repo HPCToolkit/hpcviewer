@@ -42,9 +42,7 @@ import edu.rice.cs.hpc.traceviewer.ui.AbstractDynamicView;
 public class HPCStatView extends AbstractDynamicView 
 {
 	public static final String ID = "hpcstat.view";
-	
-	private static final String UNIDENTIFIED_PROC_OBJECT = "<unknown>";
-	
+		
 	private TableViewer tableViewer;
 	private TableStatComparator comparator;
 	
@@ -104,6 +102,8 @@ public class HPCStatView extends AbstractDynamicView
 		ISourceProviderService service = (ISourceProviderService)getSite().getService(ISourceProviderService.class);
 		ISourceProvider serviceProvider = service.getSourceProvider(SummaryDataService.DATA_PROVIDER);
 		serviceProvider.addSourceProviderListener(new StatSourceProvider());
+		
+		addListener();
 	}
 	
 	
@@ -157,7 +157,7 @@ public class HPCStatView extends AbstractDynamicView
 			
 			String proc = colorTable.getProcedureNameByColorHash(rgb.hashCode());
 			if (proc == null) {
-				proc = UNIDENTIFIED_PROC_OBJECT;
+				proc = ColorTable.UNKNOWN_PROCNAME;
 			}
 			listItems.add(new StatisticItem(proc, (float)100.0 * count/totalPixels));
 		}
@@ -173,8 +173,7 @@ public class HPCStatView extends AbstractDynamicView
 	static private class StatisticContentProvider 
 	implements IStructuredContentProvider
 	{
-		StatisticContentProvider() {
-		}
+		StatisticContentProvider() {}
 
 		@Override
 		public Object[] getElements(Object inputElement) {
@@ -191,9 +190,7 @@ public class HPCStatView extends AbstractDynamicView
 		}
 		
 		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			
-		}
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 	}
 	
 	
@@ -226,7 +223,7 @@ public class HPCStatView extends AbstractDynamicView
 			if (columnIndex == 0) {
 				if (element != null && element instanceof StatisticItem) {
 					final StatisticItem item = (StatisticItem) element;
-					if (item.procedureName == UNIDENTIFIED_PROC_OBJECT)
+					if (item.procedureName == ColorTable.UNKNOWN_PROCNAME)
 						return null;
 					
 					return HPCStatView.this.colorTable.getImage(((StatisticItem)element).procedureName);
