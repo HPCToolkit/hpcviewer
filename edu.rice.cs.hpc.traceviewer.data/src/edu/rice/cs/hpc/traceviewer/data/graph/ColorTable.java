@@ -30,7 +30,7 @@ public class ColorTable
 	static private final long RANDOM_SEED = 612543231L;
 	
 	static final private String SEPARATOR_PROCNAME = "\n";
-	static final public String  UNKNOWN_PROCNAME   = "No activity";
+	static final public String  UNKNOWN_PROCNAME   = "[No activity]";
 	
 	/**The display this ColorTable uses to generate the random colors.*/
 	final private Display display;
@@ -46,6 +46,7 @@ public class ColorTable
 	private	HashMap<String, ColorImagePair> colorMatcher;
 	private	HashMap<String, ColorImagePair> predefinedColorMatcher;
 	private HashMap<Integer, String>        mapRGBtoProcedure;
+	private HashMap<Integer, String>		mapReservedColor;
 
 	/**Creates a new ColorTable with Display _display.*/
 	public ColorTable()
@@ -59,10 +60,11 @@ public class ColorTable
 		classMap = new ProcedureClassMap(display);
 		
 		colorMatcher 		   = new HashMap<String, ColorTable.ColorImagePair>();
-		predefinedColorMatcher = new HashMap<String, ColorTable.ColorImagePair>();
-		mapRGBtoProcedure	   = new HashMap<Integer,  String>();
 		
 		initializeWhiteColor();
+		
+		predefinedColorMatcher = new HashMap<String, ColorTable.ColorImagePair>();
+		mapRGBtoProcedure	   = new HashMap<Integer, String>();
 	}
 	
 	/**
@@ -150,11 +152,31 @@ public class ColorTable
 	 ************************************************************************/
 	public String getProcedureNameByColorHash(int hashcode) 
 	{
-		String proc = mapRGBtoProcedure.get(Integer.valueOf(hashcode));
+		// get the reserved color first
+		String proc = mapReservedColor.get(Integer.valueOf(hashcode));
+		if (proc != null)
+			return proc;
+		
+		// get the normal procedure (if exist)
+		proc = mapRGBtoProcedure.get(Integer.valueOf(hashcode));
 		if (proc == null)
 			return UNKNOWN_PROCNAME;
 		
 		return proc;
+	}
+	
+	/************************************************************************
+	 * add list of reserved color-procedure pair
+	 * 
+	 * @param procName
+	 * @param rgb
+	 ************************************************************************/
+	public void addReservedColor(String procName, RGB rgb)
+	{
+		if (mapReservedColor == null) {
+			mapReservedColor = new HashMap<Integer, String>(1);
+		}
+		mapReservedColor.put(rgb.hashCode(), procName);
 	}
 	
 	/***********************************************************************
@@ -319,6 +341,8 @@ public class ColorTable
 			IMAGE_WHITE = new ColorImagePair(col_white, img_white );
 			
 			colorMatcher.put(CallPath.NULL_FUNCTION, IMAGE_WHITE);
+			
+			addReservedColor(UNKNOWN_PROCNAME, rgb_white);
 		}
 	}
 	

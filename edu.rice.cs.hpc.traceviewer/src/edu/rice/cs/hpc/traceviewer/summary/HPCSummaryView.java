@@ -72,11 +72,11 @@ public class HPCSummaryView extends AbstractDynamicView
 			@Override
 			public void sourceChanged(int sourcePriority, String sourceName, Object sourceValue) {
 				if (sourceName.equals(SummaryDataService.DATA_REQUEST)) {
-					
+
 					// force summary view to be "active" so that it can repaint the canvas
 					// and send the new summary data to other views
 					active(true);
-					summaryCanvas.redraw();
+					summaryCanvas.broadcast();
 				}				
 			}
 			

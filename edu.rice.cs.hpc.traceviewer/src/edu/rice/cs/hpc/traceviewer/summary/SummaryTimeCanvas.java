@@ -34,7 +34,7 @@ import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
 import edu.rice.cs.hpc.traceviewer.data.db.Position;
 import edu.rice.cs.hpc.traceviewer.data.graph.ColorTable;
 import edu.rice.cs.hpc.traceviewer.data.util.Constants;
-import edu.rice.cs.hpc.traceviewer.data.util.Debugger;
+
 
 /******************************************************************
  * 
@@ -246,6 +246,16 @@ implements IOperationHistoryListener
 		return (dataTraces.getAttributes().getTimeInterval());
 	}
 
+	
+	/****
+	 * <p>broadcast the content of summary if it's already computed
+	 * If the content is not computed, do nothing.</p>
+	 */
+	public void broadcast() {
+		if (this.detailData != null) {
+			broadcast(detailData.palette, totPixels);
+		}
+	}
 
 	private void broadcast(
 			PaletteData palette,
@@ -268,7 +278,7 @@ implements IOperationHistoryListener
 		// we are not interested with other operation
 		if (event.getOperation().hasContext(BufferRefreshOperation.context)) {
 			if (event.getEventType() == OperationHistoryEvent.DONE) {
-				Debugger.printDebug(1, "STC attributes: ");
+
 				if (isDisposed()) return;
 					
 				getDisplay().syncExec(new Runnable() {
