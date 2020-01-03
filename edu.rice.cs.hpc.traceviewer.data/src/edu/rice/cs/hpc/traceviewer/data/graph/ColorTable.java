@@ -30,7 +30,7 @@ public class ColorTable
 	static private final long RANDOM_SEED = 612543231L;
 	
 	static final private String SEPARATOR_PROCNAME = "\n";
-	static final public String  UNKNOWN_PROCNAME   = "???";
+	static final public String  UNKNOWN_PROCNAME   = "No activity";
 	
 	/**The display this ColorTable uses to generate the random colors.*/
 	final private Display display;
@@ -205,6 +205,8 @@ public class ColorTable
 			cip = createColorImagePair(procName, rgb);
 			predefinedColorMatcher.put(procName, cip);
 			
+			storeProcedureName(rgb, procName);
+			
 			return cip;
 		}
 		
@@ -237,7 +239,22 @@ public class ColorTable
 		
 		// store in a hashmap the pair of RGB hashcode and procedure name
 		// if the hash is already stored, we concatenate the procedure name
-		Integer key = Integer.valueOf(cip.color.getRGB().hashCode());
+		storeProcedureName(cip.color.getRGB(), procName);
+		
+		return cip;
+	}
+	
+	/************************************************************************
+	 * Store a procedure name to the map from rgb to procedure name
+	 *   
+	 * @param rgb
+	 * @param procName
+	 ************************************************************************/
+	private void storeProcedureName(RGB rgb, String procName)
+	{		
+		// store in a hashmap the pair of RGB hashcode and procedure name
+		// if the hash is already stored, we concatenate the procedure name
+		Integer key = Integer.valueOf(rgb.hashCode());
 		String name = mapRGBtoProcedure.get(key);
 		
 		if (name != null) {
@@ -246,8 +263,7 @@ public class ColorTable
 			name = procName;
 		}
 		mapRGBtoProcedure.put(key, name);
-		
-		return cip;
+
 	}
 	
 	/************************************************************************

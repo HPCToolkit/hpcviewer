@@ -77,7 +77,6 @@ public class HPCSummaryView extends AbstractDynamicView
 					// and send the new summary data to other views
 					active(true);
 					summaryCanvas.redraw();
-					System.out.println("HPCSummaryView: redraw");
 				}				
 			}
 			
