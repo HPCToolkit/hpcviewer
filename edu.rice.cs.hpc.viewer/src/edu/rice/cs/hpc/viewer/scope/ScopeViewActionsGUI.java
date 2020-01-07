@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Control;
@@ -48,6 +49,7 @@ import edu.rice.cs.hpc.viewer.window.ViewerWindow;
 import edu.rice.cs.hpc.viewer.window.ViewerWindowManager;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
 import edu.rice.cs.hpc.data.experiment.metric.IMetricManager;
+
 
 /**
  * General actions GUI for basic scope views like caller view and calling context view
@@ -367,8 +369,8 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 		// since the table also contains tree scope column
 		
 		assert status.length == objViewActions.getMetricManager().getMetricCount();
-		
-		treeViewer.getTree().setRedraw(false);
+
+    treeViewer.getTree().setRedraw(false);
     	
 		TreeColumn []columns = treeViewer.getTree().getColumns();
 
@@ -422,6 +424,7 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 		   			Integer objWidth = Integer.valueOf(currentWidth); 
 		   			// Laks: bug no 131: we need to have special key for storing the column width
 		   			column.setData(ScopeTreeViewer.COLUMN_DATA_WIDTH, objWidth);
+
 				}
 				// need a special treatment for Linux/GTK platform:
 				// Explicitly set column pixel into zero due to SWT/GTK implementation that
