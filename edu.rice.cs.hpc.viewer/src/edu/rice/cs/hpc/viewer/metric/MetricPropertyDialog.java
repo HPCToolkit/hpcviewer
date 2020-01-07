@@ -10,7 +10,8 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -19,8 +20,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.ViewerCell;
-
+import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -42,6 +42,7 @@ import edu.rice.cs.hpc.data.experiment.metric.DerivedMetric;
 import edu.rice.cs.hpc.data.experiment.metric.Metric;
 import edu.rice.cs.hpc.data.experiment.metric.MetricType;
 import edu.rice.cs.hpc.data.experiment.scope.RootScope;
+import edu.rice.cs.hpc.data.util.string.StringUtil;
 import edu.rice.cs.hpc.viewer.window.ViewerWindow;
 import edu.rice.cs.hpc.viewer.window.ViewerWindowManager;
 
@@ -188,8 +189,7 @@ public class MetricPropertyDialog extends TitleAreaDialog
 		// metrics table 
 		// -----------------
 		
-		Composite metricArea = new Composite(composite, SWT.BORDER);
-		Table table = new Table(metricArea, SWT.BORDER | SWT.V_SCROLL);
+		Table table = new Table(composite, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 
 		table.setHeaderVisible(true);
 
@@ -225,35 +225,48 @@ public class MetricPropertyDialog extends TitleAreaDialog
 		final TableColumn colName = columnName.getColumn();
 		colName.setText("Metric");
 		colName.setWidth(200);
-		columnName.setLabelProvider(new CellLabelProvider() {
+		columnName.setLabelProvider(new ColumnLabelProvider() {
 			
 			@Override
-			public void update(ViewerCell cell) {
-				cell.setText( ((PropertiesModel)cell.getElement()).sTitle );
+			public String getText(Object element) {
+				final PropertiesModel obj = (PropertiesModel) element;
+				return obj.sTitle;
+			}
+			
+			@Override
+			public String getToolTipText(Object element) {
+				final PropertiesModel obj = (PropertiesModel) element;
+				return obj.sTitle;
 			}
 		});
 		
 		// second column: description
-		final TableViewerColumn columnDesc = new TableViewerColumn(viewer, SWT.NONE);
+		final TableViewerColumn columnDesc = new TableViewerColumn(viewer, SWT.NONE | SWT.WRAP);
 		final TableColumn colDesc = columnDesc.getColumn();
 		colDesc.setText("Description");
 		colDesc.setWidth(100);
-		columnDesc.setLabelProvider(new CellLabelProvider() {
+		columnDesc.setLabelProvider(new ColumnLabelProvider() {
 			
 			@Override
-			public void update(ViewerCell cell) {
-				final PropertiesModel obj = (PropertiesModel) cell.getElement();
-				
-				if (obj.metric instanceof DerivedMetric)
-					cell.setText( "Derived metric" );
+			public String getText(Object element) {
+				final PropertiesModel obj = (PropertiesModel) element;
+				// wrap the description into 70 characters. This number is completely heuristic
+				// and may not fit properly in the column if using different font
+				return StringUtil.wrapScopeName(obj.metric.getDescription(), 70);
+			}
+			
+			@Override
+			public String getToolTipText(Object element) {
+				final PropertiesModel obj = (PropertiesModel) element;
+				final String description  = StringUtil.wrapScopeName(obj.metric.getDescription(), 100);
+				return description;
 			}
 		});
 		
-		GridDataFactory.defaultsFor(table).hint(600, 300).grab(true, true).applyTo(table);
+		ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 		
-		GridDataFactory.swtDefaults().align(SWT.CENTER, SWT.CENTER).
-			grab(true, true).applyTo(metricArea);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(metricArea);
+		GridDataFactory.defaultsFor(table).hint(600, 300).grab(true, true).applyTo(table);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(table);
 		
 		// -------------------------------------
 		// initialize metric table if necessary
@@ -465,7 +478,8 @@ public class MetricPropertyDialog extends TitleAreaDialog
 		
 		for (int i=0; i<10; i++) {
 			final String id = String.valueOf(4 * i + 10);
-			list.add( new Metric(id, id, "M" + id, true, null, null, null, i, MetricType.INCLUSIVE, i) );
+			list.add( new Metric(id, id + ": this is a long description of the metric. Everyone knows that there is no such as thing as a long description. But for the sake sanity test (and insanity test), we do this stupid test on purpose. Please ignore any stupidity in this code.", 
+					"M" + id, true, null, null, null, i, MetricType.INCLUSIVE, i) );
 		}
 		exp.setMetrics(list);
 		dialog.setExperiment(exp);

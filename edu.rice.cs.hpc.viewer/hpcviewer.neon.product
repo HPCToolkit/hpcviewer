@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="hpctraceviewer" id="edu.rice.cs.hpc.traceviewer.product" application="edu.rice.cs.hpc.traceviewer.application" version="2019.10" useFeatures="false" includeLaunchers="true">
+<product name="hpcviewer" id="edu.rice.cs.hpc.viewer.product" application="edu.rice.cs.hpc.viewer.application" version="2019.12" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
-      <image path="/edu.rice.cs.hpc.traceviewer/icons/hpctraceviewer048.png"/>
+      <image path="icons/hpcviewerEclipseShadow128.png"/>
       <text>
-         hpctraceviewer is part of Rice University&apos;s HPCToolkit project. Development of  HPCToolkit is principally funded by the Department of Energy&apos;s Office of Science, Lawrence Livermore National Laboratory and National Science Foundation.
+         hpcviewer is a user interface for analyzing a database of performance metrics in conjunction with an application&apos;s source code.
 
-Release 2019.10   (C) Copyright 2019, Rice University.
+hpcviewer is part of Rice University&apos;s HPCToolkit project. Development of HPCToolkit is principally funded by the Department of Energy&apos;s Office of Science, Lawrence Livermore National Laboratory and National Science Foundation.
+
+Release 2019.12  (C) Copyright 2019, Rice University.
       </text>
    </aboutInfo>
 
@@ -21,25 +23,25 @@ Release 2019.10   (C) Copyright 2019, Rice University.
       <vmArgs>-Dosgi.locking=none
 -Dosgi.requiredJavaVersion=1.8
       </vmArgs>
-      <vmArgsLin>-Dorg.eclipse.swt.internal.gtk.cairoGraphics=false
-      </vmArgsLin>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
       </vmArgsMac>
    </launcherArgs>
 
-   <windowImages i16="/edu.rice.cs.hpc.traceviewer/icons/hpctraceviewer016.png" i32="/edu.rice.cs.hpc.traceviewer/icons/hpctraceviewer032.png" i48="/edu.rice.cs.hpc.traceviewer/icons/hpctraceviewer048.png" i128="/edu.rice.cs.hpc.traceviewer/icons/hpctraceviewer128.png"/>
+   <windowImages i16="icons/hpcviewerEclipse16.gif" i32="icons/hpcviewerEclipse32.gif" i48="icons/hpcviewerEclipse48.gif" i64="icons/hpcviewerEclipse64.gif" i128="icons/hpcviewerEclipse128.gif"/>
 
    <splash
-      startupProgressRect="0,275,445,15" />
-   <launcher name="hpctraceviewer">
-      <linux icon="/edu.rice.cs.hpc.traceviewer/icons/hpctraceviewer032.xpm"/>
-      <macosx icon="/edu.rice.cs.hpc.traceviewer/icons/hpctraceviewer.icns"/>
+      startupProgressRect="0,275,445,15"
+      startupMessageRect="7,252,445,20"
+      startupForegroundColor="000000" />
+   <launcher name="hpcviewer">
+      <linux icon="/edu.rice.cs.hpc.viewer/icons/hpcviewer-icon-32x32-32bit.xpm"/>
+      <macosx icon="/edu.rice.cs.hpc.viewer/icons/hpcviewer.icns"/>
       <solaris/>
       <win useIco="false">
          <bmp
-            winSmallHigh="/edu.rice.cs.hpc.traceviewer/icons/hpctraceviewer016.BMP"
-            winMediumHigh="/edu.rice.cs.hpc.traceviewer/icons/hpctraceviewer032.BMP"
-            winLargeHigh="/edu.rice.cs.hpc.traceviewer/icons/hpctraceviewer048.BMP"/>
+            winSmallHigh="/edu.rice.cs.hpc.viewer/icons/hpcviewer-icon-16x16-32bit.bmp"
+            winMediumHigh="/edu.rice.cs.hpc.viewer/icons/hpcviewer-icon-32x32-32bit.bmp"
+            winLargeHigh="/edu.rice.cs.hpc.viewer/icons/hpcviewer-icon-48x48-32bit.bmp"/>
       </win>
    </launcher>
 
@@ -48,6 +50,7 @@ Release 2019.10   (C) Copyright 2019, Rice University.
    </vm>
 
    <license>
+        <url>http://hpctoolkit.org</url>
         <text>
    Copyright (c) 2002-2018, Rice University 
 All rights reserved.
@@ -84,13 +87,10 @@ if advised of the possibility of such damage.
    <plugins>
       <plugin id="com.graphbuilder"/>
       <plugin id="com.ibm.icu"/>
-      <plugin id="com.jcraft.jsch"/>
-      <plugin id="com.jcraft.jzlib"/>
       <plugin id="edu.rice.cs.hpc.common"/>
       <plugin id="edu.rice.cs.hpc.data"/>
-      <plugin id="edu.rice.cs.hpc.remote"/>
-      <plugin id="edu.rice.cs.hpc.traceviewer"/>
-      <plugin id="edu.rice.cs.hpc.traceviewer.data"/>
+      <plugin id="edu.rice.cs.hpc.filter"/>
+      <plugin id="edu.rice.cs.hpc.viewer"/>
       <plugin id="javax.annotation"/>
       <plugin id="javax.inject"/>
       <plugin id="javax.xml"/>
@@ -101,15 +101,16 @@ if advised of the possibility of such damage.
       <plugin id="org.apache.xerces"/>
       <plugin id="org.apache.xml.resolver"/>
       <plugin id="org.apache.xml.serializer"/>
+      <plugin id="org.eclipse.compare.core"/>
       <plugin id="org.eclipse.core.commands"/>
       <plugin id="org.eclipse.core.contenttype"/>
       <plugin id="org.eclipse.core.databinding"/>
       <plugin id="org.eclipse.core.databinding.observable"/>
       <plugin id="org.eclipse.core.databinding.property"/>
       <plugin id="org.eclipse.core.expressions"/>
+      <plugin id="org.eclipse.core.filebuffers"/>
       <plugin id="org.eclipse.core.filesystem"/>
       <plugin id="org.eclipse.core.filesystem.java7" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.filesystem.macosx" fragment="true"/>
       <plugin id="org.eclipse.core.jobs"/>
       <plugin id="org.eclipse.core.resources"/>
@@ -181,16 +182,18 @@ if advised of the possibility of such damage.
       <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
       <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
       <plugin id="org.eclipse.swt.gtk.solaris.sparc" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.solaris.sparcv9" fragment="true"/>
       <plugin id="org.eclipse.swt.gtk.solaris.x86" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.solaris.x86_64" fragment="true"/>
       <plugin id="org.eclipse.swt.win32.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.swt.win32.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.text"/>
       <plugin id="org.eclipse.ui"/>
       <plugin id="org.eclipse.ui.cocoa" fragment="true"/>
+      <plugin id="org.eclipse.ui.editors"/>
       <plugin id="org.eclipse.ui.ide"/>
       <plugin id="org.eclipse.ui.workbench"/>
+      <plugin id="org.eclipse.ui.workbench.texteditor"/>
+      <plugin id="org.swtchart"/>
+      <plugin id="org.swtchart.ext"/>
       <plugin id="org.tukaani.xz"/>
       <plugin id="org.w3c.css.sac"/>
       <plugin id="org.w3c.dom.events"/>

@@ -34,6 +34,8 @@ public interface IScopeActionsGUI {
 	 */
 	public void updateContent(Experiment exp, RootScope scope);
 
+	public void finalizeContent(RootScope root);
+	
 	/**
 	 * Set the new tree viewer
 	 * @param tree

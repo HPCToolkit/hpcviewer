@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Display;
 
 import edu.rice.cs.hpc.common.ui.Util;
 import edu.rice.cs.hpc.common.util.ProcedureClassData;
+import edu.rice.cs.hpc.data.util.OSValidator;
 import edu.rice.cs.hpc.traceviewer.data.util.ProcedureClassMap;
 
 /**************************************************************
@@ -28,6 +29,9 @@ public class ColorTable
 	static private final int COLOR_MAX = 200 - COLOR_MIN;
 	static private final long RANDOM_SEED = 612543231L;
 	
+	static final private String SEPARATOR_PROCNAME = "\n";
+	static final public String  UNKNOWN_PROCNAME   = "[No activity]";
+	
 	/**The display this ColorTable uses to generate the random colors.*/
 	final private Display display;
 
@@ -41,6 +45,8 @@ public class ColorTable
 	private ColorImagePair IMAGE_WHITE;
 	private	HashMap<String, ColorImagePair> colorMatcher;
 	private	HashMap<String, ColorImagePair> predefinedColorMatcher;
+	private HashMap<Integer, String>        mapRGBtoProcedure;
+	private HashMap<Integer, String>		mapReservedColor;
 
 	/**Creates a new ColorTable with Display _display.*/
 	public ColorTable()
@@ -54,9 +60,11 @@ public class ColorTable
 		classMap = new ProcedureClassMap(display);
 		
 		colorMatcher 		   = new HashMap<String, ColorTable.ColorImagePair>();
-		predefinedColorMatcher = new HashMap<String, ColorTable.ColorImagePair>();
 		
 		initializeWhiteColor();
+		
+		predefinedColorMatcher = new HashMap<String, ColorTable.ColorImagePair>();
+		mapRGBtoProcedure	   = new HashMap<Integer, String>();
 	}
 	
 	/**
@@ -75,6 +83,8 @@ public class ColorTable
 		predefinedColorMatcher.clear();
 		
 		classMap.clear();
+		
+		mapRGBtoProcedure.clear();
 	}
 	
 	public void resetPredefinedColor() 
@@ -94,6 +104,7 @@ public class ColorTable
 			ColorImagePair cip = createColorImagePair(proc, rgb);
 			
 			predefinedColorMatcher.put(proc, cip);
+			mapRGBtoProcedure.put(rgb.hashCode(), proc);
 		}
 	}
 	
@@ -129,6 +140,43 @@ public class ColorTable
 	public void addProcedure(String proc) 
 	{
 		createColorImagePair(proc);
+	}
+	
+	/************************************************************************
+	 * Return the name of the procedure for a given RGB or Color hashcode.<br/>
+	 * If the hashcode is not recognized, it returns null.<br/>
+	 * Notes: on Mac, the hashcode for RGB is the same as the hashcode for Color
+	 * 
+	 * @param int hashcode
+	 * @return String the name of the procedure
+	 ************************************************************************/
+	public String getProcedureNameByColorHash(int hashcode) 
+	{
+		// get the reserved color first
+		String proc = mapReservedColor.get(Integer.valueOf(hashcode));
+		if (proc != null)
+			return proc;
+		
+		// get the normal procedure (if exist)
+		proc = mapRGBtoProcedure.get(Integer.valueOf(hashcode));
+		if (proc == null)
+			return UNKNOWN_PROCNAME;
+		
+		return proc;
+	}
+	
+	/************************************************************************
+	 * add list of reserved color-procedure pair
+	 * 
+	 * @param procName
+	 * @param rgb
+	 ************************************************************************/
+	public void addReservedColor(String procName, RGB rgb)
+	{
+		if (mapReservedColor == null) {
+			mapReservedColor = new HashMap<Integer, String>(1);
+		}
+		mapReservedColor.put(rgb.hashCode(), procName);
 	}
 	
 	/***********************************************************************
@@ -179,6 +227,8 @@ public class ColorTable
 			cip = createColorImagePair(procName, rgb);
 			predefinedColorMatcher.put(procName, cip);
 			
+			storeProcedureName(rgb, procName);
+			
 			return cip;
 		}
 		
@@ -189,12 +239,12 @@ public class ColorTable
 		}
 		
 		// 3. generate a new color-image if we have enough handles
-		if (colorMatcher.size() < MAX_NUM_DIFFERENT_COLORS) {
+		if (colorMatcher.size() < MAX_NUM_DIFFERENT_COLORS || !OSValidator.isWindows()) {
 			RGB rgb = getProcedureColor( procName, COLOR_MIN, COLOR_MAX, random_generator );
 			cip = createColorImagePair(procName, rgb);
 		} else {			
 			
-			// 4. we have more procedures than the limit
+			// 4. Windows only: we have more procedures than the limit
 			// this may not work on some OS like Windows that limits the number of handles
 			// we need to reuse existing color randomly to this procedure to avoid system crash
 
@@ -206,9 +256,36 @@ public class ColorTable
 			int index = random_generator.nextInt(MAX_NUM_DIFFERENT_COLORS-2)+1;
 			cip = listDefinedColorImagePair[index];
 		}
+		// store in a hashmap the pair procdure and image-color
 		colorMatcher.put(procName, cip);
-
+		
+		// store in a hashmap the pair of RGB hashcode and procedure name
+		// if the hash is already stored, we concatenate the procedure name
+		storeProcedureName(cip.color.getRGB(), procName);
+		
 		return cip;
+	}
+	
+	/************************************************************************
+	 * Store a procedure name to the map from rgb to procedure name
+	 *   
+	 * @param rgb
+	 * @param procName
+	 ************************************************************************/
+	private void storeProcedureName(RGB rgb, String procName)
+	{		
+		// store in a hashmap the pair of RGB hashcode and procedure name
+		// if the hash is already stored, we concatenate the procedure name
+		Integer key = Integer.valueOf(rgb.hashCode());
+		String name = mapRGBtoProcedure.get(key);
+		
+		if (name != null) {
+			name += SEPARATOR_PROCNAME + procName;
+		} else {
+			name = procName;
+		}
+		mapRGBtoProcedure.put(key, name);
+
 	}
 	
 	/************************************************************************
@@ -264,6 +341,8 @@ public class ColorTable
 			IMAGE_WHITE = new ColorImagePair(col_white, img_white );
 			
 			colorMatcher.put(CallPath.NULL_FUNCTION, IMAGE_WHITE);
+			
+			addReservedColor(UNKNOWN_PROCNAME, rgb_white);
 		}
 	}
 	

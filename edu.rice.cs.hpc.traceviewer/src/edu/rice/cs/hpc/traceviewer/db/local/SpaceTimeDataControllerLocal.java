@@ -2,8 +2,6 @@ package edu.rice.cs.hpc.traceviewer.db.local;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.IWorkbenchWindow;
 
@@ -15,9 +13,7 @@ import edu.rice.cs.hpc.data.experiment.extdata.TraceAttribute;
 import edu.rice.cs.hpc.data.util.Constants;
 import edu.rice.cs.hpc.data.util.MergeDataFiles;
 import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
-import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
 import edu.rice.cs.hpc.traceviewer.data.db.TraceDataByRank;
-import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimeline;
 import edu.rice.cs.hpc.traceviewer.data.version2.BaseData;
 import edu.rice.cs.hpc.traceviewer.data.version2.FilteredBaseData;
 import edu.rice.cs.hpc.traceviewer.data.version3.FileDB3;
@@ -110,60 +106,7 @@ public class SpaceTimeDataControllerLocal extends SpaceTimeDataController
 		}
 		return null;
 	}
-	
-	/***********************************************************************
-	 * Gets the next available trace to be filled/painted
-	 * 
-	 * @param changedBounds
-	 *            Whether or not the thread should get the data.
-	 * @return The next trace.
-	 **********************************************************************/
-	@Override
-	public ProcessTimeline getNextTrace(AtomicInteger currentLine, int totalLines,
-			ImageTraceAttributes attributes, boolean changedBounds, IProgressMonitor monitor) {
-		
-		ProcessTimeline timeline = null;
-		// retrieve the current processing line, and atomically increment so that 
-		// other threads will not increment at the same time
-		// if the current line reaches the number of traces to render, we are done
-		
-		int currentLineNum = currentLine.getAndIncrement();
-		if (currentLineNum < totalLines) {
-			
-			if (ptlService.getNumProcessTimeline() == 0)
-				ptlService.setProcessTimeline(new ProcessTimeline[totalLines]);
-			
-			if (changedBounds) {
-				ProcessTimeline currentTimeline = new ProcessTimeline(currentLineNum, getScopeMap(),
-						dataTrace, lineToPaint(currentLineNum, attributes),
-						attributes.numPixelsH, attributes.getTimeInterval(), 
-						minBegTime + attributes.getTimeBegin());
-				
-				if (ptlService.setProcessTimeline(currentLineNum, currentTimeline)) {
-					timeline = currentTimeline;
-				} else {
-					monitor.setCanceled(true);
-					monitor.done();
-				}
-			} else {
-				timeline = ptlService.getProcessTimeline(currentLineNum);
-			}
-		}
-		return timeline;
-	}
 
-	
-	/** Returns the index of the file to which the line-th line corresponds. */
-
-	private int lineToPaint(int line, ImageTraceAttributes attributes) {
-
-		int numTimelinesToPaint = attributes.getProcessInterval();
-		if (numTimelinesToPaint > attributes.numPixelsV)
-			return attributes.getProcessBegin() + (line * numTimelinesToPaint)
-					/ (attributes.numPixelsV);
-		else
-			return attributes.getProcessBegin() + line;
-	}
 	
 
 	@Override

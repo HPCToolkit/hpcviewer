@@ -42,12 +42,12 @@ public class MetricRaw  extends BaseMetric
 	 * @param type
 	 * @param metrics
 	 */
-	public MetricRaw(int id, String title, String db_pattern, int db_num, int partner_index, 
+	public MetricRaw(int id, String title, String description, String db_pattern, int db_num, int partner_index, 
 			MetricType type, int metrics) {
 		// raw metric has no partner
 		// default annotation: percentage, although some metrics may have no percent due to missing value
 		// on its root (such as exclusive metric)
-		super( String.valueOf(id), title, true, null, AnnotationType.PERCENT, db_num, partner_index, type);
+		super( String.valueOf(id), title, description, true, null, AnnotationType.PERCENT, db_num, partner_index, type);
 		this.ID 	 = id;
 		this.db_glob = db_pattern;
 		this.db_id 	 = db_num;
@@ -167,7 +167,7 @@ public class MetricRaw  extends BaseMetric
 
 	@Override
 	public BaseMetric duplicate() {
-		MetricRaw dup = new MetricRaw(ID, displayName, db_glob, db_id, 
+		MetricRaw dup = new MetricRaw(ID, displayName, description, db_glob, db_id, 
 				partner_index, metricType, num_metrics);
 		// TODO: hack to duplicate also the thread data
 		dup.threadData = threadData;
@@ -199,7 +199,8 @@ public class MetricRaw  extends BaseMetric
 			}
 			if (value == MetricValue.NONE && s instanceof RootScope 
 					&& metricType == MetricType.EXCLUSIVE) {
-				value = partner.getValue(s, threads);
+				if (partner != null)
+					value = partner.getValue(s, threads);
 			}
 		}
 		return value;
@@ -230,19 +231,6 @@ public class MetricRaw  extends BaseMetric
 	}
 	
 
-	/*****
-	 * compute the average value of a scope for certain threads.
-	 * The number of threads cannot be null.
-	 * @param s
-	 * @return
-	 * @throws IOException
-	 */
-	private MetricValue getAverageValue(IMetricScope s, List<Integer> threads) throws IOException
-	{
-		double value = getSumValue(s, threads).value / threads.size(); 
-		return setValue(value);
-	}
-	
 	/****
 	 * get the metric value of a give scope on a given thread
 	 * 

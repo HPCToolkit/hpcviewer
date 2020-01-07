@@ -1,6 +1,7 @@
 package edu.rice.cs.hpc.traceviewer.main;
 
 import java.text.DecimalFormat;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,6 +24,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -30,7 +32,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.services.ISourceProviderService;
 
+import edu.rice.cs.hpc.data.experiment.BaseExperiment;
+import edu.rice.cs.hpc.data.experiment.ExperimentWithoutMetrics;
 import edu.rice.cs.hpc.data.experiment.extdata.IBaseData;
+import edu.rice.cs.hpc.data.experiment.extdata.TraceAttribute;
 import edu.rice.cs.hpc.traceviewer.operation.BufferRefreshOperation;
 import edu.rice.cs.hpc.traceviewer.operation.DepthOperation;
 import edu.rice.cs.hpc.traceviewer.operation.PositionOperation;
@@ -38,6 +43,7 @@ import edu.rice.cs.hpc.traceviewer.operation.TraceOperation;
 import edu.rice.cs.hpc.traceviewer.operation.WindowResizeOperation;
 import edu.rice.cs.hpc.traceviewer.operation.ZoomOperation;
 import edu.rice.cs.hpc.traceviewer.painter.AbstractTimeCanvas;
+import edu.rice.cs.hpc.traceviewer.painter.BaseViewPaint;
 import edu.rice.cs.hpc.traceviewer.painter.BufferPaint;
 import edu.rice.cs.hpc.traceviewer.painter.ISpaceTimeCanvas;
 import edu.rice.cs.hpc.traceviewer.painter.ResizeListener;
@@ -45,6 +51,7 @@ import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
 import edu.rice.cs.hpc.traceviewer.data.db.Frame;
 import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
 import edu.rice.cs.hpc.traceviewer.data.db.Position;
+import edu.rice.cs.hpc.traceviewer.data.graph.ColorTable;
 import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimeline;
 import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimelineService;
 import edu.rice.cs.hpc.traceviewer.util.MessageLabelManager;
@@ -62,6 +69,8 @@ import edu.rice.cs.hpc.traceviewer.data.util.Debugger;
 public class SpaceTimeDetailCanvas extends AbstractTimeCanvas 
 	implements IOperationHistoryListener, ISpaceTimeCanvas
 {	
+	final long PER_MICRO_SECOND = 1000000;
+	
 	/**The SpaceTimeData corresponding to this canvas.*/
 	protected SpaceTimeDataController stData;
 
@@ -542,6 +551,32 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		restoreMessage.showWarning(message);
 	}
 	
+	/**************************************************************************
+	 * retrieve the unit time per second of the trace
+	 * The information is from experiment.xml
+	 * 
+	 * @return double unit time oer second
+	 **************************************************************************/
+	private double getUnitTimePerSecond() 
+	{
+		long unit_time = TraceAttribute.PER_NANO_SECOND;
+		
+		if (stData.getExperiment().getMajorVersion() == 2) {
+			if (stData.getExperiment().getMinorVersion() < 2) {
+				// old version of database: always microsecond
+				unit_time = PER_MICRO_SECOND;
+			} else {
+				// new version of database:
+				// - if the measurement is from old hpcrun: microsecond
+				// - if the measurement is from new hpcrun: nanosecond
+				
+				BaseExperiment be = this.stData.getExperiment();
+				ExperimentWithoutMetrics exp = (ExperimentWithoutMetrics) be;
+				unit_time = exp.getTraceAttribute().dbUnitTime;
+			}
+		}
+		return (double)unit_time;
+	}
 	
 	/**************************************************************************
 	 * Updates what the labels display to the viewer's current state.
@@ -549,9 +584,15 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	private void adjustLabels()
     {
 		final ImageTraceAttributes attributes = stData.getAttributes();
-		final String timeStart = formatTime.format(attributes.getTimeBegin()/1000000.0);
-		final String timeEnd   = formatTime.format(attributes.getTimeEnd()/1000000.0);
-        timeLabel.setText("Time Range: [" + timeStart + "s, " + timeEnd +  "s]");
+		double unit_time = getUnitTimePerSecond();
+		
+		double timeInSec = attributes.getTimeBegin()/unit_time;
+		final String timeStart = formatTime.format(timeInSec);
+		
+		timeInSec = attributes.getTimeEnd()/unit_time;
+		final String timeEnd   = formatTime.format(timeInSec);
+        
+		timeLabel.setText("Time Range: [" + timeStart + "s, " + timeEnd +  "s]");
         timeLabel.setSize(timeLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT));
         
 
@@ -591,26 +632,14 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
         {
         	final Position position = stData.getAttributes().getPosition();
     		final long selectedTime = position.time;
-    		int proc = 0;
+    		final int  selectedProc = stData.computeScaledProcess();
     		
-    		//final int rank = position.process;
-    		// we need to use the process of the depth view to know the selected process
-    		// this approach is more reliable than computing the selected process based on
-    		// cursor position. Due to inconsistency use of floating-point rounding, 
-    		// the computed cursor position can be "non-deterministic"
-    		ProcessTimeline ptl = stData.getCurrentDepthTrace();
-
-    		// in case of exception, it is possible the depth trace is null
-    		if (ptl != null) {
-        		proc = stData.getCurrentDepthTrace().getProcessNum();
-    		}
-    		
-    		if ( proc >= 0 && proc < processes.length ) {  
-    			crossHairLabel.setText("Cross Hair: " + getCrossHairText(selectedTime, proc));
+    		if ( selectedProc >= 0 && selectedProc < processes.length ) {  
+    			crossHairLabel.setText("Cross Hair: " + getCrossHairText(selectedTime, selectedProc));
             	//crossHairLabel.setText("Cross Hair: (" + (selectedTime/1000)/1000.0 + "s, " + processes[rank] + ")");
     		} else {
     			// in case of incorrect filtering where user may have empty ranks or incorrect filters, we don't display the rank
-    			crossHairLabel.setText("Cross Hair: (" + (selectedTime/1000)/1000.0 + "s, ?)");
+    			crossHairLabel.setText("Cross Hair: (" + (selectedTime/getUnitTimePerSecond())/.0 + "s, ?)");
     		}
         }
         
@@ -628,7 +657,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	 **************************************************************************/
 	private String getCrossHairText(long closeTime, int selectedProcess) 
 	{
-		final float selectedTime = (float) ((float)closeTime / 1000000.0);
+		final float selectedTime = (float) ((float)closeTime / getUnitTimePerSecond());
         final IBaseData traceData = stData.getBaseData();
         final String processes[] = traceData.getListOfRanks();
 
@@ -893,7 +922,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		return (stData.getAttributes().getProcessInterval());
 	}
 	
-
+	final private ConcurrentLinkedQueue<BaseViewPaint> queue = new ConcurrentLinkedQueue<>();
 	
 	/*********************************************************************************
 	 * Refresh the content of the canvas with new input data or boundary or parameters
@@ -999,7 +1028,19 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 			@Override
 			public void aboutToRun(IJobChangeEvent event) {}
 		});
+		
+		if (!queue.isEmpty()) {
+			for (BaseViewPaint job : queue) {
+				if (!job.cancel()) {
+					// a job cannot be cancel
+					// this is fine, we should wait until it terminates or
+					// response that it will cancel in the future
+				}
+			}
+		}
+		
 		detailPaint.schedule();
+		queue.add(detailPaint);
 	}
 
 	private void asyncRedraw() 
@@ -1265,5 +1306,17 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 			adjustSelection(region);
 			setDetail();
 		}
+	}
+
+
+	@Override
+	protected String tooltipText(int pixel, RGB rgb) {
+		return null;
+	}
+
+
+	@Override
+	protected ColorTable getColorTable() {
+		return stData.getColorTable();
 	}
 }

@@ -1,16 +1,23 @@
 package edu.rice.cs.hpc.traceviewer.painter;
 
+import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 
 import edu.rice.cs.hpc.data.util.OSValidator;
+import edu.rice.cs.hpc.data.util.string.StringUtil;
+import edu.rice.cs.hpc.traceviewer.data.graph.ColorTable;
 import edu.rice.cs.hpc.traceviewer.data.util.Constants;
 
 
@@ -32,6 +39,8 @@ implements ITraceCanvas, PaintListener
 	
 	/** The left/right point that you selected.*/
 	private Rectangle selection;
+	
+	private BufferedCanvasToolTip tooltip;
 	
 	protected enum RegionType {Vertical, Rectangle};
 	
@@ -72,6 +81,9 @@ implements ITraceCanvas, PaintListener
 					AbstractTimeCanvas.this.initMouseSelection();
 				}
 			});
+			
+			tooltip = new BufferedCanvasToolTip(this);
+			tooltip.activate();
 		}
 		initMouseSelection();
 		super.initBuffer();
@@ -161,6 +173,14 @@ implements ITraceCanvas, PaintListener
 	}
 	
 	
+	@Override
+	public void dispose () {
+		if (tooltip != null)
+			tooltip.deactivate();
+		
+		super.dispose();
+	}
+	
 	private void adjustPosition(Point p1, Point p2) 
 	{
 		selection.x = Math.min(p1.x, p2.x);
@@ -180,6 +200,73 @@ implements ITraceCanvas, PaintListener
 		}
 	}
 	
+	
+	/******************************************************************
+	 * 
+	 * Customized tooltip for generic time-based buffered canvas
+	 *
+	 ******************************************************************/
+
+	
+	static private class BufferedCanvasToolTip extends DefaultToolTip
+	{
+		final private AbstractTimeCanvas canvas;
+		
+		public BufferedCanvasToolTip(AbstractTimeCanvas canvas) {
+			super(canvas);
+			
+			this.canvas = canvas;
+		}
+		
+		@Override
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.window.DefaultToolTip#getText(org.eclipse.swt.widgets.Event)
+		 */
+		protected String getText(Event event) {
+			final Image image = canvas.getBuffer();
+			if (image == null)
+				return null;
+			
+			final ImageData imgData = image.getImageData();
+			if (imgData == null)
+				return null;
+			
+			if (event.x >= imgData.width || event.y >= imgData.height || event.x < 0 || event.y < 0)
+				// corner case: when resizing is faster than rendering
+				return null;
+			
+			int pixel = imgData.getPixel(event.x, event.y);
+			final RGB rgb = imgData.palette.getRGB(pixel);
+			
+			ColorTable colorTable = canvas.getColorTable();
+			if (colorTable == null)
+				return null;
+			
+			String proc = canvas.getColorTable().getProcedureNameByColorHash( rgb.hashCode() );
+			if (proc != null) {
+				proc = StringUtil.wrapScopeName(proc, 80);
+			}
+			
+			String addText = canvas.tooltipText(pixel, rgb);
+			if (addText != null)
+				return addText + proc;
+			
+			return proc;
+		}
+		
+		@Override
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.window.ToolTip#getLocation(org.eclipse.swt.graphics.Point, org.eclipse.swt.widgets.Event)
+		 */
+		public Point getLocation(Point tipSize, Event event) {
+			return canvas.toDisplay(event.x + 5, event.y - 15);
+		}
+		
+	}
+
+	
 	/*************************
 	 * function called when there's a change of mouse click position
 	 * 
@@ -195,4 +282,9 @@ implements ITraceCanvas, PaintListener
 	 * @param right
 	 ***************************/
 	protected abstract void changeRegion(Rectangle region);
+	
+	
+	protected abstract String tooltipText(int pixel, RGB rgb);
+	
+	protected abstract ColorTable getColorTable();
 }

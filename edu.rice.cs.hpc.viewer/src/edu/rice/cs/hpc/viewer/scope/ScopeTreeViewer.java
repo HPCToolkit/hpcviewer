@@ -120,7 +120,11 @@ public class ScopeTreeViewer extends TreeViewer
 	public void refreshColumnTitle() {
 		
 		String []sText = Utilities.getTopRowItems(this);
-
+		
+		// corner case; empty top row for initial state of dynamic views
+		if (sText == null)
+			return;
+		
 		TreeColumn columns[] = this.getTree().getColumns();
 		boolean need_to_refresh = false;
 		
@@ -184,7 +188,7 @@ public class ScopeTreeViewer extends TreeViewer
 		// set the title and tooltip of the header
 		
     	col.setText(objMetric.getDisplayName());		
-    	col.setToolTipText(objMetric.getDisplayName());
+    	col.setToolTipText(objMetric.getDescription());
     	
 		// associate the data of this column to the metric since we
 		// allowed columns to move (col position is not enough !)

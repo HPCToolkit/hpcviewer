@@ -13,6 +13,7 @@ import edu.rice.cs.hpc.common.ui.Util;
 import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
 import edu.rice.cs.hpc.data.experiment.metric.DerivedMetric;
+import edu.rice.cs.hpc.data.experiment.metric.MetricValue;
 import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.experiment.scope.RootScopeType;
 import edu.rice.cs.hpc.data.experiment.scope.visitors.FilterScopeVisitor;
@@ -137,13 +138,16 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         if (myRootScope != null && myRootScope.getChildCount() > 0) {
             treeViewer.setInput(myRootScope);
             
-            this.objViewActions.updateContent(getExperiment(), myRootScope);
-
             // Try select the first scope
             /*TreeItem objItem = treeViewer.getTree().getItem(1);            
             treeViewer.getTree().showItem(objItem);
             this.treeViewer.getTree().setSelection(objItem);*/
-            
+    		
+            // Finalize the content of the table: 
+    		// - update the root scope of the actions
+    		// - insert the parent node (aggregate metric)
+    		objViewActions.finalizeContent(myRootScope);
+
             // reset the button
             this.objViewActions.checkNodeButtons();
             
@@ -172,13 +176,12 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
 		
 		if (treeViewer == null) return;
 		
+        objViewActions.updateContent(database.getExperiment(), myRootScope);
+		
     	Tree tree = treeViewer.getTree();
     	if (tree == null || tree.isDisposed()) return;
     	
 		addMetricColumnsToTable(tree, keepColumnStatus);
-		
-        // update the root scope of the actions !
-        this.objViewActions.updateContent(database.getExperiment(), myRootScope);
 	}
 
 	/***
@@ -227,29 +230,46 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         final int numMetric			  = myExperiment.getMetricCount();
 
         int iColCount = tree.getColumnCount();
+        
+        /** status: list of booleans to indicate if a column should be shown or not 
+         *  The number of items depends of the number of created column. 
+         *  If the experiment has empty  metrics, the number of columns is not the same
+         *    as the number of metrics since we don't create empty columns to save memory
+         *    and processing */ 
         boolean status[] = new boolean[numMetric];
+        
+        boolean empty[]  = new boolean[numMetric];
 
         tree.setRedraw(false);
         
         if (!keepColumnStatus) {
         	int i=0;
+        	
+        	// empty metric: if the root scope has no metric value
+        	// displayable: if the metric is to be displayed and not empty
         	for(BaseMetric metric: myExperiment.getMetrics()) {
-        		status[i] = metric.getDisplayed();
+        		
+        		empty[i]  = myRootScope.getMetricValue(metric) == MetricValue.NONE;
+    			status[i] = !empty[i] && metric.getDisplayed();
         		i++;
         	}
         }
         else if(iColCount>1) {
-        	TreeColumn []columns = tree.getColumns();
         	
-        	// this is Eclipse Indigo bug: when a column is disposed, the next column will have
-        	//	zero as its width. Somehow they didn't preserve the width of the columns.
-        	// Hence, we have to retrieve the information of column width before the dispose action
-        	for(int i=1;i<iColCount;i++) {        		
-        		// bug fix: for callers view activation, we have to reserve the current status
-        		if (keepColumnStatus && i-1<status.length) {
-        			int width = columns[i].getWidth();
-        			status[i-1] = (width > 0);
+        	TreeColumn []columns = tree.getColumns();
+        	int i=0;
+        	for(BaseMetric metric: myExperiment.getMetrics()) {
+        		empty[i]  = myRootScope.getMetricValue(metric) == MetricValue.NONE;
+        		
+        		int j;
+        		for (j=1; j<columns.length && columns[j].getData() != metric; j++) ;
+        		
+        		if (j<columns.length && columns[j].getData() == metric) {
+        			status[i] = columns[j].getWidth() > 1;
+        		} else {
+        			status[i] = false;
         		}
+        		i++;
         	}
         }
     	TreeColumn []columns = tree.getColumns();
@@ -267,35 +287,27 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
 		ScopeSelectionAdapter selectionAdapter = new ScopeSelectionAdapter(treeViewer, colTree);
 		colTree.getColumn().addSelectionListener(selectionAdapter);
         
-        // dirty solution to update titles
-        TreeViewerColumn []colMetrics = new TreeViewerColumn[numMetric];
-        {
-            // Update metric title labels
-            String[] titles  = new String[numMetric+1];
-            titles[0] 		 = "Scope";	 // unused element. Already defined
-            
-            boolean alreadySorted = false;
-            
-            // add table column for each metric
-        	for (int i=0; i<numMetric; i++)
-        	{
-        		final BaseMetric metric = myExperiment.getMetric(i);
-        		if (metric != null) {
-            		titles[i+1] = metric.getDisplayName();	// get the title
-            		
-                    boolean toBeSorted = false;
-                    
-            		// A column is sorted if it is the first displayed column            		
-            		if (!alreadySorted && status[i]) {
-            			toBeSorted    = true;
-            			alreadySorted = true;
-            		}
-            		
-            		colMetrics[i] = this.treeViewer.addTreeColumn(metric, toBeSorted);
+        boolean alreadySorted = false;
+        
+        // add table column for each metric
+    	for (int i=0; i<numMetric; i++)
+    	{
+    		final BaseMetric metric = myExperiment.getMetric(i);
+    		if (metric != null) {
+        		
+                boolean toBeSorted = false;
+                
+        		// A column is sorted if it is the first displayed column            		
+        		if (!alreadySorted && !empty[i] && metric.getDisplayed()) {
+        			toBeSorted    = true;
+        			alreadySorted = true;
         		}
-        	}
-            treeViewer.setColumnProperties(titles); // do we need this ??
-        }
+        		// only create metric columns if it has metric values
+        		// we don't need to create empty column just to show the metric exists
+        		if (!empty[i])
+        			treeViewer.addTreeColumn(metric, toBeSorted);
+    		}
+    	}
     	this.objViewActions.objActionsGUI.setColumnsStatus(status);
     	
         tree.setRedraw(true);

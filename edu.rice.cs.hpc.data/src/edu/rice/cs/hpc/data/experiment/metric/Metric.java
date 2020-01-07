@@ -50,22 +50,23 @@ public final static int NO_PARTNER_INDEX = -1;
 /**
  * Construct a metric using a "String" sample period
  * @param shortName
- * @param nativeName
+ * @param description
  * @param displayName
  * @param displayed
  * @param format
  * @param annotationType
  * @param sampleperiod
+ * @param index
  * @param metricType
  * @param partnerIndex
  */
-public Metric(String shortName, String nativeName, String displayName, boolean displayed, 
+public Metric(String shortName, String description, String displayName, boolean displayed, 
               String format, AnnotationType annotationType, String samplePeriod, 
               int index, MetricType metricType, int partnerIndex)
 {
-	super(shortName, displayName, displayed, format, annotationType, index, partnerIndex, metricType);
+	super(shortName, displayName, description, 
+			displayed, format, annotationType, index, partnerIndex, metricType);
 	// creation arguments
-	this.nativeName  = nativeName;
     this.sampleperiod  = this.convertSamplePeriode(samplePeriod);
     this.metricType     = metricType;
 }
@@ -87,7 +88,7 @@ public MetricValue getRawValue(IMetricScope s)
 
 //@Override
 public BaseMetric duplicate() {
-	return new Metric(shortName, nativeName, displayName, displayed, null, annotationType, 
+	return new Metric(shortName, description, displayName, displayed, null, annotationType, 
 			String.valueOf(sampleperiod), index, metricType, partner_index);
 }
 

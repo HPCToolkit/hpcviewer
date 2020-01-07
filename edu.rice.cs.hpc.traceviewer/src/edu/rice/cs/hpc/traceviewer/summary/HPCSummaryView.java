@@ -12,14 +12,15 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
 import edu.rice.cs.hpc.traceviewer.services.DataService;
-import edu.rice.cs.hpc.traceviewer.ui.AbstractTimeView;
+import edu.rice.cs.hpc.traceviewer.services.SummaryDataService;
+import edu.rice.cs.hpc.traceviewer.ui.AbstractDynamicView;
 
 /*************************************************************************
  * 
  * View part of the summary window 
  *
  *************************************************************************/
-public class HPCSummaryView extends AbstractTimeView
+public class HPCSummaryView extends AbstractDynamicView
 {
 
 	public static final String ID = "hpcsummaryview.view";
@@ -64,6 +65,24 @@ public class HPCSummaryView extends AbstractTimeView
 				}
 			}
 		});
+
+		ISourceProvider requestProvider = service.getSourceProvider(SummaryDataService.DATA_REQUEST);
+		requestProvider.addSourceProviderListener( new ISourceProviderListener() {
+			
+			@Override
+			public void sourceChanged(int sourcePriority, String sourceName, Object sourceValue) {
+				if (sourceName.equals(SummaryDataService.DATA_REQUEST)) {
+
+					// force summary view to be "active" so that it can repaint the canvas
+					// and send the new summary data to other views
+					active(true);
+					summaryCanvas.broadcast();
+				}				
+			}
+			
+			@Override
+			public void sourceChanged(int sourcePriority, Map sourceValuesByName) {}
+		});
 	}
 
 	public void updateView(SpaceTimeDataController dataTraces)
@@ -83,7 +102,6 @@ public class HPCSummaryView extends AbstractTimeView
 	@Override
 	public void active(boolean isActive) 
 	{
-		summaryCanvas.activate(isActive);
 	}
 
 }

@@ -12,7 +12,6 @@ import edu.rice.cs.hpc.traceviewer.data.db.DataLinePainting;
 import edu.rice.cs.hpc.traceviewer.data.db.DataPreparation;
 import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
 import edu.rice.cs.hpc.traceviewer.data.db.TimelineDataSet;
-import edu.rice.cs.hpc.traceviewer.data.graph.ColorTable;
 import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimeline;
 
 

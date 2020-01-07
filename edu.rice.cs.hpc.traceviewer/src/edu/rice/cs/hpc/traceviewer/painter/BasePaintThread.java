@@ -115,6 +115,9 @@ public abstract class BasePaintThread implements Callable<List<ImagePosition>> {
 			// ------------------------------------------------------------------
 			for(BaseDataVisualization data : setDataToPaint.getList()) 
 			{
+				if (monitor.isCanceled())
+					return listOfImages;
+				
 				// ------------------------------------------------------------------
 				// paint the image
 				// ------------------------------------------------------------------

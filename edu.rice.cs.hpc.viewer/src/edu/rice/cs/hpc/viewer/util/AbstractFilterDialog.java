@@ -8,18 +8,20 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -34,20 +36,19 @@ import org.eclipse.swt.widgets.Text;
 
 public abstract class AbstractFilterDialog extends TitleAreaDialog 
 {
-	final private String []label;
-	final private boolean []checked;
+	final private FilterDataItem []items;
+	
 	final private String title, message;
 	protected ColumnCheckTableViewer objCheckBoxTable ;
 	protected Text objSearchText;
-	protected boolean[] results;
 
 	protected ArrayList<PropertiesModel> arrElements;
 	
 	public AbstractFilterDialog(Shell parentShell, String title, String message, 
-			String []label, boolean []checked) {
+			FilterDataItem items[]) {
+
 		super(parentShell);
-		this.label   = label;
-		this.checked = checked;
+		this.items   = items;
 		this.title	 = title;
 		this.message = message;
 	}
@@ -56,8 +57,8 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 	 * Get the list of checked and unchecked items
 	 * @return the array of true/false
 	 */
-	public boolean[] getResult() {
-		return results;
+	public FilterDataItem[] getResult() {
+		return items;
 	}
 
 	
@@ -135,8 +136,8 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 		// list of columns (we use table for practical purpose)
 		Table table = new Table(composite, SWT.CHECK | SWT.BORDER);
 		table.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-		this.objCheckBoxTable = new ColumnCheckTableViewer(table) ;
+		
+		objCheckBoxTable = new ColumnCheckTableViewer(table) ;
 		objCheckBoxTable.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
 		// setup the content provider
 		objCheckBoxTable.setContentProvider(new IStructuredContentProvider() {
@@ -160,6 +161,10 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				PropertiesModel objItem = (PropertiesModel) event.getElement();
 				objItem.isVisible = event.getChecked();
+				
+				if (!objItem.isEditable)
+					return;
+				
 				// check if the selected item is in the list
 				if (arrElements.get(objItem.iIndex) != objItem) {
 					arrElements.get(objItem.iIndex).isVisible = objItem.isVisible;
@@ -167,7 +172,7 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 			}
 
 		});
-		this.objCheckBoxTable.setLabelProvider(new CheckLabelProvider());
+		this.objCheckBoxTable.setLabelProvider(new StyledFilterLabelProvider());
 		// laksono 2009.03.19: add the filter for this table
 		ColumnFilter objFilter = new ColumnFilter();
 		this.objCheckBoxTable.addFilter(objFilter);
@@ -187,17 +192,17 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 	 * Populate the content of the table with the new information
 	 */
 	private void updateContent() {
-		if(label == null)
+		if(items == null)
 			return; // caller of this object need to set up the column first !
-		int nbColumns = label.length;
-		// PropertiesModel objProps[] = new PropertiesModel[nbColumns];
+		int nbColumns = items.length;
+		
 		arrElements = new ArrayList<PropertiesModel>(nbColumns);
 		ArrayList<PropertiesModel> arrColumns = new ArrayList<PropertiesModel>();
 		
 		int index = 0;
 		for(int i=0;i<nbColumns;i++) {
-			boolean isVisible = (checked != null ? checked[i] : true);		
-			PropertiesModel model = new PropertiesModel(isVisible, label[i], index);
+			boolean isVisible = items[i].checked;		
+			PropertiesModel model = new PropertiesModel(isVisible, items[i].enabled, items[i].label, index);
 			index++;
 			
 			arrElements.add( model );
@@ -205,11 +210,6 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 			if(isVisible) {
 				arrColumns.add(model);
 			}
-		}
-		
-		this.results = new boolean[index];
-		for(int i=0; i<index; i++) {
-			results[i] = false; // initialize with false value
 		}
 
 		this.objCheckBoxTable.setInput(arrElements);
@@ -243,10 +243,8 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 	 * derived from the parent
 	 */
 	protected void okPressed() {
-		// laksono 2009.04.14: bug fix, retrieving all checked elements into the results
 		for (int i=0; i<arrElements.size(); i++) {
-			 boolean isVisible = (this.arrElements.get(i).isVisible);
-			 results[i] = isVisible;
+			 items[i].checked  = (this.arrElements.get(i).isVisible);
 		} 
 		
 		super.okPressed();	// this will shut down the window
@@ -257,34 +255,8 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 	//--------------------------------------------------
 	//	CLASS DEFINITION
 	//--------------------------------------------------
-	/**
-	 * Label provider for the table
-	 * @author laksono
-	 *
-	 */
-	protected class CheckLabelProvider implements ILabelProvider {
-		public void addListener(ILabelProviderListener arg0) {
-			// Throw it away
-		}
-		public void dispose() {
-			// Nothing to dispose
-		}
-		public boolean isLabelProperty(Object arg0, String arg1) {
-			return false;
-		}
-		public void removeListener(ILabelProviderListener arg0) {
-			// Ignore
-		}
-		public Image getImage(Object arg0) {
-			return null;
-		}
-		public String getText(Object arg0) {
-			PropertiesModel prop = (PropertiesModel) arg0;
-			return prop.sTitle;
-		}
-	}
 
-	//--------------------------------------------------
+
 	/**
 	 * Data model for the column properties
 	 * Containing two items: the state and the title
@@ -292,11 +264,13 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 	 */
 	protected class PropertiesModel {
 		public boolean isVisible;
+		public boolean isEditable;
 		public String sTitle;
 		public int iIndex;
 
-		public PropertiesModel(boolean b, String s, int i) {
+		public PropertiesModel(boolean b, boolean e, String s, int i) {
 			this.isVisible = b;
+			this.isEditable = e;
 			this.sTitle = s;
 			this.iIndex = i;
 		}
@@ -343,7 +317,6 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 		 */
 		public ColumnCheckTableViewer(Table table) {
 			super(table);
-			// TODO Auto-generated constructor stub
 		}
 
 		/*
@@ -382,6 +355,34 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 			}
 		}
 	}
+	
+	static class StyledFilterLabelProvider extends DelegatingStyledCellLabelProvider
+	{
+
+		public StyledFilterLabelProvider() {
+			super( new FilterLabelProvider());
+		}
+		
+	}
+	
+	static private class FilterLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider
+	{
+
+		@Override
+		public StyledString getStyledText(Object element) {
+
+			StyledString style = new StyledString();
+			
+			PropertiesModel model = (PropertiesModel) element;
+			if (!model.isEditable) {
+				style.append(model.sTitle + " (empty)", Utilities.STYLE_DECORATIONS);
+			} else {
+				style.append(model.sTitle);
+			}
+			return style;
+		}
+	}
+	
 	
 	abstract protected void createAdditionalButton(Composite parent); 
 }

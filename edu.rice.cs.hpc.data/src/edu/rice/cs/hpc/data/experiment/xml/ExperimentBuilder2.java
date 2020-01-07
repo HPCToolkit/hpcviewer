@@ -41,6 +41,7 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
     We use the maxNumberOfMetrics value to generate short names for the self metrics*/
 	final protected int maxNumberOfMetrics = 10000;
 
+	final private ArrayList<DerivedMetric> listOfDerivedMetrics;
 	/**
 	 * 
 	 * Creating experiment with metrics
@@ -55,6 +56,7 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 		this.metricList = new ArrayList<BaseMetric>();
 		
 		numberOfPrimaryMetrics = 0;
+		listOfDerivedMetrics   = new ArrayList<DerivedMetric>(2);
 	}
 
 
@@ -205,8 +207,15 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 			} else if (attributes[i].charAt(0) == 'f') {
 				// formula
 				assert (formula_type != '\0');
-				AggregateMetric objMetric = (AggregateMetric) this.metricList.get(nbMetrics-1);
-				objMetric.setFormula(formula_type, values[i]);
+				BaseMetric objMetric = this.metricList.get(nbMetrics-1);
+				
+				if (objMetric instanceof AggregateMetric) {
+					( (AggregateMetric)objMetric).setFormula(formula_type, values[i]);
+				
+				} else if (objMetric instanceof DerivedMetric) {
+					DerivedMetric derived_metric = (DerivedMetric) objMetric;
+					derived_metric.setExpression(values[i]);
+				}
 			}
 		}
 	}
@@ -226,23 +235,41 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 	      show (1|0) "1">
 	 ************************************************************************/
 	private void do_METRIC(String[] attributes, String[] values)
-	{		
+	{	
+		final char ATTRIBUTE_NAME    = 'n';
+		final char ATTRIBUTE_INDEX   = 'i';
+		final char ATTRIBUTE_VALUE   = 'v';
+		final char ATTRIBUTE_TYPE    = 't';
+		final char ATTRIBUTE_FORMAT  = 'f';
+		final char ATTRIBUTE_SHOW    = 's';
+		final char ATTRIBUTE_PARTNER = 'p';
+		final char ATTRIBUTE_EVENT   = 'e';
+		final char ATTRIBUTE_ORDER   = 'o';
+		
+		final char ATTRIBUTE_METRIC_EXT      = 'm';
+		final char ATTRIBUTE_METRIC_EXT_DESC = 'd';
+		
 		int nbMetrics = this.metricList.size();
-		String sID = null;// = values[nID];
 		int iSelf = -1;
 		int partner = 0;	// 2010.06.28: new feature to add partner
+		int order = -1;
+		
+		String sID = null;// = values[nID];
 		String sDisplayName = null;
-		String sNativeName = null;
-		boolean toShow = true;
+		String sNativeName  = null;
+		String sDescription = null;
+		
 		AnnotationType percent = AnnotationType.NONE;
 		MetricType objType = MetricType.UNKNOWN;
+
 		boolean needPartner = isCallingContextTree();
+		boolean toShow = true;
 		
 		MetricValueDesc mDesc = MetricValueDesc.Raw; // by default is a raw metric
 		String format = null;
 		
 		for (int i=0; i<attributes.length; i++) {
-			if (attributes[i].charAt(0) == 'i') {
+			if (attributes[i].charAt(0) == ATTRIBUTE_INDEX) {
 				// id ?
 				sID = values[i];
 				// somehow, the ID of the metric is not number, but asterisk
@@ -255,10 +282,15 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 				} else {
 					iSelf = Integer.parseInt(sID);
 				}
-			} else if (attributes[i].charAt(0) == 'n') {
+			} else if (attributes[i].charAt(0) == ATTRIBUTE_NAME) {
 				// name ?
 				sNativeName = values[i];
-			} else if (attributes[i].charAt(0) == 'v') {
+			} else if (attributes[i].charAt(0) == ATTRIBUTE_METRIC_EXT) {
+				if (attributes[i].charAt(1) == ATTRIBUTE_METRIC_EXT_DESC) {
+					sDescription = values[i];
+				}
+				
+			} else if (attributes[i].charAt(0) == ATTRIBUTE_VALUE) {
 				// value: raw|final|derived-incr|derived
 				if (values[i].equals("final")) {
 					mDesc = MetricValueDesc.Final;
@@ -268,12 +300,15 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 					needPartner = false;
 				} else if (values[i].equals("derived")) {
 					mDesc = MetricValueDesc.Derived;
+				} else if (values[i].equals("formula")) {
+					mDesc = MetricValueDesc.Derived;
+					needPartner = false;
 				}
-			} else if (attributes[i].charAt(0) == 't') {
+			} else if (attributes[i].charAt(0) == ATTRIBUTE_TYPE) {
 				// type: inclusive|exclusive|nil
 				objType = getMetricType(values[i]);
 
-			} else if (attributes[i].charAt(0) == 'f') {
+			} else if (attributes[i].charAt(0) == ATTRIBUTE_FORMAT) {
 				// format to display
 				format = values[i];
 				
@@ -283,20 +318,19 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 				} else {
 					percent = AnnotationType.NONE;
 				}
-			} else if (attributes[i].charAt(0) == 's') {
+			} else if (attributes[i].charAt(0) == ATTRIBUTE_SHOW) {
 				// show or not ? 1=yes, 0=no
 				toShow = (values[i].charAt(0) == '1');
-			} else if (attributes[i].charAt(0) == 'p') {
+			} else if (attributes[i].charAt(0) == ATTRIBUTE_PARTNER) {
 				// partner
-				if (attributes[i].charAt(1) == 'e') {
-					// pe : perf events attributes, which can be :
-					//  pep: period mean
-					//  pem: is the event multiplexed
-					//  pes: number of total samples
-					// do nothing at the moment
-				} else {
-					partner = Integer.valueOf( values[i] );
-				}
+				partner = Integer.valueOf( values[i] );
+			} else if (attributes[i].charAt(0) == ATTRIBUTE_ORDER) {
+				order = Integer.parseInt(values[i]);
+				
+			} else if (attributes[i].charAt(0) == ATTRIBUTE_EVENT) {
+				//  ep: period mean
+				//  em: is the event multiplexed
+				//  es: number of total samples
 			}
 		}
 		
@@ -311,24 +345,31 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 			sDisplayName = sNativeName;
 		}
 		
+		if (sDescription == null) sDescription = sDisplayName;
+		
 		// set the metric
 		BaseMetric metricInc;
 		switch (mDesc) {
 			case Final:
 				metricInc = new FinalMetric(
 						String.valueOf(iSelf),			// short name
-						sNativeName,			// native name
+						sDescription,			// native name
 						sDisplayName, 	// display name
 						toShow, format, percent, 			// displayed ? percent ?
 						"",						// period (not defined at the moment)
 						nbMetrics, objType, partner);
 				break;
 			case Derived_Incr:
-				metricInc = new AggregateMetric(sID, sDisplayName, toShow, format, percent, nbMetrics, partner, objType);
+				metricInc = new AggregateMetric(sID, sDisplayName, sDescription,
+									toShow, format, percent, nbMetrics, partner, objType);
 				((AggregateMetric) metricInc).init( (BaseExperimentWithMetrics) this.experiment );
 				break;
-			case Raw:
 			case Derived:
+				metricInc = new DerivedMetric(sDisplayName, sID, nbMetrics, percent, objType);
+				
+				listOfDerivedMetrics.add( (DerivedMetric) metricInc);
+				break;
+			case Raw:
 			default:
 				metricInc = new Metric(
 						String.valueOf(iSelf),			// short name
@@ -339,7 +380,9 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 						nbMetrics, objType, partner);
 				break;
 		}
-
+		metricInc.setDescription(sDescription);
+		metricInc.setOrder(order);
+		
 		this.metricList.add(metricInc);
 
 		// ----------------------------------------------------------------------------
@@ -354,7 +397,7 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 			String sSelfDisplayName = sNativeName + " (E)";
 			Metric metricExc = new Metric(
 					sSelfName,			// short name
-					sSelfDisplayName,	// native name
+					sDescription,		// metric description
 					sSelfDisplayName, 	// display name
 					toShow, format, AnnotationType.PERCENT, 		// displayed ? percent ?
 					"",					// period (not defined at the moment)
@@ -398,7 +441,7 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 			}
 		}
 		
-		MetricRaw metric = new MetricRaw(ID, title, db_glob, db_id, 
+		MetricRaw metric = new MetricRaw(ID, title, title, db_glob, db_id, 
 				partner_index, type, num_metrics);
 		this.metricRawList.add(db_id, metric);
 	}
@@ -559,6 +602,17 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 
 		return type;
 	}
+	
+	@Override
+	public void end()
+	{
+		super.end();
+		
+		for(DerivedMetric metric: listOfDerivedMetrics) {
+			metric.resetMetric((Experiment) experiment, viewRootScope);
+		}
+	}
+	
 	//--------------------------------------------------------------------------------
 	// raw metric database
 	//--------------------------------------------------------------------------------

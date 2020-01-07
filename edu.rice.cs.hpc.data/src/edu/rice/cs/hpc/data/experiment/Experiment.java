@@ -106,6 +106,7 @@ public class Experiment extends BaseExperimentWithMetrics
 		}
 	}
 
+	
 	/*************************************************************************
 	 *	Adds a new scope subtree to the scope tree (& scope list)
 	 ************************************************************************/
@@ -128,6 +129,13 @@ public class Experiment extends BaseExperimentWithMetrics
 	{
 		RootScope callersViewRootScope = new RootScope(this, Experiment.TITLE_BOTTOM_UP_VIEW, RootScopeType.CallerTree);
 		beginScope(callersViewRootScope);
+		
+		EmptyMetricValuePropagationFilter filter = new EmptyMetricValuePropagationFilter();
+
+		// bug fix 2008.10.21 : we don't need to recompute the aggregate metrics here. Just copy it from the CCT
+		//	This will solve the problem where there is only nested loops in the programs
+		callersViewRootScope.accumulateMetrics(callingContextViewRootScope, filter, this.getMetricCount());
+		
 		return callersViewRootScope;
 	}
 	
@@ -143,10 +151,6 @@ public class Experiment extends BaseExperimentWithMetrics
 		CallersViewScopeVisitor csv = new CallersViewScopeVisitor(this, callersViewRootScope, 
 					getMetricCount(), false, filter);
 		callingContextViewRootScope.dfsVisitScopeTree(csv);
-
-		// bug fix 2008.10.21 : we don't need to recompute the aggregate metrics here. Just copy it from the CCT
-		//	This will solve the problem where there is only nested loops in the programs
-		callersViewRootScope.accumulateMetrics(callingContextViewRootScope, filter, this.getMetricCount());
 		
 		return callersViewRootScope;
 	}
@@ -163,6 +167,12 @@ public class Experiment extends BaseExperimentWithMetrics
 	{
 		RootScope flatRootScope = new RootScope(this, Experiment.TITLE_FLAT_VIEW, RootScopeType.Flat);
 		beginScope(flatRootScope);
+
+		// bug fix 2008.10.21 : we don't need to recompute the aggregate metrics here. Just copy it from the CCT
+		//	This will solve the problem where there is only nested loops in the programs
+		EmptyMetricValuePropagationFilter filter = new EmptyMetricValuePropagationFilter();
+		flatRootScope.accumulateMetrics(cctRootScope, filter, getMetricCount());
+
 		return flatRootScope;
 	}
 	
@@ -177,9 +187,6 @@ public class Experiment extends BaseExperimentWithMetrics
 		FlatViewScopeVisitor fv = new FlatViewScopeVisitor(this, (RootScope) flatViewRootScope);
 
 		callingContextViewRootScope.dfsVisitScopeTree(fv);
-
-		EmptyMetricValuePropagationFilter filter = new EmptyMetricValuePropagationFilter();
-		flatViewRootScope.accumulateMetrics(callingContextViewRootScope, filter	, getMetricCount());
 		return flatViewRootScope;
 	}
 

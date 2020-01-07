@@ -43,17 +43,17 @@ public class ScopeComparator implements Comparator<Object>
 		// otherwise, sort according to the metric
 		if(metric == null) {
 			return direction * this.doCompare(node1, node2);
-		} else {
-			MetricValue mv1 = this.metric.getValue(node1); 
-			MetricValue mv2 = this.metric.getValue(node2);
-			
-			int iRet = direction * MetricValue.compareTo(mv2, mv1);
-			if(iRet != 0)
-				return iRet;
-
-			// if the two values are equal, look at the text of the tree node
-			return direction * this.doCompare(node1, node2);
 		}
+		
+		MetricValue mv1 = this.metric.getValue(node1); 
+		MetricValue mv2 = this.metric.getValue(node2);
+		
+		int iRet = direction * MetricValue.compareTo(mv2, mv1);
+		if(iRet != 0)
+			return iRet;
+
+		// if the two values are equal, look at the text of the tree node
+		return direction * this.doCompare(node1, node2);
 	}
 
 

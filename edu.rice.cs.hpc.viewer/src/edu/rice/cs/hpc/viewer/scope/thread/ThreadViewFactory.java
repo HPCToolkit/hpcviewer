@@ -17,6 +17,7 @@ import edu.rice.cs.hpc.data.experiment.extdata.IThreadDataCollection;
 import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.viewer.experiment.ExperimentView;
 import edu.rice.cs.hpc.viewer.scope.AbstractBaseScopeView;
+import edu.rice.cs.hpc.viewer.util.FilterDataItem;
 import edu.rice.cs.hpc.viewer.window.Database;
 import edu.rice.cs.hpc.viewer.window.ViewerWindow;
 import edu.rice.cs.hpc.viewer.window.ViewerWindowManager;
@@ -116,7 +117,8 @@ public class ThreadViewFactory
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				MessageDialog.openError(window.getShell(), "Error", e.getMessage());
+				String msg = e.getMessage() == null ? e.getClass().getCanonicalName() : e.getMessage();
+				MessageDialog.openError(window.getShell(), "Error", msg);
 			}
 		}
 		return null;
@@ -128,14 +130,19 @@ public class ThreadViewFactory
 	{
 		IThreadDataCollection threadData = db.getThreadDataCollection();
 		String []labels = threadData.getRankStringLabels();
+		FilterDataItem items[] =  new FilterDataItem[labels.length];
+		
+		for (int i=0; i<labels.length; i++) {
+			items[i] = new FilterDataItem(labels[i], false, true);
+		}
 
-		ThreadFilterDialog dialog = new ThreadFilterDialog(window.getShell(), labels);
+		ThreadFilterDialog dialog = new ThreadFilterDialog(window.getShell(), items);
 		if (dialog.open() == Window.OK) {
-			boolean []result = dialog.getResult();
-			if (result != null) {
+			items = dialog.getResult();
+			if (items != null) {
 				List<Integer> threads = new ArrayList<Integer>();
-				for(int i=0; i<result.length; i++) {
-					if (result[i]) {
+				for(int i=0; i<items.length; i++) {
+					if (items[i].checked) {
 						threads.add(i);
 					}
 				}

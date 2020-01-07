@@ -6,6 +6,8 @@ import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+
+import edu.rice.cs.hpc.remote.data.SpaceTimeDataControllerRemote;
 import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
 import edu.rice.cs.hpc.traceviewer.data.db.DataLinePainting;
 import edu.rice.cs.hpc.traceviewer.data.db.DataPreparation;
@@ -43,7 +45,44 @@ public class TimelineThread
 	
 	@Override
 	protected ProcessTimeline getNextTrace(AtomicInteger currentLine) {
-		return stData.getNextTrace(currentLine, totalLines, attributes, changedBounds, monitor);
+		
+		// case 1: remote database
+		
+		if (stData instanceof SpaceTimeDataControllerRemote) {
+			return ((SpaceTimeDataControllerRemote)stData).getNextTrace(currentLine, 
+					totalLines, attributes, changedBounds, monitor);
+		}
+		
+		// case 2: local database
+		
+		ProcessTimeline timeline = null;
+		// retrieve the current processing line, and atomically increment so that 
+		// other threads will not increment at the same time
+		// if the current line reaches the number of traces to render, we are done
+		int currentLineNum = currentLine.getAndIncrement();
+		
+		if (currentLineNum >= totalLines)
+			return null;
+		
+		if (traceService.getNumProcessTimeline() == 0)
+			traceService.setProcessTimeline(new ProcessTimeline[totalLines]);
+		
+		if (changedBounds) {
+			ProcessTimeline currentTimeline = new ProcessTimeline(currentLineNum, stData.getScopeMap(),
+					stData.getBaseData(), lineToPaint(currentLineNum, attributes),
+					attributes.numPixelsH, attributes.getTimeInterval(), 
+					stData.getMinBegTime() + attributes.getTimeBegin());
+			
+			if (traceService.setProcessTimeline(currentLineNum, currentTimeline)) {
+				timeline = currentTimeline;
+			} else {
+				monitor.setCanceled(true);
+				monitor.done();
+			}
+		} else {
+			timeline = traceService.getProcessTimeline(currentLineNum);
+		}
+		return timeline;
 	}
 
 	
@@ -78,4 +117,15 @@ public class TimelineThread
 		return new DetailDataPreparation(data);
 	}
 
-}
+	
+	/** Returns the index of the file to which the line-th line corresponds. */
+
+	private int lineToPaint(int line, ImageTraceAttributes attributes) {
+
+		int numTimelinesToPaint = attributes.getProcessInterval();
+		if (numTimelinesToPaint > attributes.numPixelsV)
+			return attributes.getProcessBegin() + (line * numTimelinesToPaint)
+					/ (attributes.numPixelsV);
+		else
+			return attributes.getProcessBegin() + line;
+	}}

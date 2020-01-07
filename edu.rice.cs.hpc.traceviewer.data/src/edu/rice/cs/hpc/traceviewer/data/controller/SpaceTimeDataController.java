@@ -4,13 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.services.ISourceProviderService;
-import org.eclipse.core.runtime.IProgressMonitor;
 import edu.rice.cs.hpc.common.util.ProcedureAliasMap;
+import edu.rice.cs.hpc.data.experiment.BaseExperiment;
 import edu.rice.cs.hpc.data.experiment.ExperimentWithoutMetrics;
 import edu.rice.cs.hpc.data.experiment.InvalExperimentException;
 import edu.rice.cs.hpc.data.experiment.extdata.IBaseData;
@@ -55,12 +53,6 @@ public abstract class SpaceTimeDataController
 	
 	/** The map between the nodes and the cpid's. */
 	private HashMap<Integer, CallPath> scopeMap = null;
-	
-	// We probably want to get away from this. The for code that needs it should be
-	// in one of the threads. It's here so that both local and remote can use
-	// the same thread class yet get their information differently.
-	//protected AtomicInteger lineNum;
-	//AtomicInteger depthLineNum;
 		
 	/** The maximum depth of any single CallStackSample in any trace. */
 	protected int maxDepth = 0;
@@ -69,6 +61,7 @@ public abstract class SpaceTimeDataController
 	private boolean enableMidpoint  = true;
 	
 	protected IBaseData dataTrace = null;
+	
 	final protected ExperimentWithoutMetrics exp;
 	
 	// nathan's data index variable
@@ -210,38 +203,7 @@ public abstract class SpaceTimeDataController
 		return  ptlService.getProcessTimeline(scaledDTProcess);
 	}
 	
-	/***********************************************************************
-	 * Gets the next available trace to be filled/painted from the DepthTimeView
-	 * 
-	 * @return The next trace.
-	 **********************************************************************/
-	public ProcessTimeline getNextDepthTrace(AtomicInteger depthLineNum, 
-			ImageTraceAttributes attributes, IProgressMonitor monitor) {
-		
-		ProcessTimeline depthTrace = getCurrentDepthTrace();
-		if (depthTrace == null) {
-			monitor.setCanceled(true);
-			monitor.done(); // forcing to reset the title bar
-			return null;
-		}
-		
-		int currentDepthLineNum = depthLineNum.getAndIncrement();
-		if (currentDepthLineNum < Math.min(attributes.numPixelsDepthV, maxDepth)) {
-			
-			// I can't get the data from the ProcessTimeline directly, so create
-			// a ProcessTimeline with data=null and then copy the actual data to
-			// it.
-			ProcessTimeline toDonate = new ProcessTimeline(currentDepthLineNum,
-					scopeMap, dataTrace, getCurrentlySelectedProcess(), attributes.numPixelsH,
-					attributes.getTimeInterval(), minBegTime
-							+ attributes.getTimeBegin());
 
-			toDonate.copyDataFrom(depthTrace);
-
-			return toDonate;
-		} else
-			return null;
-	}
 	
 	public IBaseData getBaseData(){
 		return dataTrace;
@@ -255,7 +217,7 @@ public abstract class SpaceTimeDataController
 		return dataTrace.getNumberOfRanks();
 	}
 	
-	protected HashMap<Integer, CallPath> getScopeMap() {
+	public HashMap<Integer, CallPath> getScopeMap() {
 		return scopeMap;
 	}
 
@@ -268,7 +230,9 @@ public abstract class SpaceTimeDataController
 		return attributes.numPixelsH;
 	}
 	
-	
+	public BaseExperiment getExperiment() {
+		return exp;
+	}
 
 	public ImageTraceAttributes getAttributes() {
 		return attributes;
@@ -356,16 +320,6 @@ public abstract class SpaceTimeDataController
 	 * @return String: the name of the database
 	 *************************************************************************/
 	abstract public String getName() ;
-
-	/***
-	 * get the next trace process timeline base on the current line
-	 * 
-	 * @param currentLine : atomic integer of current line
-	 * @param changedBounds : boolean flag whether there's a change of boundary or not
-	 * @return
-	 */
-	public abstract ProcessTimeline getNextTrace(AtomicInteger currentLine, int totalLines,
-			ImageTraceAttributes attributes, boolean changedBounds, IProgressMonitor monitor);
 
 	public abstract void closeDB();
 

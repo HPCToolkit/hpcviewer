@@ -45,7 +45,31 @@ public class TimelineDepthThread
 
 	@Override
 	protected ProcessTimeline getNextTrace(AtomicInteger currentLine) {
-		return stData.getNextDepthTrace(currentLine, attributes, monitor);
+		ProcessTimeline depthTrace = stData.getCurrentDepthTrace();
+		if (depthTrace == null) {
+			monitor.setCanceled(true);
+			monitor.done(); // forcing to reset the title bar
+			return null;
+		}
+		
+		int currentDepthLineNum = currentLine.getAndIncrement();
+		if (currentDepthLineNum < Math.min(attributes.numPixelsDepthV, stData.getMaxDepth())) {
+			
+			// I can't get the data from the ProcessTimeline directly, so create
+			// a ProcessTimeline with data=null and then copy the actual data to
+			// it.
+			ProcessTimeline toDonate = new ProcessTimeline(currentDepthLineNum,
+					stData.getScopeMap(), stData.getBaseData(), 
+					stData.computeScaledProcess(), attributes.numPixelsH,
+					attributes.getTimeInterval(), 
+					stData.getMinBegTime() + attributes.getTimeBegin());
+
+			toDonate.copyDataFrom(depthTrace);
+
+			return toDonate;
+		} else
+			return null;
+
 	}
 
 	@Override

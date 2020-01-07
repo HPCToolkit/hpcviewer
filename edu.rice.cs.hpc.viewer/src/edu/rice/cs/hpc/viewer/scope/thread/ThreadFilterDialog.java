@@ -5,11 +5,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.rice.cs.hpc.viewer.util.AbstractFilterDialog;
+import edu.rice.cs.hpc.viewer.util.FilterDataItem;
 
 public class ThreadFilterDialog extends AbstractFilterDialog {
 
-	public ThreadFilterDialog(Shell parentShell, String []labels) {
-		super(parentShell, "Select threads to view", "Please check any threads to be viewed.\nYou can narrow the list by specifying partial name of the threads on the filter.", labels, null);
+	public ThreadFilterDialog(Shell parentShell, FilterDataItem items[]) {
+		super(parentShell, "Select threads to view", 
+				"Please check any threads to be viewed.\nYou can narrow the list by specifying partial name of the threads on the filter.", 
+				items);
 	}
 
 	@Override
@@ -20,19 +23,19 @@ public class ThreadFilterDialog extends AbstractFilterDialog {
 	
 	static public void main(String argv[]) {
 		Shell shell = new Shell();
-		String []labels = new String[10];
+		FilterDataItem items[] = new FilterDataItem[10];
 		
 		for(int i=0; i<10; i++) {
-			labels[i] = String.valueOf("i="+i);
+			items[i] = new FilterDataItem("i="+i, i<6, i>3);
 		}
-		ThreadFilterDialog dialog = new ThreadFilterDialog(shell, labels);
+		ThreadFilterDialog dialog = new ThreadFilterDialog(shell, items);
 		if (dialog.open() == Dialog.OK) {
 			System.out.println("result-ok: " + dialog.getReturnCode());
-			boolean results[] = dialog.getResult();
+			items = dialog.getResult();
 			
 			int i=0;
-			for(boolean res : results) {
-				System.out.println("\t" + i + ": " + res);
+			for(FilterDataItem res : items) {
+				System.out.println("\t" + i + ": " + res.label + " -> " + res.checked);
 				i++;
 			}
 		}
