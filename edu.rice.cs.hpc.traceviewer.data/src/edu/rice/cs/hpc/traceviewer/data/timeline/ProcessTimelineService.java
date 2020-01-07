@@ -45,10 +45,11 @@ public class ProcessTimelineService extends AbstractSourceProvider {
  	
 	
 	public ProcessTimeline getProcessTimeline(int proc) {
-		if (traces == null)
-			return null;
 		
-		return traces[proc];
+		if (traces != null && proc >= 0 && proc < traces.length)
+			return traces[proc];
+		
+		return null;
 	}
 	
 	public int getNumProcessTimeline() {

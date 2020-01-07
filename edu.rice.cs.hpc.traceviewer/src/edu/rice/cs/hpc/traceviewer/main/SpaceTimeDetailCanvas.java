@@ -1,6 +1,7 @@
 package edu.rice.cs.hpc.traceviewer.main;
 
 import java.text.DecimalFormat;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -42,6 +43,7 @@ import edu.rice.cs.hpc.traceviewer.operation.TraceOperation;
 import edu.rice.cs.hpc.traceviewer.operation.WindowResizeOperation;
 import edu.rice.cs.hpc.traceviewer.operation.ZoomOperation;
 import edu.rice.cs.hpc.traceviewer.painter.AbstractTimeCanvas;
+import edu.rice.cs.hpc.traceviewer.painter.BaseViewPaint;
 import edu.rice.cs.hpc.traceviewer.painter.BufferPaint;
 import edu.rice.cs.hpc.traceviewer.painter.ISpaceTimeCanvas;
 import edu.rice.cs.hpc.traceviewer.painter.ResizeListener;
@@ -630,22 +632,10 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
         {
         	final Position position = stData.getAttributes().getPosition();
     		final long selectedTime = position.time;
-    		int proc = 0;
+    		final int  selectedProc = stData.computeScaledProcess();
     		
-    		//final int rank = position.process;
-    		// we need to use the process of the depth view to know the selected process
-    		// this approach is more reliable than computing the selected process based on
-    		// cursor position. Due to inconsistency use of floating-point rounding, 
-    		// the computed cursor position can be "non-deterministic"
-    		ProcessTimeline ptl = stData.getCurrentDepthTrace();
-
-    		// in case of exception, it is possible the depth trace is null
-    		if (ptl != null) {
-        		proc = stData.getCurrentDepthTrace().getProcessNum();
-    		}
-    		
-    		if ( proc >= 0 && proc < processes.length ) {  
-    			crossHairLabel.setText("Cross Hair: " + getCrossHairText(selectedTime, proc));
+    		if ( selectedProc >= 0 && selectedProc < processes.length ) {  
+    			crossHairLabel.setText("Cross Hair: " + getCrossHairText(selectedTime, selectedProc));
             	//crossHairLabel.setText("Cross Hair: (" + (selectedTime/1000)/1000.0 + "s, " + processes[rank] + ")");
     		} else {
     			// in case of incorrect filtering where user may have empty ranks or incorrect filters, we don't display the rank
@@ -932,7 +922,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		return (stData.getAttributes().getProcessInterval());
 	}
 	
-
+	final private ConcurrentLinkedQueue<BaseViewPaint> queue = new ConcurrentLinkedQueue<>();
 	
 	/*********************************************************************************
 	 * Refresh the content of the canvas with new input data or boundary or parameters
@@ -1038,7 +1028,19 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 			@Override
 			public void aboutToRun(IJobChangeEvent event) {}
 		});
+		
+		if (!queue.isEmpty()) {
+			for (BaseViewPaint job : queue) {
+				if (!job.cancel()) {
+					// a job cannot be cancel
+					// this is fine, we should wait until it terminates or
+					// response that it will cancel in the future
+				}
+			}
+		}
+		
 		detailPaint.schedule();
+		queue.add(detailPaint);
 	}
 
 	private void asyncRedraw() 

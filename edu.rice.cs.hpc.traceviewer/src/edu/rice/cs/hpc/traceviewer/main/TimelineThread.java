@@ -61,28 +61,26 @@ public class TimelineThread
 		// if the current line reaches the number of traces to render, we are done
 		int currentLineNum = currentLine.getAndIncrement();
 		
-		synchronized(this) {
-			if (currentLineNum >= totalLines)
-				return null;
+		if (currentLineNum >= totalLines)
+			return null;
+		
+		if (traceService.getNumProcessTimeline() == 0)
+			traceService.setProcessTimeline(new ProcessTimeline[totalLines]);
+		
+		if (changedBounds) {
+			ProcessTimeline currentTimeline = new ProcessTimeline(currentLineNum, stData.getScopeMap(),
+					stData.getBaseData(), lineToPaint(currentLineNum, attributes),
+					attributes.numPixelsH, attributes.getTimeInterval(), 
+					stData.getMinBegTime() + attributes.getTimeBegin());
 			
-			if (traceService.getNumProcessTimeline() == 0)
-				traceService.setProcessTimeline(new ProcessTimeline[totalLines]);
-			
-			if (changedBounds) {
-				ProcessTimeline currentTimeline = new ProcessTimeline(currentLineNum, stData.getScopeMap(),
-						stData.getBaseData(), lineToPaint(currentLineNum, attributes),
-						attributes.numPixelsH, attributes.getTimeInterval(), 
-						stData.getMinBegTime() + attributes.getTimeBegin());
-				
-				if (traceService.setProcessTimeline(currentLineNum, currentTimeline)) {
-					timeline = currentTimeline;
-				} else {
-					monitor.setCanceled(true);
-					monitor.done();
-				}
+			if (traceService.setProcessTimeline(currentLineNum, currentTimeline)) {
+				timeline = currentTimeline;
 			} else {
-				timeline = traceService.getProcessTimeline(currentLineNum);
+				monitor.setCanceled(true);
+				monitor.done();
 			}
+		} else {
+			timeline = traceService.getProcessTimeline(currentLineNum);
 		}
 		return timeline;
 	}

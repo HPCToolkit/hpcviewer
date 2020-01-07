@@ -275,6 +275,9 @@ public abstract class BaseViewPaint extends Job
 		int num_invalid_samples = 0;
 		for (int i=0; i<launch_threads; i++)
 		{
+			if (monitor.isCanceled())
+				return false;
+			
 			try {
 				Integer linenum = ecs.take().get();
 				if (linenum == null)
