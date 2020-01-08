@@ -262,7 +262,7 @@ implements IOperationHistoryListener
 			int totalPixels) {
 		
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		ISourceProviderService provider = window.getService(ISourceProviderService.class);
+		ISourceProviderService provider = (ISourceProviderService) window.getService(ISourceProviderService.class);
 		
 		SummaryDataService service = (SummaryDataService) provider.getSourceProvider(SummaryDataService.DATA_PROVIDER);
 		service.broadcastUpdate(palette, mapPixelToPercent, getColorTable(), totalPixels);

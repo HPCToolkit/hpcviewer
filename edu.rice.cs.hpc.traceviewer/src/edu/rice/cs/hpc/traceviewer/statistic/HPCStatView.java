@@ -191,6 +191,11 @@ public class HPCStatView extends AbstractDynamicView
 		
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+
+		//@Override
+		// Eclipse 3.x requires to override dispose() method
+		public void dispose() {
+		}
 	}
 	
 	
@@ -252,7 +257,7 @@ public class HPCStatView extends AbstractDynamicView
 	
 	
 	/*************************************************************
-	 * 
+	 *  
 	 * class to manage changes in the source provider
 	 *
 	 *************************************************************/
@@ -300,7 +305,7 @@ public class HPCStatView extends AbstractDynamicView
 	public void active(boolean isActive) {
 		if (isActive) {
 			final IWorkbenchPage activePage = getViewSite().getPage();
-			ISourceProviderService provider = activePage.getWorkbenchWindow().getService(ISourceProviderService.class);
+			ISourceProviderService provider = (ISourceProviderService) activePage.getWorkbenchWindow().getService(ISourceProviderService.class);
 			SummaryDataService service = (SummaryDataService) provider.getSourceProvider(SummaryDataService.DATA_REQUEST);
 			service.requestData();
 		}		
