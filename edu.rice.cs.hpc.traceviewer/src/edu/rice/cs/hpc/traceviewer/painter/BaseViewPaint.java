@@ -256,6 +256,20 @@ public abstract class BaseViewPaint extends Job
 		{
 			endPainting(threadsPaint, monitor);
 		} else {
+			
+			// threads to collect data are shutdown, perhaps due to cancellation
+			// it is very important to cancel threads to paint the canvas
+			// without this cancellation, in some platforms,  the painter threads 
+			// are NOT notified, and still thinking that the progress monitor is still
+			// valid and continue to wait data from data collector threads
+			// 
+			// Due to bug in Eclipse' ProgressMonitor, the monitor's isCanceled() method
+			// always returns true if the parent exits.
+			
+			for(Future<List<ImagePosition>> p: threadsPaint) {
+				p.cancel(true);
+			}
+			
 			monitor.setCanceled(true);
 			// whatever the result, we need to clear the 
 			monitor.setTaskName("");
