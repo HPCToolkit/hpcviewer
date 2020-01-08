@@ -634,6 +634,8 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
     		final long selectedTime = position.time;
     		
     		ProcessTimeline ptl     = stData.getCurrentDepthTrace();
+    		if (ptl == null) return;
+    		
     		final int selectedProc  = ptl.getProcessNum();
     		
     		if ( selectedProc >= 0 && selectedProc < processes.length ) {  
