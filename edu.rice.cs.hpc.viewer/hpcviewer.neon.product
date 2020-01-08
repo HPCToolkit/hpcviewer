@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="hpcviewer" id="edu.rice.cs.hpc.viewer.product" application="edu.rice.cs.hpc.viewer.application" version="2019.12" useFeatures="false" includeLaunchers="true">
+<product name="hpcviewer" id="edu.rice.cs.hpc.viewer.product" application="edu.rice.cs.hpc.viewer.application" version="2020.01" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="icons/hpcviewerEclipseShadow128.png"/>
@@ -44,7 +44,6 @@ Release 2019.12  (C) Copyright 2019, Rice University.
             winLargeHigh="/edu.rice.cs.hpc.viewer/icons/hpcviewer-icon-48x48-32bit.bmp"/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>

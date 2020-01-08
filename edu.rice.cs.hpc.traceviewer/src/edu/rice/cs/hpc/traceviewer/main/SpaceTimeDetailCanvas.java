@@ -632,7 +632,9 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
         {
         	final Position position = stData.getAttributes().getPosition();
     		final long selectedTime = position.time;
-    		final int  selectedProc = stData.computeScaledProcess();
+    		
+    		ProcessTimeline ptl     = stData.getCurrentDepthTrace();
+    		final int selectedProc  = ptl.getProcessNum();
     		
     		if ( selectedProc >= 0 && selectedProc < processes.length ) {  
     			crossHairLabel.setText("Cross Hair: " + getCrossHairText(selectedTime, selectedProc));
