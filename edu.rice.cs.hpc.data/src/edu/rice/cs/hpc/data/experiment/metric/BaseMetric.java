@@ -175,6 +175,17 @@ public abstract class BaseMetric {
 		return description;
 	}
 	
+	/****
+	 * check if two metric has the same display name. (A display name is unique).
+	 * 
+	 * @param other other metric
+	 * @return
+	 */
+	public boolean equalIndex(BaseMetric other) 
+	{
+		return index == other.index;
+	}
+	
 	//=================================================================================
 	//		ACCESS TO METRIC
 	//=================================================================================

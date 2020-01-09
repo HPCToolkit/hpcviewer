@@ -262,9 +262,9 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         		empty[i]  = myRootScope.getMetricValue(metric) == MetricValue.NONE;
         		
         		int j;
-        		for (j=1; j<columns.length && columns[j].getData() != metric; j++) ;
+        		for (j=1; j<columns.length && !metric.equalIndex((BaseMetric) columns[j].getData()); j++) ;
         		
-        		if (j<columns.length && columns[j].getData() == metric) {
+        		if (j<columns.length && metric.equalIndex((BaseMetric) columns[j].getData())) {
         			status[i] = columns[j].getWidth() > 1;
         		} else {
         			status[i] = false;

@@ -312,7 +312,7 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 				
 				if (data != null) {
 					BaseMetric m = (BaseMetric) data;
-					if (m == metric) {
+					if (m.equalIndex(metric)) {
 						item.enabled = true;
 						item.checked = column.getWidth() > 1;
 						item.setData(column);
@@ -370,7 +370,7 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 		
 		assert status.length == objViewActions.getMetricManager().getMetricCount();
 
-    treeViewer.getTree().setRedraw(false);
+		treeViewer.getTree().setRedraw(false);
     	
 		TreeColumn []columns = treeViewer.getTree().getColumns();
 
@@ -394,9 +394,9 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 				continue; // not a metric column
 			
 			int i=0;			
-			for (i=0; i<numMetrics && metrics[i] != metric; i++);
+			for (i=0; i<numMetrics && !metrics[i].equalIndex((BaseMetric)metric); i++);
 			
-			if (i<numMetrics && metric == metrics[i]) {
+			if (i<numMetrics && metrics[i].equalIndex((BaseMetric) metric)) {
 				toShow[numColumn] = status[i];
 				numColumn++;
 			}
