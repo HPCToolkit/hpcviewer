@@ -249,7 +249,8 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         	// displayable: if the metric is to be displayed and not empty
         	for(BaseMetric metric: myExperiment.getMetrics()) {
         		
-        		empty[i]  = myRootScope.getMetricValue(metric) == MetricValue.NONE;
+        		MetricValue mv = metric.getValue(myRootScope);
+        		empty[i]  = mv == MetricValue.NONE; // myRootScope.getMetricValue(metric) == MetricValue.NONE;
     			status[i] = !empty[i] && metric.getDisplayed();
         		i++;
         	}
@@ -259,7 +260,8 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         	TreeColumn []columns = tree.getColumns();
         	int i=0;
         	for(BaseMetric metric: myExperiment.getMetrics()) {
-        		empty[i]  = myRootScope.getMetricValue(metric) == MetricValue.NONE;
+        		MetricValue mv = metric.getValue(myRootScope);
+        		empty[i]  = mv == MetricValue.NONE; //myRootScope.getMetricValue(metric) == MetricValue.NONE;
         		
         		int j;
         		for (j=1; j<columns.length && !metric.equalIndex((BaseMetric) columns[j].getData()); j++) ;

@@ -209,6 +209,19 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 				assert (formula_type != '\0');
 				BaseMetric objMetric = this.metricList.get(nbMetrics-1);
 				
+				// corner case: hpcrun derived metric
+				if (formula_type == 'v') {
+					DerivedMetric mtr = new DerivedMetric(objMetric.getDisplayName(), objMetric.getShortName(), 
+												  objMetric.getIndex(), objMetric.getAnnotationType(),
+												  objMetric.getMetricType());
+					mtr.setExpression(values[i]);
+					
+					// replace the current metric with the new derived metric
+					metricList.set(nbMetrics-1, mtr);
+					
+					listOfDerivedMetrics.add(mtr);
+				}
+				
 				if (objMetric instanceof AggregateMetric) {
 					( (AggregateMetric)objMetric).setFormula(formula_type, values[i]);
 				

@@ -71,4 +71,10 @@ public class MetricRawManager implements IMetricManager
 	@Override
 	public void addDerivedMetric(DerivedMetric objMetric) {
 	}
+
+	@Override
+	public BaseMetric getMetricFromOrder(int order) {
+
+		return getMetric(order);
+	}
 }

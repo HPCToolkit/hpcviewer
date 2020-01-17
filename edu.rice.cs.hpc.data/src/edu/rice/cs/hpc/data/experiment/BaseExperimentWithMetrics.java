@@ -1,6 +1,7 @@
 package edu.rice.cs.hpc.data.experiment;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
@@ -19,6 +20,7 @@ implements IMetricManager
 {
 	/***** A list of metric descriptor   */
 	protected List<BaseMetric> metrics;
+	protected ArrayList<BaseMetric> metricsWithOrder;
 
 	//////////////////////////////////////////////////////////////////////////
 	//ACCESS TO METRICS													    //
@@ -36,6 +38,13 @@ implements IMetricManager
 	 */
 	public void setMetrics(List<BaseMetric> metricList) {
 		metrics = metricList;
+		
+		metricsWithOrder = new ArrayList<BaseMetric>();
+		for(BaseMetric metric:metrics) {
+			if (metric.getOrder() >= 0) {
+				metricsWithOrder.add(metric);
+			}
+		}
 	}
 
 	/*****
@@ -86,6 +95,15 @@ implements IMetricManager
 				return metrics.get(i);
 		}
 		return null;	
+	}
+	
+	@Override
+	public BaseMetric getMetricFromOrder(int order)
+	{
+		if (order >=0 && metricsWithOrder != null && order < metricsWithOrder.size()) {
+			return metricsWithOrder.get(order);
+		}
+		return null;
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
