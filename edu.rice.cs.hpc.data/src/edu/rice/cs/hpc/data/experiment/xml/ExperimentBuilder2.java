@@ -187,6 +187,32 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 		}
 	}
 
+	static private final char FORMULA_TYPE 		 = 't';
+	static private final char FORMULA_EXPRESSION = 'f';
+	static private final char FORMULA_FOR_VIEWER = 'v';
+	
+	/***
+	 * create a derived metric from a base metric
+	 * @param metric
+	 * @param formula
+	 * @return
+	 */
+	private DerivedMetric createDerivedMetric(BaseMetric metric, String formula)
+	{
+		
+		DerivedMetric dm = new DerivedMetric(metric.getDisplayName(), metric.getShortName(), 
+				metric.getIndex(), metric.getAnnotationType(),
+				metric.getMetricType());
+
+		dm.setDescription(DerivedMetric.DESCRIPTION + ": " + metric.getDescription());
+		dm.setExpression(formula);
+		dm.setOrder(metric.getOrder());
+
+		listOfDerivedMetrics.add(dm);
+		
+		return dm;
+	}
+
 	/*************************************************************************
 	 *	Processes a METRICFORMULA element.
 	 *     <!-- MetricFormula represents derived metrics: (t)ype; (frm): formula -->
@@ -201,25 +227,30 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 		int nbMetrics= this.metricList.size();
 		
 		for (int i=0; i<attributes.length; i++) {
-			if (attributes[i].charAt(0) == 't') {
+			if (attributes[i].charAt(0) == FORMULA_TYPE) {
 				// type of formala
 				formula_type = values[i].charAt(0);
-			} else if (attributes[i].charAt(0) == 'f') {
+				
+			} else if (attributes[i].charAt(0) == FORMULA_EXPRESSION) {
 				// formula
 				assert (formula_type != '\0');
 				BaseMetric objMetric = this.metricList.get(nbMetrics-1);
 				
 				// corner case: hpcrun derived metric
-				if (formula_type == 'v') {
-					DerivedMetric mtr = new DerivedMetric(objMetric.getDisplayName(), objMetric.getShortName(), 
-												  objMetric.getIndex(), objMetric.getAnnotationType(),
-												  objMetric.getMetricType());
-					mtr.setExpression(values[i]);
+				if (formula_type == FORMULA_FOR_VIEWER) {
+					
+					DerivedMetric dm = createDerivedMetric(objMetric, values[i]);
 					
 					// replace the current metric with the new derived metric
-					metricList.set(nbMetrics-1, mtr);
+					metricList.set(nbMetrics-1, dm);
 					
-					listOfDerivedMetrics.add(mtr);
+					if (objMetric instanceof Metric && nbMetrics>1) {
+						// raw metric requires a partner. Let's make the derived metric of the partner
+						objMetric = metricList.get(nbMetrics - 2);
+						
+						dm = createDerivedMetric(objMetric, values[i]);
+						metricList.set(nbMetrics - 2, dm);
+					}
 				}
 				
 				if (objMetric instanceof AggregateMetric) {

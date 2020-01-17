@@ -18,7 +18,7 @@ public class DerivedMetric extends BaseMetric {
 	// DATA
 	//===================================================================================
 
-	final static private String DESCRIPTION = "Derived metric";
+	final static public String DESCRIPTION = "Derived metric";
 	
 	// formula expression
 	private Expression expression;

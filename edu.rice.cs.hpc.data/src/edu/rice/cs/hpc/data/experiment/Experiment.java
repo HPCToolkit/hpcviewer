@@ -231,8 +231,13 @@ public class Experiment extends BaseExperimentWithMetrics
 			if (metric instanceof Metric) {
 				if (metric.getMetricType() == sourceType) {
 					// get the partner index (if the metric exclusive, its partner is inclusive)
-					int partner = metric.getPartner(); 
-					copyMetric(scope, scope, i, partner, filter);
+					
+					int partner 			 = metric.getPartner(); 	 // get the partner ID
+					String partnerName 		 = String.valueOf(partner);  // convert partner ID to shortID
+					BaseMetric partnerMetric = getMetric(partnerName);   // get the partner metric
+					int partnerIndex		 = partnerMetric.getIndex(); // get the index of partner metric
+					
+					copyMetric(scope, scope, i, partnerIndex, filter);
 				}
 			} else if (metric instanceof AggregateMetric) {
 				if (metric.getMetricType() == MetricType.EXCLUSIVE ) {
@@ -245,6 +250,10 @@ public class Experiment extends BaseExperimentWithMetrics
 						scope.setMetricValue( i, partner_value);
 					}
 				}
+			} else if (metric instanceof DerivedMetric) {
+				// compute the metric value
+				MetricValue mv = metric.getValue(scope);
+				scope.setMetricValue(metric.getIndex(), mv);
 			}
 		}
 	}
