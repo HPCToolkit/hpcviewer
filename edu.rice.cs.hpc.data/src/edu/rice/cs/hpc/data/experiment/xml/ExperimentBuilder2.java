@@ -204,9 +204,10 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 				metric.getIndex(), metric.getAnnotationType(),
 				metric.getMetricType());
 
-		dm.setDescription(DerivedMetric.DESCRIPTION + ": " + metric.getDescription());
-		dm.setExpression(formula);
-		dm.setOrder(metric.getOrder());
+		dm.setDescription  (DerivedMetric.DESCRIPTION + ": " + metric.getDescription());
+		dm.setExpression   (formula);
+		dm.setOrder        (metric.getOrder());
+		dm.setDisplayFormat(metric.getDisplayFormat());
 
 		listOfDerivedMetrics.add(dm);
 		

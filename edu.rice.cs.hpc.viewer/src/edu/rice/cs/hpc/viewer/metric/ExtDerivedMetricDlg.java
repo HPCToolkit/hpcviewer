@@ -385,10 +385,11 @@ public class ExtDerivedMetricDlg extends TitleAreaDialog {
 					// only one option is allowed. If one is enabled, the other is disabled
 					btnDefaultFormat.setSelection(false);
 				}
+			} else {
+				
+				// make sure to initialize the state of the text
+				txtFormat.setEnabled(false); 
 			}
-			
-			// make sure to initialize the state of the text
-			txtFormat.setEnabled(false); 
 			
 			final Label lblCustomFormat = new Label( cOptions, SWT.NONE );
 			lblCustomFormat.setText(txtCustomFormat + "\n"
