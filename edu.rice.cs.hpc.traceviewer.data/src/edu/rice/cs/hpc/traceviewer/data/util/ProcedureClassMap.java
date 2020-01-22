@@ -66,7 +66,9 @@ public class ProcedureClassMap extends AliasMap<String,ProcedureClassData> {
 		this.put("cuStreamSynchronize",   CLASS_IDLE, COLOR_GRAY);
 		this.put("cuEventSynchronize", 	  CLASS_IDLE, COLOR_GRAY);
 		this.put("cuCtxSynchronize", 	  CLASS_IDLE, COLOR_GRAY);
+
 		this.put("<no thread>", 		  CLASS_IDLE, COLOR_WHITE);
+		this.put("<no activity>", 		  CLASS_IDLE, COLOR_WHITE);
 	}
 	
 	public Object[] getEntrySet() {
