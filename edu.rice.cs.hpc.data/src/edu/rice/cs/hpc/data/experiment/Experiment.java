@@ -23,6 +23,7 @@ import edu.rice.cs.hpc.data.filter.IFilterData;
 import edu.rice.cs.hpc.data.util.IUserData;
 
 import java.io.File;
+import java.util.ArrayList;
 
 //////////////////////////////////////////////////////////////////////////
 //	CLASS EXPERIMENT													//
@@ -225,6 +226,8 @@ public class Experiment extends BaseExperimentWithMetrics
 	}
 
 	protected void copyMetricsToPartner(Scope scope, MetricType sourceType, MetricValuePropagationFilter filter) {
+		ArrayList<BaseMetric> listDerivedMetrics = new ArrayList<>();
+		
 		for (int i = 0; i< this.getMetricCount(); i++) {
 			BaseMetric metric = this.getMetric(i);
 			// Laksono 2009.12.11: aggregate metric doesn't have partner
@@ -251,10 +254,22 @@ public class Experiment extends BaseExperimentWithMetrics
 					}
 				}
 			} else if (metric instanceof DerivedMetric) {
-				// compute the metric value
-				MetricValue mv = metric.getValue(scope);
-				scope.setMetricValue(metric.getIndex(), mv);
+				listDerivedMetrics.add(metric);
 			}
+		}
+
+		// compute the root value of derived metric at the end
+		// some times, hpcrun derived metrics require the value of "future" metrics. 
+		// This causes the value of derived metrics to be empty.
+		// If we compute derived metrics at the end, we are more guaranteed that the value
+		// is not empty.
+		// FIXME: unless a derived metric requires a value of "future" derived metric. 
+		//        In this case, we are doomed.
+		
+		for (BaseMetric metric: listDerivedMetrics) {
+			// compute the metric value
+			MetricValue mv = metric.getValue(scope);
+			scope.setMetricValue(metric.getIndex(), mv);
 		}
 	}
 

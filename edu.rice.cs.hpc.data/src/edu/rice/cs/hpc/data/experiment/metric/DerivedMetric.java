@@ -225,6 +225,9 @@ public class DerivedMetric extends BaseMetric {
 			return MetricValue.NONE;
 		
 		double rootVal = getDoubleValue(rootScope);
+		if (Double.compare(0.0, rootVal) == 0) {
+			return MetricValue.NONE;
+		}
 		double rootAnn = 1.0d;
 		return new MetricValue(rootVal, rootAnn);
 	}
