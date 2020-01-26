@@ -11,6 +11,7 @@ package edu.rice.cs.hpc.data.experiment.xml;
 import edu.rice.cs.hpc.data.experiment.*;
 import edu.rice.cs.hpc.data.experiment.metric.*;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric.AnnotationType;
+import edu.rice.cs.hpc.data.experiment.metric.BaseMetric.VisibilityType;
 import edu.rice.cs.hpc.data.experiment.scope.*;
 import edu.rice.cs.hpc.data.experiment.xml.Token2.TokenXML;
 import edu.rice.cs.hpc.data.util.IUserData;
@@ -308,7 +309,7 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 		MetricType objType = MetricType.UNKNOWN;
 
 		boolean needPartner = isCallingContextTree();
-		boolean toShow = true;
+		BaseMetric.VisibilityType visibility = VisibilityType.SHOW;
 		
 		MetricValueDesc mDesc = MetricValueDesc.Raw; // by default is a raw metric
 		String format = null;
@@ -365,7 +366,8 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 				}
 			} else if (attributes[i].charAt(0) == ATTRIBUTE_SHOW) {
 				// show or not ? 1=yes, 0=no
-				toShow = (values[i].charAt(0) == '1');
+				int visVal = Integer.valueOf(values[i]);
+				visibility = BaseMetric.convertToVisibilityType(visVal);
 			} else if (attributes[i].charAt(0) == ATTRIBUTE_PARTNER) {
 				// partner
 				partner = Integer.valueOf( values[i] );
@@ -400,13 +402,13 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 						String.valueOf(iSelf),			// short name
 						sDescription,			// native name
 						sDisplayName, 	// display name
-						toShow, format, percent, 			// displayed ? percent ?
+						visibility, format, percent, 			// displayed ? percent ?
 						"",						// period (not defined at the moment)
 						nbMetrics, objType, partner);
 				break;
 			case Derived_Incr:
 				metricInc = new AggregateMetric(sID, sDisplayName, sDescription,
-									toShow, format, percent, nbMetrics, partner, objType);
+									visibility, format, percent, nbMetrics, partner, objType);
 				((AggregateMetric) metricInc).init( (BaseExperimentWithMetrics) this.experiment );
 				break;
 			case Derived:
@@ -420,7 +422,7 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 						String.valueOf(iSelf),			// short name
 						sNativeName,			// native name
 						sDisplayName, 	// display name
-						toShow, format, percent, 			// displayed ? percent ?
+						visibility, format, percent, 			// displayed ? percent ?
 						"",						// period (not defined at the moment)
 						nbMetrics, objType, partner);
 				break;
@@ -444,7 +446,7 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 					sSelfName,			// short name
 					sDescription,		// metric description
 					sSelfDisplayName, 	// display name
-					toShow, format, AnnotationType.PERCENT, 		// displayed ? percent ?
+					visibility, format, AnnotationType.PERCENT, 		// displayed ? percent ?
 					"",					// period (not defined at the moment)
 					nbMetrics+1, MetricType.EXCLUSIVE, nbMetrics);
 			this.metricList.add(metricExc);

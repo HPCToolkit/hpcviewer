@@ -32,6 +32,9 @@ public abstract class BaseMetric {
 	/** Valid types of Annotations to be used with metric values */
 	static public enum AnnotationType { NONE, PERCENT, PROCESS };
 	
+	static public enum VisibilityType { HIDE, SHOW, SHOW_INCLUSIVE, SHOW_EXCLUSIVE };
+	
+	
 	//-------------------------------------------------------------------------------
 	// DATA
 	//-------------------------------------------------------------------------------
@@ -48,7 +51,7 @@ public abstract class BaseMetric {
 	protected String displayName;
 
 	/** Whether this metric should be displayed. */
-	protected boolean displayed;
+	protected VisibilityType visibility;
 
 	/** The type of annotation that should be displayed with this metric (percent or process number). */
 	protected AnnotationType annotationType = AnnotationType.NONE;
@@ -88,7 +91,7 @@ public abstract class BaseMetric {
 	 * @param type : type of the metric
 	 *************************************************************************/
 	public BaseMetric(String sID, String sDisplayName, String sDescription,
-			boolean displayed, String format, 
+			VisibilityType displayed, String format, 
 			AnnotationType annotationType, int index, int partner_index, MetricType type) 
 	{
 		// in case of instantiation from duplicate() method, we need to make sure there is
@@ -98,7 +101,7 @@ public abstract class BaseMetric {
 		else
 			this.displayName = sDisplayName + EMPTY_SUFFIX; // johnmc - hack to leave enough room for ascending/descending triangle;
 		
-		this.displayed = displayed;
+		this.visibility = displayed;
 		this.annotationType = annotationType;
 		
 		this.order = NO_ORDER;
@@ -230,16 +233,22 @@ public abstract class BaseMetric {
 	 ************************************************************************/	
 	public boolean getDisplayed()
 	{
-		return this.displayed;
+		return this.visibility != VisibilityType.HIDE;
 	}
 
+	
+	public VisibilityType getVisibility()
+	{
+		return visibility;
+	}
+	
 	/*************************************************************************
 	 * Set display flag (true=to be displayed)
 	 * @param d, the flag
 	 *************************************************************************/
-	public void setDisplayed(boolean d)
+	public void setDisplayed(VisibilityType d)
 	{
-		this.displayed = d;
+		this.visibility = d;
 	}
 
 	/*************************************************************************
@@ -354,6 +363,28 @@ public abstract class BaseMetric {
 		return this.sampleperiod;
 	}
 
+	static public VisibilityType convertToVisibilityType(int type) 
+	{
+		VisibilityType vType = VisibilityType.HIDE;
+		
+		switch(type) {
+		case 0:
+			vType = VisibilityType.HIDE;
+			break;
+		case 1:
+			vType = VisibilityType.SHOW;
+			break;
+		case 2:
+			vType = VisibilityType.SHOW_INCLUSIVE;
+			break;
+		case 3:
+			vType = VisibilityType.SHOW_INCLUSIVE;
+			break;
+		}
+		return vType;
+	}
+	
+	
 	//=================================================================================
 	//		ABSTRACT METHODS
 	//=================================================================================

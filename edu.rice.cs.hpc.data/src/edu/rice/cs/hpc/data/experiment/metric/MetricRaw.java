@@ -47,7 +47,7 @@ public class MetricRaw  extends BaseMetric
 		// raw metric has no partner
 		// default annotation: percentage, although some metrics may have no percent due to missing value
 		// on its root (such as exclusive metric)
-		super( String.valueOf(id), title, description, true, null, AnnotationType.PERCENT, db_num, partner_index, type);
+		super( String.valueOf(id), title, description, VisibilityType.SHOW, null, AnnotationType.PERCENT, db_num, partner_index, type);
 		this.ID 	 = id;
 		this.db_glob = db_pattern;
 		this.db_id 	 = db_num;

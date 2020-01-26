@@ -41,6 +41,7 @@ import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
 import edu.rice.cs.hpc.data.experiment.metric.DerivedMetric;
 import edu.rice.cs.hpc.data.experiment.metric.Metric;
 import edu.rice.cs.hpc.data.experiment.metric.MetricType;
+import edu.rice.cs.hpc.data.experiment.metric.BaseMetric.VisibilityType;
 import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.util.string.StringUtil;
 import edu.rice.cs.hpc.viewer.window.ViewerWindow;
@@ -479,7 +480,7 @@ public class MetricPropertyDialog extends TitleAreaDialog
 		for (int i=0; i<10; i++) {
 			final String id = String.valueOf(4 * i + 10);
 			list.add( new Metric(id, id + ": this is a long description of the metric. Everyone knows that there is no such as thing as a long description. But for the sake sanity test (and insanity test), we do this stupid test on purpose. Please ignore any stupidity in this code.", 
-					"M" + id, true, null, null, null, i, MetricType.INCLUSIVE, i) );
+					"M" + id, VisibilityType.SHOW, null, null, null, i, MetricType.INCLUSIVE, i) );
 		}
 		exp.setMetrics(list);
 		dialog.setExperiment(exp);

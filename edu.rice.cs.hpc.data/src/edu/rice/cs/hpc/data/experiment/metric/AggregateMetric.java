@@ -39,7 +39,7 @@ public class AggregateMetric extends BaseMetric {
 	 * @see BaseMetric
 	 */
 	public AggregateMetric(String sID, String sDisplayName, String sDescription,
-			boolean displayed, String format,
+			VisibilityType displayed, String format,
 			AnnotationType annotationType, int index, int partner, MetricType type) {
 
 		super( sID, sDisplayName, sDescription, displayed, format, annotationType, index, partner, type);
@@ -188,7 +188,7 @@ public class AggregateMetric extends BaseMetric {
 	 * @see edu.rice.cs.hpc.data.experiment.metric.BaseMetric#duplicate()
 	 */
 	public BaseMetric duplicate() {
-		return new AggregateMetric(shortName, displayName, description, displayed, 
+		return new AggregateMetric(shortName, displayName, description, visibility, 
 				null, annotationType, index, partner_index, metricType);
 	}
 }

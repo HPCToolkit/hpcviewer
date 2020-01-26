@@ -362,7 +362,7 @@ public class Experiment extends BaseExperimentWithMetrics
 		// hide columns if the metric has no value
 		for(BaseMetric metric: metrics) {
 			if (metric.getValue(firstSubTree) == MetricValue.NONE) {
-				metric.setDisplayed(false);
+				metric.setDisplayed(BaseMetric.VisibilityType.HIDE);
 			}
 		}
 	}

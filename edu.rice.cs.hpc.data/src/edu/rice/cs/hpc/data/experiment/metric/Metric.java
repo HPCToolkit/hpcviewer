@@ -60,7 +60,7 @@ public final static int NO_PARTNER_INDEX = -1;
  * @param metricType
  * @param partnerIndex
  */
-public Metric(String shortName, String description, String displayName, boolean displayed, 
+public Metric(String shortName, String description, String displayName, VisibilityType displayed, 
               String format, AnnotationType annotationType, String samplePeriod, 
               int index, MetricType metricType, int partnerIndex)
 {
@@ -88,7 +88,7 @@ public MetricValue getRawValue(IMetricScope s)
 
 //@Override
 public BaseMetric duplicate() {
-	return new Metric(shortName, description, displayName, displayed, null, annotationType, 
+	return new Metric(shortName, description, displayName, visibility, null, annotationType, 
 			String.valueOf(sampleperiod), index, metricType, partner_index);
 }
 
