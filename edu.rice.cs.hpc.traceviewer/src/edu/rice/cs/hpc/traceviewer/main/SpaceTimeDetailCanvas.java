@@ -926,7 +926,9 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		return (stData.getAttributes().getProcessInterval());
 	}
 	
-	final private ConcurrentLinkedQueue<BaseViewPaint> queue = new ConcurrentLinkedQueue<>();
+	// remove queue of jobs because it causes deadlock 
+	// 
+	//final private ConcurrentLinkedQueue<BaseViewPaint> queue = new ConcurrentLinkedQueue<>();
 	
 	/*********************************************************************************
 	 * Refresh the content of the canvas with new input data or boundary or parameters
@@ -994,7 +996,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		 *	on the SpaceTimeCanvas using the SpaceTimeSamplePainter given. Also paints
 		 *	the sample's max depth before becoming overDepth on samples that have gone over depth.
 		 *************************************************************************/
-		DetailViewPaint detailPaint = new DetailViewPaint(bufferGC, origGC, stData, 
+		final DetailViewPaint detailPaint = new DetailViewPaint(bufferGC, origGC, stData, 
 					attributes, numLines, changedBounds, window, this, threadExecutor); 
 
 		//detailPaint.setUser(true);
@@ -1024,6 +1026,8 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 				bufferGC.dispose();
 				origGC.dispose();
 				imageOrig.dispose();
+				
+				//queue.remove(detailPaint);
 			}
 			
 			@Override
@@ -1033,7 +1037,9 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 			public void aboutToRun(IJobChangeEvent event) {}
 		});
 		
-		if (!queue.isEmpty()) {
+/*		this part of the code causes deadlock since we don't clear the queue
+  
+  		if (!queue.isEmpty()) {
 			for (BaseViewPaint job : queue) {
 				if (!job.cancel()) {
 					// a job cannot be cancel
@@ -1041,10 +1047,10 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 					// response that it will cancel in the future
 				}
 			}
-		}
+		}*/
 		
 		detailPaint.schedule();
-		queue.add(detailPaint);
+		//queue.add(detailPaint);
 	}
 
 	private void asyncRedraw() 
