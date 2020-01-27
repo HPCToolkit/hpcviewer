@@ -233,7 +233,10 @@ public abstract class BaseMetric {
 	 ************************************************************************/	
 	public boolean getDisplayed()
 	{
-		return this.visibility != VisibilityType.HIDE;
+		boolean display = visibility == VisibilityType.SHOW || 
+				(visibility == VisibilityType.SHOW_EXCLUSIVE && metricType == MetricType.EXCLUSIVE) ||
+				(visibility == VisibilityType.SHOW_INCLUSIVE && metricType == MetricType.INCLUSIVE);
+		return display;
 	}
 
 	
@@ -363,9 +366,16 @@ public abstract class BaseMetric {
 		return this.sampleperiod;
 	}
 
+	/*************************************************************************
+	 * Convert hpcrun visibility type to Java enum
+	 * 
+	 * @param type hpcrun visibility type. Has to consult with hpcrun file
+	 * 
+	 * @return VisibilityType. Default is the metric to be shown.
+	 *************************************************************************/
 	static public VisibilityType convertToVisibilityType(int type) 
 	{
-		VisibilityType vType = VisibilityType.HIDE;
+		VisibilityType vType = VisibilityType.SHOW;
 		
 		switch(type) {
 		case 0:
@@ -378,7 +388,7 @@ public abstract class BaseMetric {
 			vType = VisibilityType.SHOW_INCLUSIVE;
 			break;
 		case 3:
-			vType = VisibilityType.SHOW_INCLUSIVE;
+			vType = VisibilityType.SHOW_EXCLUSIVE;
 			break;
 		}
 		return vType;
