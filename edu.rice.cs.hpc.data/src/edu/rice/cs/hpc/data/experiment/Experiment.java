@@ -377,7 +377,9 @@ public class Experiment extends BaseExperimentWithMetrics
 		boolean isNeeded = false;
 		for (int i=0; !isNeeded && i<this.getMetricCount(); i++) {
 			BaseMetric m = getMetric(i);
-			isNeeded = !( (m instanceof FinalMetric) || (m instanceof AggregateMetric) );
+			isNeeded = !(   (m instanceof FinalMetric) 
+					     || (m instanceof AggregateMetric) 
+					     || (m instanceof DerivedMetric) );
 		}
 		return isNeeded;
 	}
