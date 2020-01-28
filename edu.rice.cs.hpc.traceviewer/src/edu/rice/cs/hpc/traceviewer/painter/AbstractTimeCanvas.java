@@ -211,10 +211,13 @@ implements ITraceCanvas, PaintListener
 	static private class BufferedCanvasToolTip extends DefaultToolTip
 	{
 		final private AbstractTimeCanvas canvas;
-		
+
 		public BufferedCanvasToolTip(AbstractTimeCanvas canvas) {
 			super(canvas);
 			
+			// delay the popup in millisecond
+			
+			super.setPopupDelay(edu.rice.cs.hpc.data.util.Constants.TOOLTIP_DELAY_MS);
 			this.canvas = canvas;
 		}
 		

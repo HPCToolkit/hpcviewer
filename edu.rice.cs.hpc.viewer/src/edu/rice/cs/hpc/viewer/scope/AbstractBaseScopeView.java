@@ -350,14 +350,7 @@ abstract public class AbstractBaseScopeView  extends ViewPart
     	final Tree tree = treeViewer.getTree();
         tree.setHeaderVisible(true);
         tree.setLinesVisible(true);
-        
-        // --------------------------------------------------------------------
-        // tricky code for linux: by default on linux the tooltip doesn't show up
-        //  we should manually tell eclipse/jface that we want a tooltip for the table
-        // --------------------------------------------------------------------
-        if (OSValidator.isUnix())
-        	ColumnViewerToolTipSupport.enableFor(treeViewer, ToolTip.NO_RECREATE);
-        
+                
         //-----------------
         // create the context menus
         this.createContextMenu();

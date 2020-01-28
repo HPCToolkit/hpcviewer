@@ -8,12 +8,13 @@ import java.util.Set;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -29,6 +30,8 @@ import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.services.ISourceProviderService;
 
+import edu.rice.cs.hpc.data.util.Constants;
+import edu.rice.cs.hpc.data.util.string.StringUtil;
 import edu.rice.cs.hpc.traceviewer.data.graph.ColorTable;
 import edu.rice.cs.hpc.traceviewer.services.SummaryDataService;
 import edu.rice.cs.hpc.traceviewer.ui.AbstractDynamicView;
@@ -74,14 +77,17 @@ public class HPCStatView extends AbstractDynamicView
 		
 		// column for procedure name
 		final TableViewerColumn colProc  = new TableViewerColumn(tableViewer, SWT.LEFT, 0);
-		TableColumn column = colProc.getColumn();
+		colProc.setLabelProvider(new ColumnProcedureLabelProvider());
 		
+		TableColumn column = colProc.getColumn();
 		column.setText("Procedure");
 		column.setWidth(120);
 		column.addSelectionListener(getSelectionAdapter(column, 0));
 		
 		// column for the percentage
 		final TableViewerColumn colCount = new TableViewerColumn(tableViewer, SWT.LEFT, 1);
+		colCount.setLabelProvider(new ColumnStatLabelProvider());
+		
 		column = colCount.getColumn();
 		
 		column.setText("Percent");
@@ -91,7 +97,6 @@ public class HPCStatView extends AbstractDynamicView
 
 		// setup the table viewer
 		tableViewer.setContentProvider(new StatisticContentProvider());		
-		tableViewer.setLabelProvider(new TableStatLabelProvider());
 		
 		comparator = new TableStatComparator();
 		tableViewer.setComparator(comparator);
@@ -103,6 +108,8 @@ public class HPCStatView extends AbstractDynamicView
 		ISourceProvider serviceProvider = service.getSourceProvider(SummaryDataService.DATA_PROVIDER);
 		serviceProvider.addSourceProviderListener(new StatSourceProvider());
 		
+		ColumnViewerToolTipSupport.enableFor(tableViewer, ToolTip.NO_RECREATE);
+
 		addListener();
 	}
 	
@@ -198,63 +205,61 @@ public class HPCStatView extends AbstractDynamicView
 		}
 	}
 	
+
 	
 	/*************************************************************
 	 * 
-	 * Label provider for the stat label
+	 * Class to manage label of procedure name
 	 *
 	 *************************************************************/
-	private class TableStatLabelProvider implements ITableLabelProvider
-	{		
-		public TableStatLabelProvider() {
-		}
-		
+	private class ColumnProcedureLabelProvider extends ColumnLabelProvider
+	{
 		@Override
-		public void addListener(ILabelProviderListener listener) {}
-
-		@Override
-		public void dispose() {}
-
-		@Override
-		public boolean isLabelProperty(Object element, String property) {
-			return false;
-		}
-
-		@Override
-		public void removeListener(ILabelProviderListener listener) {}
-
-		@Override
-		public Image getColumnImage(Object element, int columnIndex) {
-			if (columnIndex == 0) {
-				if (element != null && element instanceof StatisticItem) {
-					final StatisticItem item = (StatisticItem) element;
-					if (item.procedureName == ColorTable.UNKNOWN_PROCNAME)
-						return null;
-					
-					return HPCStatView.this.colorTable.getImage(((StatisticItem)element).procedureName);
-				}
+		public Image getImage(Object element) {
+			if (element != null && element instanceof StatisticItem) {
+				final StatisticItem item = (StatisticItem) element;
+				if (item.procedureName == ColorTable.UNKNOWN_PROCNAME)
+					return null;
+				
+				return HPCStatView.this.colorTable.getImage(((StatisticItem)element).procedureName);
 			}
 			return null;
 		}
-
+		
 		@Override
-		public String getColumnText(Object element, int columnIndex) {
+		public String getText(Object element) {
 			if (element == null || !(element instanceof StatisticItem))
 				return null;
 			
 			StatisticItem item = (StatisticItem) element;
-
-			switch(columnIndex) {
-			case 0:					
-				return item.procedureName;
-				
-			case 1:
-				return String.format("%.2f %%", item.percent);
-			}
-			return null;
+			return item.procedureName;
+		}
+		
+		@Override
+		public String getToolTipText(Object element) {
+    		final String originalText = getText(element);
+    		return StringUtil.wrapScopeName(originalText, 100);
+		}
+		
+		@Override
+		public int getToolTipDisplayDelayTime(Object object) {
+    		return Constants.TOOLTIP_DELAY_MS;
 		}
 	}
 	
+	
+	private class ColumnStatLabelProvider extends ColumnLabelProvider
+	{
+		
+		@Override
+		public String getText(Object element) {
+			if (element == null || !(element instanceof StatisticItem))
+				return null;
+			
+			StatisticItem item = (StatisticItem) element;
+			return String.format("%.2f %%", item.percent);
+		}
+	}
 	
 	/*************************************************************
 	 *  

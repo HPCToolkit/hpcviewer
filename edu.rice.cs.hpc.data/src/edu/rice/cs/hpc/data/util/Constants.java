@@ -14,4 +14,6 @@ public class Constants {
 	public static final int SIZEOF_FLOAT = Float.SIZE / Byte.SIZE;
 
 	static public final String DATABASE_FILENAME = "experiment.xml";
+	
+	static public final int    TOOLTIP_DELAY_MS  = 5000;
 }

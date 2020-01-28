@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.services.ISourceProviderService;
 
+import edu.rice.cs.hpc.data.util.Constants;
 import edu.rice.cs.hpc.data.util.string.StringUtil;
 import edu.rice.cs.hpc.traceviewer.operation.BufferRefreshOperation;
 import edu.rice.cs.hpc.traceviewer.operation.DepthOperation;
@@ -144,7 +145,7 @@ public class CallStackViewer extends TableViewer
         	
         	public int getToolTipDisplayDelayTime(Object object)
         	{
-        		return 200;
+        		return Constants.TOOLTIP_DELAY_MS;
         	}
 		};
 		viewerColumn = new TableViewerColumn(this, SWT.NONE);
