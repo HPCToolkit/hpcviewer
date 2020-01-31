@@ -217,6 +217,8 @@ public class ThreadView extends AbstractBaseScopeView
 		        
 				ScopeSelectionAdapter selectionAdapter = new ScopeSelectionAdapter(treeViewer, colTree);
 				colTree.getColumn().addSelectionListener(selectionAdapter);
+				
+				contentProvider.sort_column(colTree, ScopeSelectionAdapter.SORT_ASCENDING);
 			}
 
 			try {

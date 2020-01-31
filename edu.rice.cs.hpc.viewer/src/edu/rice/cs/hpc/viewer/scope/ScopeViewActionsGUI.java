@@ -296,6 +296,9 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 
     	TreeColumn []columns = treeViewer.getTree().getColumns();    	
 		BaseMetric []metrics = objViewActions.getMetricManager().getMetrics();
+		if (metrics == null)
+			return;
+		
 		FilterDataItem []arrayOfItems = new FilterDataItem[metrics.length];
 		int i= 0;
 		
