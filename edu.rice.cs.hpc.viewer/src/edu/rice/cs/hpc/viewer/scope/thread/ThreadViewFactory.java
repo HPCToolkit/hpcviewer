@@ -56,7 +56,10 @@ public class ThreadViewFactory
 	static public String getThreadViewKey(RootScope root) 
 	{
 		BaseExperiment experiment = root.getExperiment();
-		return experiment.getDefaultDirectory().getAbsolutePath() + "." + root.getType();
+		String key = experiment.getDefaultDirectory().getAbsolutePath() + "." + root.getType();
+		
+		// Bug on Windows : second key cannot contain a colon
+		return key.replace(':', '-');
 	}
 	
 	/*****
