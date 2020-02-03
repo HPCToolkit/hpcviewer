@@ -209,6 +209,7 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 		dm.setExpression   (formula);
 		dm.setOrder        (metric.getOrder());
 		dm.setDisplayFormat(metric.getDisplayFormat());
+		dm.setDisplayed	   (metric.getVisibility()); // fix issue #63
 
 		listOfDerivedMetrics.add(dm);
 		
