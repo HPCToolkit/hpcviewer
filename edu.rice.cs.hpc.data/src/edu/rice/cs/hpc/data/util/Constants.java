@@ -15,5 +15,5 @@ public class Constants {
 
 	static public final String DATABASE_FILENAME = "experiment.xml";
 	
-	static public final int    TOOLTIP_DELAY_MS  = 5000;
+	static public final int    TOOLTIP_DELAY_MS  = 2000;
 }
