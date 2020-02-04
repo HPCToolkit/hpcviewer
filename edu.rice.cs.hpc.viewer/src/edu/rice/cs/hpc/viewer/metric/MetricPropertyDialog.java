@@ -327,17 +327,20 @@ public class MetricPropertyDialog extends TitleAreaDialog
 	 * @param exp : experiment database 
 	 */
 	private ArrayList<PropertiesModel> createInput(Experiment exp) {
-		int nbColumns = exp.getMetricCount();
-		BaseMetric []metrics = exp.getMetrics();
 		
-		final ArrayList<PropertiesModel> arrElements = new ArrayList<PropertiesModel>(nbColumns);
+		final ArrayList<PropertiesModel> arrElements = new ArrayList<PropertiesModel>();
 		
-		for(int i=0;i<nbColumns;i++) {
-			if (metrics[i] != null) {
+		for(BaseMetric metric: exp.getMetrics()) {
+			
+			// we don't want to show empty metric (if exist) and 
+			// metric with invisible type
+			
+			if (metric != null && 
+				metric.getVisibility() != BaseMetric.VisibilityType.INVISIBLE) {
 
-				String sTitle = metrics[i].getDisplayName();
+				String sTitle = metric.getDisplayName();
 				
-				PropertiesModel model = new PropertiesModel(sTitle, i, metrics[i]);
+				PropertiesModel model = new PropertiesModel(sTitle, metric);
 				arrElements.add( model );
 			}
 		}
@@ -445,12 +448,10 @@ public class MetricPropertyDialog extends TitleAreaDialog
 	protected class PropertiesModel {
 
 		public String sTitle;
-		public int iIndex;
 		public BaseMetric metric;
 
-		public PropertiesModel(String s, int i, BaseMetric metric) {
+		public PropertiesModel(String s, BaseMetric metric) {
 			this.sTitle = s;
-			this.iIndex = i;
 			this.metric = metric;
 		}
 	}

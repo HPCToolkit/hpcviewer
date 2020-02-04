@@ -133,10 +133,11 @@ public class ThreadViewFactory
 	{
 		IThreadDataCollection threadData = db.getThreadDataCollection();
 		String []labels = threadData.getRankStringLabels();
-		FilterDataItem items[] =  new FilterDataItem[labels.length];
+		List<FilterDataItem> items =  new ArrayList<FilterDataItem>(labels.length);
 		
 		for (int i=0; i<labels.length; i++) {
-			items[i] = new FilterDataItem(labels[i], false, true);
+			FilterDataItem obj = new FilterDataItem(labels[i], false, true);
+			items.add(obj);
 		}
 
 		ThreadFilterDialog dialog = new ThreadFilterDialog(window.getShell(), items);
@@ -144,8 +145,8 @@ public class ThreadViewFactory
 			items = dialog.getResult();
 			if (items != null) {
 				List<Integer> threads = new ArrayList<Integer>();
-				for(int i=0; i<items.length; i++) {
-					if (items[i].checked) {
+				for(int i=0; i<items.size(); i++) {
+					if (items.get(i).checked) {
 						threads.add(i);
 					}
 				}

@@ -2,6 +2,7 @@ package edu.rice.cs.hpc.viewer.util;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -21,7 +22,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Text;
 
 public abstract class AbstractFilterDialog extends TitleAreaDialog 
 {
-	final private FilterDataItem []items;
+	final private List<FilterDataItem> items;
 	
 	final private String title, message;
 	protected ColumnCheckTableViewer objCheckBoxTable ;
@@ -45,7 +45,7 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 	protected ArrayList<PropertiesModel> arrElements;
 	
 	public AbstractFilterDialog(Shell parentShell, String title, String message, 
-			FilterDataItem items[]) {
+			List<FilterDataItem> items) {
 
 		super(parentShell);
 		this.items   = items;
@@ -57,7 +57,7 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 	 * Get the list of checked and unchecked items
 	 * @return the array of true/false
 	 */
-	public FilterDataItem[] getResult() {
+	public List<FilterDataItem> getResult() {
 		return items;
 	}
 
@@ -194,15 +194,14 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 	private void updateContent() {
 		if(items == null)
 			return; // caller of this object need to set up the column first !
-		int nbColumns = items.length;
 		
-		arrElements = new ArrayList<PropertiesModel>(nbColumns);
+		arrElements = new ArrayList<PropertiesModel>(items.size());
 		ArrayList<PropertiesModel> arrColumns = new ArrayList<PropertiesModel>();
 		
 		int index = 0;
-		for(int i=0;i<nbColumns;i++) {
-			boolean isVisible = items[i].checked;		
-			PropertiesModel model = new PropertiesModel(isVisible, items[i].enabled, items[i].label, index);
+		for(FilterDataItem item: items) {
+			boolean isVisible = item.checked;		
+			PropertiesModel model = new PropertiesModel(isVisible, item.enabled, item.label, index);
 			index++;
 			
 			arrElements.add( model );
@@ -244,7 +243,7 @@ public abstract class AbstractFilterDialog extends TitleAreaDialog
 	 */
 	protected void okPressed() {
 		for (int i=0; i<arrElements.size(); i++) {
-			 items[i].checked  = (this.arrElements.get(i).isVisible);
+			 items.get(i).checked  = (this.arrElements.get(i).isVisible);
 		} 
 		
 		super.okPressed();	// this will shut down the window

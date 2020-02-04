@@ -1,5 +1,7 @@
 package edu.rice.cs.hpc.viewer.metric;
 
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -32,7 +34,7 @@ public class MetricColumnDialog extends AbstractFilterDialog
 	 * @param label : set of labels of the metrics
 	 * @param checked : set of boolean whether the metric is hidden/showed
 	 */
-	public MetricColumnDialog(Shell parentShell, FilterDataItem items[]) {
+	public MetricColumnDialog(Shell parentShell, List<FilterDataItem> items) {
 		super(parentShell, "Column Selection", 
 				"Check columns to be shown and uncheck columns to be hidden", 
 				items);

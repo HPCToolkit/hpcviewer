@@ -1,12 +1,12 @@
 package edu.rice.cs.hpc.viewer.framework;
 
-import java.io.File;
+/*import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Platform;*/
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
@@ -18,7 +18,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class HPCViewer implements IApplication 
 {
-	static private final String FILE_NAME = "hpcviewer.log";
+	//static private final String FILE_NAME = "hpcviewer.log";
 
 	private String[] checkArguments(IApplicationContext context) {
 		String[] args = (String[])context.getArguments().get("application.args");
@@ -40,7 +40,7 @@ public class HPCViewer implements IApplication
 		// We don't want users to see tons of SWT error message during the launch
 		// but we still keep the log in user workspace
 		
-		IPath path 		= Platform.getLocation().makeAbsolute();
+/*		IPath path 		= Platform.getLocation().makeAbsolute();
 		String filename = path.append(FILE_NAME).makeAbsolute().toString();
 		
 		try {
@@ -57,7 +57,7 @@ public class HPCViewer implements IApplication
 		} catch (IOException e2) {
 			System.err.println( filename + ": I/O error. " + e2.getMessage());
 		}
-		
+*/		
 		// create the application
 		
 		try {		

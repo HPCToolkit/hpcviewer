@@ -32,7 +32,13 @@ public abstract class BaseMetric {
 	/** Valid types of Annotations to be used with metric values */
 	static public enum AnnotationType { NONE, PERCENT, PROCESS };
 	
-	static public enum VisibilityType { HIDE, SHOW, SHOW_INCLUSIVE, SHOW_EXCLUSIVE };
+	static public enum VisibilityType { 
+		HIDE, 				// hide the metric column 
+		SHOW, 				// show the metric column
+		SHOW_INCLUSIVE,		// show only the inclusive metric 
+		SHOW_EXCLUSIVE, 	// show only the exclusive metric
+		INVISIBLE			// the metric shouldn't be visible by users. see issue #67
+	};
 	
 	
 	//-------------------------------------------------------------------------------
@@ -245,6 +251,11 @@ public abstract class BaseMetric {
 		return visibility;
 	}
 	
+	public boolean isInvisible()
+	{
+		return visibility == VisibilityType.INVISIBLE;
+	}
+	
 	/*************************************************************************
 	 * Set display flag (true=to be displayed)
 	 * @param d, the flag
@@ -390,6 +401,9 @@ public abstract class BaseMetric {
 		case 3:
 			vType = VisibilityType.SHOW_EXCLUSIVE;
 			break;
+		case 4:
+			// see issue #67
+			vType = VisibilityType.INVISIBLE;
 		}
 		return vType;
 	}

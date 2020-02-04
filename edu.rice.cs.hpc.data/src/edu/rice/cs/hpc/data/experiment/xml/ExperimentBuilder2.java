@@ -400,11 +400,11 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 		switch (mDesc) {
 			case Final:
 				metricInc = new FinalMetric(
-						String.valueOf(iSelf),			// short name
-						sDescription,			// native name
-						sDisplayName, 	// display name
-						visibility, format, percent, 			// displayed ? percent ?
-						"",						// period (not defined at the moment)
+						String.valueOf(iSelf),		 // short name
+						sDescription,				 // native name
+						sDisplayName, 				 // display name
+						visibility, format, percent, // displayed ? percent ?
+						"",							 // period (not defined at the moment)
 						nbMetrics, objType, partner);
 				break;
 			case Derived_Incr:

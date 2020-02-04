@@ -244,11 +244,10 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         
         if (!keepColumnStatus) {
         	int i=0;
-        	
-        	// empty metric: if the root scope has no metric value
-        	// displayable: if the metric is to be displayed and not empty
+
         	for(BaseMetric metric: myExperiment.getMetrics()) {
-        		
+            	
+            	// empty metric: if the root scope has no metric value
         		MetricValue mv = metric.getValue(myRootScope);
         		empty[i]  = mv == MetricValue.NONE; // myRootScope.getMetricValue(metric) == MetricValue.NONE;
     			status[i] = !empty[i] && metric.getDisplayed();
@@ -295,7 +294,7 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
     	for (int i=0; i<numMetric; i++)
     	{
     		final BaseMetric metric = myExperiment.getMetric(i);
-    		if (metric != null) {
+    		if (metric != null  && !metric.isInvisible()) {
         		
                 boolean toBeSorted = false;
                 

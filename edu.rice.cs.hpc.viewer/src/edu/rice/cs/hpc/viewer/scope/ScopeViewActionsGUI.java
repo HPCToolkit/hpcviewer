@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Control;
@@ -299,10 +298,12 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 		if (metrics == null)
 			return;
 		
-		FilterDataItem []arrayOfItems = new FilterDataItem[metrics.length];
+		List<FilterDataItem> arrayOfItems = new ArrayList<FilterDataItem>(metrics.length);
 		int i= 0;
 		
 		for(BaseMetric metric: metrics) {
+			
+			if (metric.isInvisible()) continue;
 			
 			FilterDataItem item = new FilterDataItem(metric.getDisplayName(), false, false);
 			
@@ -324,7 +325,7 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 					}
 				}
 			}
-			arrayOfItems[i]=item;
+			arrayOfItems.add(item);
 			i++;
 		}
 				
@@ -334,7 +335,7 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
     		boolean isAppliedToAllViews = dialog.isAppliedToAllViews();
     		arrayOfItems = dialog.getResult();
     		
-    		boolean []checked = new boolean[arrayOfItems.length];
+    		boolean []checked = new boolean[arrayOfItems.size()];
     		i = 0;
     		for (FilterDataItem item : arrayOfItems) {
 				checked[i] = item.checked && item.enabled;
