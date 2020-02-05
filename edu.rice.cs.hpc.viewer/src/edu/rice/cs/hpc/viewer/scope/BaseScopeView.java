@@ -132,7 +132,7 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         // Tell children to update the content with the new database
         // ------------------------------------------------------------
         final Experiment myExperiment = database.getExperiment();
-        this.updateDatabase(myExperiment);
+        updateDatabase(myExperiment);
 
         // Update root scope
         if (myRootScope != null && myRootScope.getChildCount() > 0) {

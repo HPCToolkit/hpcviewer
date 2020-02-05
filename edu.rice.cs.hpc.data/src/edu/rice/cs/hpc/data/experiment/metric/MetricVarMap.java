@@ -123,7 +123,11 @@ public class MetricVarMap extends VarMap {
 					if (pm != null)
 						value = pm.getValue(currentScope);
 				} else {
-					value = bm.getValue(currentScope);
+					
+					// avoid recursive computation
+					// if we are trying to get our own value, we return zero
+					if (metric != bm)
+						value = bm.getValue(currentScope);
 				}
 				
 				if (value != MetricValue.NONE)
