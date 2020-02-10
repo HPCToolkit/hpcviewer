@@ -284,15 +284,6 @@
                label="View"
                mnemonic="V"
                tooltip="Options for advance users: Debug mode on/off and show some debugging information">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="edu.rice.cs.hpc.viewer.provider.data.active">
-                  <equals
-                        value="ENABLED">
-                  </equals>
-               </with>
-            </visibleWhen>
             <command
                   commandId="edu.rice.cs.hpc.viewer.actions.ShowView"
                   label="Show views"

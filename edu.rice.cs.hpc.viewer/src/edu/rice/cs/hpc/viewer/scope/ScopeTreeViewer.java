@@ -192,8 +192,8 @@ public class ScopeTreeViewer extends TreeViewer
     	
 		// associate the data of this column to the metric since we
 		// allowed columns to move (col position is not enough !)
-    	col.setData(objMetric);
-    	col.setData(COLUMN_DATA_WIDTH, COLUMN_DEFAULT_WIDTH);
+    	col.setData (objMetric);
+    	col.setData (COLUMN_DATA_WIDTH, COLUMN_DEFAULT_WIDTH);
     	col.setWidth(COLUMN_DEFAULT_WIDTH);
     	
 		col.setMoveable(true);

@@ -6,6 +6,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -52,6 +53,11 @@ public class ShowView extends AbstractHandler {
 		// gather data: databases and its views
 		// ------------------------------------------------------------
 		Database []databases = vWin.getDatabases();
+		if (databases == null || databases.length == 0) {
+			MessageDialog.openError(window.getShell(), "Warning", "No database is opened");
+			return null;
+		}
+		
 		TreeNode []dbNode = new TreeNode[ databases.length ];
 		
 		for(int i=0; i<databases.length; i++) {
