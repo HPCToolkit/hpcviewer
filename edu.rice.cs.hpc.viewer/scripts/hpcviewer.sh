@@ -92,7 +92,9 @@ export SWT_GTK3=0
 #------------------------------------------------------------
 
 if test -d "$HOME" ; then
-    exec "$viewer" -data "$workspace" -configuration "$workspace" "$@"
+	stderr="$workspace"/hpcviewer.log
+	echo "Redirect standard error to $stderr"
+    exec "$viewer" -data "$workspace" -configuration "$workspace" "$@" 2> $stderr
 else
     warn "HOME is not set, proceeding anyway"
     exec "$viewer" "$@"
