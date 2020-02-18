@@ -237,7 +237,7 @@ public class FlatViewScopeVisitor implements IScopeVisitor
 		
 		// some old database do not provide load module information
 		if (lm != null)  {
-			lm_flat_s = this.htFlatLoadModuleScope.get(lm.hashCode());
+			lm_flat_s = this.htFlatLoadModuleScope.get(lm.getFlatIndex());
 			if (lm_flat_s == null) {
 				// no load module has been created. we allocate a new one
 				lm_flat_s = (LoadModuleScope) lm.duplicate();
@@ -245,7 +245,7 @@ public class FlatViewScopeVisitor implements IScopeVisitor
 				// attach the load module to the root scope
 				this.addToTree(root_ft, lm_flat_s);
 				// store this module into our dictionary
-				this.htFlatLoadModuleScope.put(lm.hashCode(), lm_flat_s);
+				this.htFlatLoadModuleScope.put(lm.getFlatIndex(), lm_flat_s);
 			}
 		}
 		return lm_flat_s;
@@ -291,7 +291,7 @@ public class FlatViewScopeVisitor implements IScopeVisitor
 				LoadModuleScope flat_parent_lm = (LoadModuleScope) parent_lm;
 
 				// check if the load module the existing file is the same with the scope's load module
-				if (flat_parent_lm.hashCode() != flat_lm.hashCode() ) {
+				if (flat_parent_lm.getFlatIndex() != flat_lm.getFlatIndex() ) {
 					// the same file in different load module scope !!!
 					flat_file = createFileScope(src_file, flat_lm, unique_file_id);
 				}

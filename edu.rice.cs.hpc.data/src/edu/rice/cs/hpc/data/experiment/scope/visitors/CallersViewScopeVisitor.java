@@ -161,7 +161,7 @@ public class CallersViewScopeVisitor extends CallerScopeBuilder implements IScop
 		else
 			cct_proc_s = ( (CallSiteScope)cct_s).getProcedureScope();
 		
-		String objCode = cct_s.getSourceFile().getFileID() + ":" + cct_proc_s.hashCode();
+		String objCode = cct_s.getSourceFile().getFileID() + ":" + cct_proc_s.getFlatIndex();
 
 		ProcedureScope caller_proc = (ProcedureScope) calleeht.get(objCode);
 		
@@ -213,12 +213,11 @@ public class CallersViewScopeVisitor extends CallerScopeBuilder implements IScop
 	//----------------------------------------------------
 	
 	/********************************************************************
+	 *
 	 * class helper to store the list of combined scopes
 	 * 
-	 * @author laksonoadhianto
-	 *
 	 ********************************************************************/
-	private class ListCombinedScopes {
+	static private class ListCombinedScopes {
 		private Stack<ArrayList<Scope>> combinedScopes;
 		
 		public ArrayList<Scope> push() {
@@ -243,8 +242,8 @@ public class CallersViewScopeVisitor extends CallerScopeBuilder implements IScop
 	
 	
 	/********************************************************************
+	 *
 	 * class to combine metrics from different scopes
-	 * @author laksonoadhianto
 	 *
 	 ********************************************************************/
 	private class CombineCallerScopeMetric extends AbstractCombineMetric {

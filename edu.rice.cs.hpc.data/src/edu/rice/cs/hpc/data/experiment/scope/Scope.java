@@ -285,7 +285,7 @@ public String toString()
 
 
 public int hashCode() {
-	return this.flat_node_index;
+	return System.identityHashCode(this);
 }
 
 
