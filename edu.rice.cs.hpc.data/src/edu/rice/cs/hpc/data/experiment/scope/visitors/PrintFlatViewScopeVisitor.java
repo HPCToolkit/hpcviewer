@@ -123,7 +123,7 @@ public class PrintFlatViewScopeVisitor implements IScopeVisitor {
 	 **-------------------------------------------------------------------------------**/
 	private void printScopeTag(Scope objScopeToPrint, String initial, boolean name, boolean line) {
 		this.objOutputStream.print(indent + "<" + initial);
-		PrintFileXML.printAttribute(objOutputStream, "i", objScopeToPrint.hashCode());
+		PrintFileXML.printAttribute(objOutputStream, "i", objScopeToPrint.getFlatIndex());
 		
 		if (name) {
 			final String scopeName;

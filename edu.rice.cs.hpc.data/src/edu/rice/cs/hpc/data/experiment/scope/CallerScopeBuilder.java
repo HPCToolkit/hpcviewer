@@ -3,6 +3,7 @@ package edu.rice.cs.hpc.data.experiment.scope;
 import java.util.LinkedList;
 
 import edu.rice.cs.hpc.data.experiment.metric.AbstractCombineMetric;
+import edu.rice.cs.hpc.data.experiment.scope.ProcedureScope.ProcedureType;
 import edu.rice.cs.hpc.data.experiment.scope.filters.MetricValuePropagationFilter;
 
 public class CallerScopeBuilder {
@@ -41,7 +42,6 @@ public class CallerScopeBuilder {
 		CallSiteScopeCallerView prev_scope = null;
 		while ( (next != null) && !(next instanceof RootScope) && (numKids<MAX_DESC) )
 		{
-			// Laksono 2009.01.14: we only deal with call site OR pure procedure scope (no alien)
 			if ( isCallSiteCandidate(next, innerCS)) {
 
 				Scope enclosingCS = null;
@@ -134,8 +134,31 @@ public class CallerScopeBuilder {
 			//------------------------------------------------------------------------
 			// we check if the scope is identical with the existing scope in the path
 			// if it is the case, we should merge them
+			// For aliens inline macro (single alien), the flat ID has to be prefixed with
+			//  the flat ID of the parent to distinguish between the same inline macro from
+			//  different context. This is because we consider single alien as part of the 
+			//  function (a bit like loops), while double aliens are considered like 
+			//  normal function.
+			//
+			// For instance we have
+			//   b -> c
+			//   a -> b -> c
+			// if c is single alien, then c has to be part of b, which means:
+			//   c_flatID = b_flatID + c_flatID
 			//------------------------------------------------------------------------
-			if (first.getProcedureScope().getFlatIndex() == existingCaller.getProcedureScope().getFlatIndex()) {
+			final ProcedureScope firstProc  = first.getProcedureScope();
+			final ProcedureScope callerProc = existingCaller.getProcedureScope();
+			
+			String firstID  = String.valueOf(firstProc.getFlatIndex());
+			String callerID = String.valueOf(callerProc.getFlatIndex());
+			
+			if (firstProc.getProcedureType()  == ProcedureType.ProcedureInlineMacro) 
+				firstID  = firstID  + ":" + firstProc.getParentScope().getCCTIndex();
+
+			if (callerProc.getProcedureType() == ProcedureType.ProcedureInlineMacro) 
+				callerID = callerID + ":" + callerProc.getParentScope().getCCTIndex();
+			
+			if (firstID.equals(callerID)) {
 
 				//------------------------------------------------------------------------
 				// combine metric values for first to those of existingCaller.
@@ -185,6 +208,8 @@ public class CallerScopeBuilder {
 	
 	
 	/******
+	 * Return if a scope is either a callsite or a procedure scope.
+	 * The inner scope cannot be empty
 	 * 
 	 * @param scope
 	 * @param innerCS

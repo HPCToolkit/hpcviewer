@@ -185,24 +185,16 @@ public class CallSiteScopeCallerView extends CallSiteScope implements IMergedSco
 		return this.getChildren();
 	}
 	
-	/*****
-	 * retrieve the list of merged scopes
-	 * @return
-	 */
-	public Object[] getMergedScopes() {
-		if (this.listOfmerged != null)
-			return this.listOfmerged.toArray();
-		else 
-			return null;
-	}
 
+	public int getNumMergedScopes() {
+		if (listOfmerged == null) return 0;
+		return listOfmerged.size();
+	}
 
 	
 	/************************
 	 * combination class to combine two metrics
 	 * This class is specifically designed for combining merged nodes in incremental caller view
-	 * @author laksonoadhianto
-	 *
 	 *************************/
 	static private class IncrementalCombineMetricUsingCopy extends AbstractCombineMetric {
 
@@ -217,8 +209,6 @@ public class CallSiteScopeCallerView extends CallSiteScope implements IMergedSco
 			
 			if (target instanceof CallSiteScopeCallerView) {
 
-				//Scope copy = getScopeOfCombineMetrics(source);
-				
 				//-----------------------------------------------------------
 				// only combine the outermost "node" of incremental callsite
 				//-----------------------------------------------------------
@@ -240,8 +230,6 @@ public class CallSiteScopeCallerView extends CallSiteScope implements IMergedSco
 	/************************
 	 * combination class specific for the creation of incremental call site
 	 * in this phase, we need to store the information of counter from the source
-	 * @author laksonoadhianto
-	 *
 	 ************************/
 	static private class CombineMetricUsingCopyNoCondition extends AbstractCombineMetric {
 
@@ -256,7 +244,6 @@ public class CallSiteScopeCallerView extends CallSiteScope implements IMergedSco
 				MetricValuePropagationFilter exclusiveOnly) {
 
 			if (target instanceof CallSiteScopeCallerView) {
-				//Scope copy = getScopeOfCombineMetrics(source);
 				
 				if (inclusiveOnly != null) {
 					target.safeCombine(source, inclusiveOnly);

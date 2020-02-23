@@ -139,7 +139,8 @@ public abstract class ScopeViewActions /*extends ScopeActions /* implements IToo
 				try {
 					treeViewer.expandToLevel(path, 1);					
 				} catch (Exception e) {
-					System.out.println("Cannot expand path: " + path);
+					System.out.println("Cannot expand path " + path.getLastSegment() + ": " + e.getMessage());
+					e.printStackTrace();
 					return false;
 				}
 

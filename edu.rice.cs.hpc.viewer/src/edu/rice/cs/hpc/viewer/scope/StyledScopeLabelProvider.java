@@ -136,14 +136,14 @@ public class StyledScopeLabelProvider extends DelegatingStyledCellLabelProvider
 					Scope cct = caller.getLineScope();
 					if (node instanceof CallSiteScopeCallerView) 
 					{
-						Object merged[] = ((CallSiteScopeCallerView)caller).getMergedScopes();
-						if (merged != null) {
-							int mult = merged.length + 1;
+						int numMerged = ((CallSiteScopeCallerView)caller).getNumMergedScopes();
+						if (numMerged > 0) {
+							int mult = numMerged + 1;
 							text = mult + "*";
 						}
 						cct = ((CallSiteScopeCallerView)caller).getScopeCCT();
 					}	
-					text += "[c:" + caller.getCCTIndex() +"/" + cct.getCCTIndex()  + "] " ;
+					text += " [c:" + caller.getCCTIndex() +"/" + cct.getCCTIndex()  + "] " ;
 				} else
 					text = "[c:" + node.getCCTIndex() + "] ";
 			} 
