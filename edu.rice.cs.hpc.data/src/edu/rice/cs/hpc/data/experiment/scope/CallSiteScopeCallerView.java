@@ -3,7 +3,6 @@ package edu.rice.cs.hpc.data.experiment.scope;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
-
 import edu.rice.cs.hpc.data.experiment.metric.AbstractCombineMetric;
 import edu.rice.cs.hpc.data.experiment.scope.filters.MetricValuePropagationFilter;
 import edu.rice.cs.hpc.data.experiment.scope.visitors.CallersViewScopeVisitor;
@@ -26,6 +25,7 @@ public class CallSiteScopeCallerView extends CallSiteScope implements IMergedSco
 	static final private IncrementalCombineMetricUsingCopy combine_with_dupl = new IncrementalCombineMetricUsingCopy();
 	static final private CombineMetricUsingCopyNoCondition combine_without_cond = new CombineMetricUsingCopyNoCondition();
 	
+	
 	/**
 	 * 
 	 * @param scope
@@ -38,8 +38,9 @@ public class CallSiteScopeCallerView extends CallSiteScope implements IMergedSco
 			CallSiteScopeType csst, int id, Scope cct, Scope s_cost) {
 		super(scope, scope2, csst, id, cct.getFlatIndex());
 
-		this.scopeCCT = cct;
+		this.scopeCCT  = cct;
 		this.scopeCost = s_cost;
+		
 		this.flag_scope_has_child = false;
 	}
 
@@ -102,8 +103,6 @@ public class CallSiteScopeCallerView extends CallSiteScope implements IMergedSco
 	/*****************
 	 * retrieve the child scopes of this node. 
 	 * If a node has merged siblings, then we need to reconstruct the children of the merged scopes
-	 * @param finalizeVisitor: visitor traversal for finalization phase
-	 * @param percentVisitor: visitor traversal to compute the percentage
 	 * @param inclusiveOnly: filter for inclusive metrics
 	 * @param exclusiveOnly: filter for exclusive metrics 
 	 */
@@ -119,22 +118,19 @@ public class CallSiteScopeCallerView extends CallSiteScope implements IMergedSco
 			//-------------------------------------------------------------------------
 			// this scope has already computed children, we do nothing, just return them
 			//-------------------------------------------------------------------------
-			return this.getChildren();
-			
-		} else {
-			
-			//-------------------------------------------------------------------------
-			// construct my own child
-			//-------------------------------------------------------------------------
-			
-			LinkedList<CallSiteScopeCallerView> listOfChain = CallerScopeBuilder.createCallChain
-				(root, scopeCCT, scopeCost, combine_without_cond, inclusiveOnly, exclusiveOnly);
+			return children;			
+		}
+		//-------------------------------------------------------------------------
+		// construct my own child
+		//-------------------------------------------------------------------------
+		
+		LinkedList<CallSiteScopeCallerView> listOfChain = CallerScopeBuilder.createCallChain
+			(root, scopeCCT, scopeCost, combine_without_cond, inclusiveOnly, exclusiveOnly);
 
-			if (!listOfChain.isEmpty())
-			{
-				CallSiteScopeCallerView first = listOfChain.removeFirst();
-				CallersViewScopeVisitor.addNewPathIntoTree(this, first, listOfChain);
-			}
+		if (!listOfChain.isEmpty())
+		{
+			CallSiteScopeCallerView first = listOfChain.removeFirst();
+			CallersViewScopeVisitor.addNewPathIntoTree(this, first, listOfChain);
 		}
 		
 		//----------------------------------------------------------------
@@ -152,7 +148,7 @@ public class CallSiteScopeCallerView extends CallSiteScope implements IMergedSco
 					//-------------------------------------------------------------------------
 					// construct the child of this merged scope
 					//-------------------------------------------------------------------------
-					LinkedList<CallSiteScopeCallerView> listOfChain = CallersViewScopeVisitor.createCallChain
+					listOfChain = CallersViewScopeVisitor.createCallChain
 						(root, scope_cct, scope, combine_without_cond, inclusiveOnly, exclusiveOnly);
 					
 					//-------------------------------------------------------------------------
@@ -191,7 +187,7 @@ public class CallSiteScopeCallerView extends CallSiteScope implements IMergedSco
 		return listOfmerged.size();
 	}
 
-	
+
 	/************************
 	 * combination class to combine two metrics
 	 * This class is specifically designed for combining merged nodes in incremental caller view
@@ -212,7 +208,8 @@ public class CallSiteScopeCallerView extends CallSiteScope implements IMergedSco
 				//-----------------------------------------------------------
 				// only combine the outermost "node" of incremental callsite
 				//-----------------------------------------------------------
-				if (inclusiveOnly != null && source.isCounterZero()) {
+				if (inclusiveOnly != null && 
+						(source.isCounterZero() || source.getCounter()==target.getCounter()) ) {
 					target.safeCombine(source, inclusiveOnly);
 				} 
 										
