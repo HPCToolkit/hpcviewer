@@ -138,6 +138,13 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         if (myRootScope != null && myRootScope.getChildCount() > 0) {
             treeViewer.setInput(myRootScope);
             
+            // Eclipse bug?
+            // Force to refresh the tree to ensure that the size and the location of tree columns
+            //  are finalized.
+            // without refreshing the tree, sometimes the columns move by themselves!
+            
+            treeViewer.refresh();
+            
             // Try select the first scope
             /*TreeItem objItem = treeViewer.getTree().getItem(1);            
             treeViewer.getTree().showItem(objItem);
