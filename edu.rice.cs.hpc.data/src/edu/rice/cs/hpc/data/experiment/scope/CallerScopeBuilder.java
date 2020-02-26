@@ -134,30 +134,13 @@ public class CallerScopeBuilder {
 			//------------------------------------------------------------------------
 			// we check if the scope is identical with the existing scope in the path
 			// if it is the case, we should merge them
-			// For aliens inline macro (single alien), the flat ID has to be prefixed with
-			//  the flat ID of the parent to distinguish between the same inline macro from
-			//  different context. This is because we consider single alien as part of the 
-			//  function (a bit like loops), while double aliens are considered like 
-			//  normal function.
-			//
-			// For instance we have
-			//   b -> c
-			//   a -> b -> c
-			// if c is single alien, then c has to be part of b, which means:
-			//   c_flatID = b_flatID + c_flatID
 			//------------------------------------------------------------------------
 			final ProcedureScope firstProc  = first.getProcedureScope();
 			final ProcedureScope callerProc = existingCaller.getProcedureScope();
 			
 			String firstID  = String.valueOf(firstProc.getFlatIndex());
 			String callerID = String.valueOf(callerProc.getFlatIndex());
-			
-			if (firstProc.getProcedureType()  == ProcedureType.ProcedureInlineMacro) 
-				firstID  = firstID  + ":" + firstProc.getParentScope().getCCTIndex();
-
-			if (callerProc.getProcedureType() == ProcedureType.ProcedureInlineMacro) 
-				callerID = callerID + ":" + callerProc.getParentScope().getCCTIndex();
-			
+						
 			if (firstID.equals(callerID)) {
 
 				//------------------------------------------------------------------------
