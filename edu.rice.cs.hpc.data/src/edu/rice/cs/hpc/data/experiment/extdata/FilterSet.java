@@ -41,17 +41,27 @@ public class FilterSet {
 		return patterns;
 	}
 	public boolean include(TraceName traceName) {
-		boolean matchedSoFar = true;
-		/*
-		 * We think about it as applying each filter to the results of the
-		 * filter before. This is logically the same as requiring a rank to
-		 * match every filter (AND, though sometimes it is more intuitive as the
-		 * OR equation provided by De Morgan's law). Also, if excludeMatched is
-		 * true, we need to NOT the matches. This is the same as XORing with
-		 * excludeMatched
-		 */
+		
+		if (excludeMatched) {
+			boolean matchedSoFar = true;
+			/*
+			 * We think about it as applying each filter to the results of the
+			 * filter before. This is logically the same as requiring a rank to
+			 * match every filter (AND, though sometimes it is more intuitive as the
+			 * OR equation provided by De Morgan's law). Also, if excludeMatched is
+			 * true, we need to NOT the matches. This is the same as XORing with
+			 * excludeMatched
+			 */
+			for (Filter filter : patterns) {
+				matchedSoFar &= (filter.matches(traceName.process, traceName.thread)^excludeMatched);
+			}
+			return matchedSoFar;
+		}
+		// special case for "to show" pattern option
+		
+		boolean matchedSoFar = false;
 		for (Filter filter : patterns) {
-			matchedSoFar &= (filter.matches(traceName.process, traceName.thread)^excludeMatched);
+			matchedSoFar |= (filter.matches(traceName.process, traceName.thread));
 		}
 		return matchedSoFar;
 	}
