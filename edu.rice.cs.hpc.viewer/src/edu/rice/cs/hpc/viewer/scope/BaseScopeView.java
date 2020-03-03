@@ -13,6 +13,7 @@ import edu.rice.cs.hpc.common.ui.Util;
 import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
 import edu.rice.cs.hpc.data.experiment.metric.DerivedMetric;
+import edu.rice.cs.hpc.data.experiment.metric.Metric;
 import edu.rice.cs.hpc.data.experiment.metric.MetricValue;
 import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.experiment.scope.RootScopeType;
@@ -113,6 +114,28 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
     }
     
 
+	/**
+	 * Packing columns.
+	 * Caller has to make sure calling this method once the data in the table has been
+	 * loaded. Otherwise this method doesn't do the job.
+	 */
+	protected void packColumns()
+	{
+        TreeColumn []columns = treeViewer.getTree().getColumns();
+        
+        // search all columns of the table
+        // if the column has metric (i.e. metric column), we only resize the column
+        //  iff it isn't hidden (the width must be greater than zero)
+        
+        for(TreeColumn col : columns) {
+        	Object obj = col.getData();
+        	if (obj != null && obj instanceof BaseMetric) {
+        		if (col.getWidth() > 0) {
+        			col.pack();
+        		}
+        	}
+        }
+	}
 	
     //======================================================
     // ................ UPDATE ............................
@@ -122,6 +145,7 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
 	 * (non-Javadoc)
 	 * @see edu.rice.cs.hpc.viewer.scope.AbstractBaseScopeView#updateDisplay()
 	 */
+	@Override
 	public void updateDisplay() 
 	{
 		// return immediately when there's no database or the view is closed (disposed)
@@ -163,6 +187,10 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
             // if the filter may incur misleading information, we should warn users
             // ------------------------------------------------------------
             checkFilterStatus(myExperiment);
+            
+            // packing columns. This may or may not work, depending if the loading has
+            // been finalized or not by Eclipse JFace.
+            packColumns();
         }
    	}
 
