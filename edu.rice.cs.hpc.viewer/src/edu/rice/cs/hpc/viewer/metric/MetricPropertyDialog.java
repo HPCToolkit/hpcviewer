@@ -356,7 +356,19 @@ public class MetricPropertyDialog extends TitleAreaDialog
 		this.experiment = exp;
 		final ArrayList<PropertiesModel> arrElements = createInput(exp);
 		viewer.setInput(arrElements);
-		viewer.refresh();
+		
+		// adjust the width of the columns
+		// use pack() to let Eclipse SWT to decide how to arrange the widths.
+		// it seems more portable to most platforms than using column weight
+		
+		final TableColumn []columns = viewer.getTable().getColumns();
+		if (columns == null)
+			return;
+		
+		for (TableColumn col : columns) {
+			col.pack();
+		}
+		//viewer.refresh();
 	}
 	
 	private void setExperiment(Experiment exp) {
