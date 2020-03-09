@@ -53,6 +53,11 @@ public class ProcedureClassMapAction extends AbstractHandler {
 		DataService dataService = (DataService) sourceProviderService.getSourceProvider(DataService.DATA_PROVIDER);
 		// reset the color table
 		SpaceTimeDataController stdc = dataService.getData();
+		if (stdc == null) {
+			// no database is opened
+			return;
+		}
+		
 		stdc.resetPredefinedColor();;
 		
 		// broadcast to all views

@@ -192,15 +192,6 @@
                   label="Show procedure-color mapping"
                   mnemonic="c"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <with
-                        variable="edu.rice.cs.hpc.traceviewer.services.DataService.data">
-                     <equals
-                           value="ENABLED">
-                     </equals>
-                  </with>
-               </visibleWhen>
             </command>
             <separator
                   name="edu.rice.cs.hpc.traceviewer.separator1">

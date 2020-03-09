@@ -27,10 +27,13 @@ public class OptionMidpoint extends AbstractHandler {
 			ISourceProviderService sourceProviderService = (ISourceProviderService) window.getService(
 					ISourceProviderService.class);
 			DataService dataService = (DataService) sourceProviderService.getSourceProvider(DataService.DATA_PROVIDER);
-			final SpaceTimeDataController data = dataService.getData();
 
 			boolean enable = !Util.isOptionEnabled(command);
-			data.setEnableMidpoint(enable);
+
+			final SpaceTimeDataController data = dataService.getData();
+			if (data != null) {				
+				data.setEnableMidpoint(enable);
+			}
 		}
 
 		HandlerUtil.toggleCommandState(command);

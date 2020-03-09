@@ -82,7 +82,7 @@ public class ColorTable
 		}
 		predefinedColorMatcher.clear();
 		
-		classMap.clear();
+		classMap.dispose();
 		
 		mapRGBtoProcedure.clear();
 	}

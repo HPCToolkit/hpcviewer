@@ -167,7 +167,7 @@ public class ProcedureClassDialog extends TitleAreaDialog {
 		btnReset.setToolTipText("Reset to the default configuration");
 		btnReset.addSelectionListener( new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				ProcedureClassDialog.this.data.clear();
+
 				ProcedureClassDialog.this.data.initDefault();
 				ProcedureClassDialog.this.tableViewer.setInput(data.getEntrySet());
 			}
@@ -215,7 +215,6 @@ public class ProcedureClassDialog extends TitleAreaDialog {
 		final Table table = tableViewer.getTable();
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
-		table.pack();
 		
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo( table );
@@ -235,6 +234,9 @@ public class ProcedureClassDialog extends TitleAreaDialog {
 		});
 		
 		sortColClass.setSorter(sortColClass, Direction.ASC);
+
+		table.pack();
+
 		setTitle("Procedure and color mapping");
 		setMessage("Add, remove or edit a procedure-color mapping");
 		getShell().setText("Procedure-color mapping");

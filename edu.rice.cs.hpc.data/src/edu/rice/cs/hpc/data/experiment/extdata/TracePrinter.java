@@ -80,14 +80,14 @@ public class TracePrinter
 		TraceReader reader = new TraceReader(fileDB);
 		long numRecords = reader.getNumberOfRecords(rank);
 		
-		long oldStamp = 0L;
+		TraceRecord prevRecord = reader.getData(rank, 0);
 		
-		for(long i=0; i<numRecords; i++) {
-			TraceRecord record = reader.getData(rank, i);
-			long delta = record.timestamp - oldStamp;
-			System.out.println(record.timestamp + " , " + record.cpId + " (+" + delta + ")");
-			
-			oldStamp = record.timestamp;
+		for(long i=1; i<numRecords; i++) {
+			TraceRecord newRecord = reader.getData(rank, i);
+			long delta = newRecord.timestamp - prevRecord.timestamp;
+			System.out.println(prevRecord.timestamp + " , " + prevRecord.cpId + " (" + delta + " ns)");
+
+			prevRecord = newRecord;
 		}
 	}
 	
@@ -123,11 +123,6 @@ public class TracePrinter
 			if (fileTrace.length() > 56) {
 				return fileTrace.getAbsolutePath();
 			}
-			
-			System.err.println("Warning! Trace file "
-					+ fileTrace.getName()
-					+ " is too small: "
-					+ fileTrace.length() + "bytes .");
 		}
 		System.err
 				.println("Error: trace file(s) does not exist or fail to open "
