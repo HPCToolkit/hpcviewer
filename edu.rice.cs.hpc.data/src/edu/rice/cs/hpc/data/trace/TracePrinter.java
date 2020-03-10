@@ -1,10 +1,15 @@
-package edu.rice.cs.hpc.data.experiment.extdata;
+package edu.rice.cs.hpc.data.trace;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.Locale;
 
 import edu.rice.cs.hpc.data.experiment.ExperimentWithoutMetrics;
+import edu.rice.cs.hpc.data.experiment.extdata.FileDB2;
+import edu.rice.cs.hpc.data.experiment.scope.Scope;
+import edu.rice.cs.hpc.data.experiment.scope.visitors.TraceCallPathVisitor;
 import edu.rice.cs.hpc.data.util.MergeDataFiles;
 
 /*****
@@ -65,9 +70,10 @@ public class TracePrinter
 			for(int j=0; j<ranks.length; j++) {
 				if (args[i].compareTo(ranks[j]) == 0) {
 					try {
-						printTrace(j, fileDB);
+						printTrace(experiment, j, fileDB);
+						System.out.println("------------------------");
 					} catch (IOException e) {
-						e.printStackTrace();
+						System.err.println(args[i] + "Unknown rank");
 						return;
 					}
 				}
@@ -76,7 +82,14 @@ public class TracePrinter
 	}
 
 	
-	private static void printTrace(int rank, FileDB2 fileDB) throws IOException {
+	private static void printTrace(ExperimentWithoutMetrics experiment, int rank, FileDB2 fileDB) throws IOException {
+		
+		final int MAX_NAME = 16;
+		
+		TraceCallPathVisitor visitor = new TraceCallPathVisitor();
+		experiment.getRootScope().dfsVisitScopeTree(visitor);
+		AbstractMap<Integer, Scope> map = visitor.getMap();
+		
 		TraceReader reader = new TraceReader(fileDB);
 		long numRecords = reader.getNumberOfRecords(rank);
 		
@@ -84,8 +97,19 @@ public class TracePrinter
 		
 		for(long i=1; i<numRecords; i++) {
 			TraceRecord newRecord = reader.getData(rank, i);
-			long delta = newRecord.timestamp - prevRecord.timestamp;
-			System.out.println(prevRecord.timestamp + " , " + prevRecord.cpId + " (" + delta + " ns)");
+			long delta  = newRecord.timestamp - prevRecord.timestamp;
+			String name = String.valueOf(prevRecord.cpId);
+			
+			if (map != null) {
+				Scope scope = map.get(prevRecord.cpId);
+				if (scope != null) {
+					name = scope.getName();
+					if (name.length() > MAX_NAME)
+						name = name.substring(0, MAX_NAME) + "...";
+				}
+			}
+
+			System.out.printf( "%-20s : %,d ns%n", name, delta);
 
 			prevRecord = newRecord;
 		}
@@ -102,7 +126,7 @@ public class TracePrinter
 			long minLoc = fileDB.getMinLoc(i);
 			long maxLoc = fileDB.getMaxLoc(i);
 			long numBytes = maxLoc - minLoc;
-			System.out.println("\t" + rank + " [" + minLoc + " , " + maxLoc + " ] : " + numBytes);
+			System.out.printf(Locale.US, "  %8s (%,d - %,d) : %,d bytes\n", rank, minLoc, maxLoc, numBytes);
 			i++;
 		}
 	}

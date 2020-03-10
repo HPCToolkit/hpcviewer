@@ -1,7 +1,8 @@
-package edu.rice.cs.hpc.data.experiment.extdata;
+package edu.rice.cs.hpc.data.trace;
 
 import java.io.IOException;
 
+import edu.rice.cs.hpc.data.experiment.extdata.IFileDB;
 import edu.rice.cs.hpc.data.util.Constants;
 
 public class TraceReader 

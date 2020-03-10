@@ -19,6 +19,7 @@ Export-Package: edu.rice.cs.hpc.data.db,
  edu.rice.cs.hpc.data.experiment.xml,
  edu.rice.cs.hpc.data.filter,
  edu.rice.cs.hpc.data.framework,
+ edu.rice.cs.hpc.data.trace,
  edu.rice.cs.hpc.data.util,
  edu.rice.cs.hpc.data.util.string
 Main-Class: edu.rice.cs.hpc.data.framework.Application

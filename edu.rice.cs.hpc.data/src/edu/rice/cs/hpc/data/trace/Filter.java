@@ -1,4 +1,4 @@
-package edu.rice.cs.hpc.data.experiment.extdata;
+package edu.rice.cs.hpc.data.trace;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

@@ -20,9 +20,9 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.rice.cs.hpc.common.util.UserInputHistory;
-import edu.rice.cs.hpc.data.experiment.extdata.Filter;
-import edu.rice.cs.hpc.data.experiment.extdata.FilterSet;
 import edu.rice.cs.hpc.data.experiment.extdata.IFilteredData;
+import edu.rice.cs.hpc.data.trace.Filter;
+import edu.rice.cs.hpc.data.trace.FilterSet;
 
 
 /*****

@@ -4,10 +4,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import edu.rice.cs.hpc.data.experiment.extdata.Filter;
-import edu.rice.cs.hpc.data.experiment.extdata.FilterSet;
 import edu.rice.cs.hpc.data.experiment.extdata.IFilteredData;
-import edu.rice.cs.hpc.data.experiment.extdata.TraceName;
+import edu.rice.cs.hpc.data.trace.Filter;
+import edu.rice.cs.hpc.data.trace.FilterSet;
+import edu.rice.cs.hpc.data.trace.TraceName;
 
 
 

@@ -19,7 +19,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 
 import com.jcraft.jsch.JSchException;
 import edu.rice.cs.hpc.data.experiment.InvalExperimentException;
-import edu.rice.cs.hpc.data.experiment.extdata.TraceName;
+import edu.rice.cs.hpc.data.trace.TraceName;
 import edu.rice.cs.hpc.remote.tunnel.LocalTunneling;
 import edu.rice.cs.hpc.remote.tunnel.RemoteUserInfo;
 
