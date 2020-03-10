@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.Queue;
-import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -136,8 +135,6 @@ public abstract class BaseViewPaint extends Job
 			launchDataGettingThreads(changedBounds, launch_threads);
 			
 		} catch (Exception e) {
-			/*MessageDialog.openError(window.getShell(), "Error while reading data", 
-					e.getMessage());*/
 			e.printStackTrace();
 			
 			// shutdown the monitor to end the progress bar
@@ -146,15 +143,10 @@ public abstract class BaseViewPaint extends Job
 		}
 		
 		// -------------------------------------------------------------------
-		// instantiate queue based on whether we need multi-threading or not
+		// instantiate queue based on whether we need multi-threading or not.
 		// in case of multithreading, we want a thread-safe queue
 		// -------------------------------------------------------------------
-		final Queue<TimelineDataSet> queue;
-		if (launch_threads > 1) {
-			queue = new ConcurrentLinkedQueue<TimelineDataSet>();
-		} else {
-			queue = new LinkedList<TimelineDataSet>();
-		}
+		final Queue<TimelineDataSet> queue = new ConcurrentLinkedQueue<TimelineDataSet>();
 
 		// -------------------------------------------------------------------
 		// case where everything works fine, and all the data has been read,

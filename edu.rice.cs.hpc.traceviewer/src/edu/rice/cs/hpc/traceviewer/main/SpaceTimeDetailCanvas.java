@@ -928,7 +928,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	
 	// remove queue of jobs because it causes deadlock 
 	// 
-	//final private ConcurrentLinkedQueue<BaseViewPaint> queue = new ConcurrentLinkedQueue<>();
+	final private ConcurrentLinkedQueue<BaseViewPaint> queue = new ConcurrentLinkedQueue<>();
 	
 	/*********************************************************************************
 	 * Refresh the content of the canvas with new input data or boundary or parameters
@@ -1027,7 +1027,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 				origGC.dispose();
 				imageOrig.dispose();
 				
-				//queue.remove(detailPaint);
+				queue.remove(detailPaint);
 			}
 			
 			@Override
@@ -1037,8 +1037,9 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 			public void aboutToRun(IJobChangeEvent event) {}
 		});
 		
-/*		this part of the code causes deadlock since we don't clear the queue
-  
+/*		this part of the code causes deadlock on VirtualBox Ubuntu
+ *      since we don't clear the queue
+ */
   		if (!queue.isEmpty()) {
 			for (BaseViewPaint job : queue) {
 				if (!job.cancel()) {
@@ -1047,10 +1048,10 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 					// response that it will cancel in the future
 				}
 			}
-		}*/
+		}
 		
 		detailPaint.schedule();
-		//queue.add(detailPaint);
+		queue.add(detailPaint);
 	}
 
 	private void asyncRedraw() 
