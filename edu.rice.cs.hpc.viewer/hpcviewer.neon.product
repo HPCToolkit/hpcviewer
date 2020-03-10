@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="hpcviewer" id="edu.rice.cs.hpc.viewer.product" application="edu.rice.cs.hpc.viewer.application" version="2020.02" useFeatures="false" includeLaunchers="true">
+<product name="hpcviewer" id="edu.rice.cs.hpc.viewer.product" application="edu.rice.cs.hpc.viewer.application" version="2020.03" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="icons/hpcviewerEclipseShadow128.png"/>
@@ -10,7 +10,7 @@
 
 hpcviewer is part of Rice University&apos;s HPCToolkit project. Development of HPCToolkit is principally funded by the Department of Energy&apos;s Office of Science, Lawrence Livermore National Laboratory and National Science Foundation.
 
-Release 2020.02  (C) Copyright 2020, Rice University.
+Release 2020.03  (C) Copyright 2020, Rice University.
       </text>
    </aboutInfo>
 
@@ -91,13 +91,13 @@ if advised of the possibility of such damage.
       <plugin id="edu.rice.cs.hpc.data"/>
       <plugin id="edu.rice.cs.hpc.filter"/>
       <plugin id="edu.rice.cs.hpc.viewer"/>
-      <plugin id="javax.annotation" fragment=""/>
-      <plugin id="javax.inject" fragment=""/>
+      <plugin id="javax.annotation"/>
+      <plugin id="javax.inject"/>
       <plugin id="javax.xml"/>
-      <plugin id="org.apache.batik.css" fragment=""/>
-      <plugin id="org.apache.batik.util" fragment=""/>
-      <plugin id="org.apache.batik.util.gui" fragment=""/>
-      <plugin id="org.apache.commons.jxpath" fragment=""/>
+      <plugin id="org.apache.batik.css"/>
+      <plugin id="org.apache.batik.util"/>
+      <plugin id="org.apache.batik.util.gui"/>
+      <plugin id="org.apache.commons.jxpath"/>
       <plugin id="org.apache.xerces"/>
       <plugin id="org.apache.xml.resolver"/>
       <plugin id="org.apache.xml.serializer"/>
@@ -116,34 +116,34 @@ if advised of the possibility of such damage.
       <plugin id="org.eclipse.core.resources"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
-      <plugin id="org.eclipse.e4.core.commands" fragment=""/>
-      <plugin id="org.eclipse.e4.core.contexts" fragment=""/>
-      <plugin id="org.eclipse.e4.core.di" fragment=""/>
-      <plugin id="org.eclipse.e4.core.di.annotations" fragment=""/>
-      <plugin id="org.eclipse.e4.core.di.extensions" fragment=""/>
-      <plugin id="org.eclipse.e4.core.services" fragment=""/>
-      <plugin id="org.eclipse.e4.emf.xpath" fragment=""/>
-      <plugin id="org.eclipse.e4.ui.bindings" fragment=""/>
-      <plugin id="org.eclipse.e4.ui.css.core" fragment=""/>
-      <plugin id="org.eclipse.e4.ui.css.swt" fragment=""/>
-      <plugin id="org.eclipse.e4.ui.css.swt.theme" fragment=""/>
-      <plugin id="org.eclipse.e4.ui.di" fragment=""/>
-      <plugin id="org.eclipse.e4.ui.model.workbench" fragment=""/>
-      <plugin id="org.eclipse.e4.ui.services" fragment=""/>
+      <plugin id="org.eclipse.e4.core.commands"/>
+      <plugin id="org.eclipse.e4.core.contexts"/>
+      <plugin id="org.eclipse.e4.core.di"/>
+      <plugin id="org.eclipse.e4.core.di.annotations"/>
+      <plugin id="org.eclipse.e4.core.di.extensions"/>
+      <plugin id="org.eclipse.e4.core.services"/>
+      <plugin id="org.eclipse.e4.emf.xpath"/>
+      <plugin id="org.eclipse.e4.ui.bindings"/>
+      <plugin id="org.eclipse.e4.ui.css.core"/>
+      <plugin id="org.eclipse.e4.ui.css.swt"/>
+      <plugin id="org.eclipse.e4.ui.css.swt.theme"/>
+      <plugin id="org.eclipse.e4.ui.di"/>
+      <plugin id="org.eclipse.e4.ui.model.workbench"/>
+      <plugin id="org.eclipse.e4.ui.services"/>
       <plugin id="org.eclipse.e4.ui.swt.gtk" fragment="true"/>
-      <plugin id="org.eclipse.e4.ui.widgets" fragment=""/>
-      <plugin id="org.eclipse.e4.ui.workbench" fragment=""/>
-      <plugin id="org.eclipse.e4.ui.workbench.addons.swt" fragment=""/>
-      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.widgets"/>
+      <plugin id="org.eclipse.e4.ui.workbench"/>
+      <plugin id="org.eclipse.e4.ui.workbench.addons.swt"/>
+      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt"/>
       <plugin id="org.eclipse.e4.ui.workbench.renderers.swt.cocoa" fragment="true"/>
-      <plugin id="org.eclipse.e4.ui.workbench.swt" fragment=""/>
-      <plugin id="org.eclipse.e4.ui.workbench3" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.workbench.swt"/>
+      <plugin id="org.eclipse.e4.ui.workbench3"/>
       <plugin id="org.eclipse.emf.common"/>
       <plugin id="org.eclipse.emf.ecore"/>
       <plugin id="org.eclipse.emf.ecore.change"/>
       <plugin id="org.eclipse.emf.ecore.xmi"/>
       <plugin id="org.eclipse.equinox.app"/>
-      <plugin id="org.eclipse.equinox.bidi" fragment=""/>
+      <plugin id="org.eclipse.equinox.bidi"/>
       <plugin id="org.eclipse.equinox.common"/>
       <plugin id="org.eclipse.equinox.ds"/>
       <plugin id="org.eclipse.equinox.event"/>
@@ -194,11 +194,11 @@ if advised of the possibility of such damage.
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
       <plugin id="org.swtchart"/>
       <plugin id="org.swtchart.ext"/>
-      <plugin id="org.tukaani.xz" fragment=""/>
-      <plugin id="org.w3c.css.sac" fragment=""/>
-      <plugin id="org.w3c.dom.events" fragment=""/>
-      <plugin id="org.w3c.dom.smil" fragment=""/>
-      <plugin id="org.w3c.dom.svg" fragment=""/>
+      <plugin id="org.tukaani.xz"/>
+      <plugin id="org.w3c.css.sac"/>
+      <plugin id="org.w3c.dom.events"/>
+      <plugin id="org.w3c.dom.smil"/>
+      <plugin id="org.w3c.dom.svg"/>
    </plugins>
 
 
