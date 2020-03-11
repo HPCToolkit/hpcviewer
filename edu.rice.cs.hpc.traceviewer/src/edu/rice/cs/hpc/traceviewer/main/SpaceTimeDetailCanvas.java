@@ -1000,42 +1000,11 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 					attributes, numLines, changedBounds, window, this, threadExecutor); 
 
 		//detailPaint.setUser(true);
-		detailPaint.addJobChangeListener(new IJobChangeListener() {
-			
-			@Override
-			public void sleeping(IJobChangeEvent event) {}
-			
-			@Override
-			public void scheduled(IJobChangeEvent event) {}
-			
-			@Override
-			public void running(IJobChangeEvent event) {}
-			
-			@Override
-			public void done(IJobChangeEvent event) {
-				if (event.getResult() == Status.OK_STATUS)
-				{
-					donePainting(imageOrig, imageFinal, changedBounds);
-				} else
-				{
-					// we don't need this "new image" since the paint fails
-					imageFinal.dispose();	
-					asyncRedraw();
-				}
-				// free resources 
-				bufferGC.dispose();
-				origGC.dispose();
-				imageOrig.dispose();
-				
-				queue.remove(detailPaint);
-			}
-			
-			@Override
-			public void awake(IJobChangeEvent event) {}
-			
-			@Override
-			public void aboutToRun(IJobChangeEvent event) {}
-		});
+		detailPaint.addJobChangeListener(new DetailPaintJobListener(
+											imageOrig, imageFinal, 
+											bufferGC, origGC, 
+											detailPaint, queue, 
+											changedBounds));
 		
 /*		this part of the code causes deadlock on VirtualBox Ubuntu
  *      since we don't clear the queue
@@ -1054,6 +1023,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		queue.add(detailPaint);
 	}
 
+	
 	private void asyncRedraw() 
 	{
 		Display display = Display.getDefault();
@@ -1228,6 +1198,76 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	//-----------------------------------------------------------------------------------------
 	
 
+	/******
+	 * 
+	 * private class to listen to the job status.
+	 * once a job is done, we need to free resources and remove the job
+	 * from the queue.
+	 *
+	 ******/
+	private class DetailPaintJobListener implements IJobChangeListener
+	{
+		final Image imageOrig, imageFinal;
+		final GC	bufferGC, origGC;
+		final BaseViewPaint detailPaint;
+		
+		final ConcurrentLinkedQueue<BaseViewPaint> queue;
+
+		final boolean changedBounds;
+		
+		public DetailPaintJobListener(Image imageOrig, Image imageFinal,
+							  GC	bufferGC,  GC    origGC,
+							  BaseViewPaint detailPaint,
+							  ConcurrentLinkedQueue<BaseViewPaint> queue,
+							  boolean 		changedBounds)	 {
+
+			this.imageFinal = imageFinal;
+			this.imageOrig  = imageOrig;
+			this.bufferGC   = bufferGC;
+			this.origGC     = origGC;
+			this.detailPaint = detailPaint;
+			
+			this.queue		= queue;
+			
+			this.changedBounds = changedBounds;
+		}
+		
+		@Override
+		public void sleeping(IJobChangeEvent event) {}
+		
+		@Override
+		public void scheduled(IJobChangeEvent event) {}
+		
+		@Override
+		public void running(IJobChangeEvent event) {}
+		
+		@Override
+		public void done(IJobChangeEvent event) {
+			if (event.getResult() == Status.OK_STATUS)
+			{
+				SpaceTimeDetailCanvas.this.donePainting(imageOrig, imageFinal, changedBounds);
+			} else
+			{
+				// we don't need this "new image" since the paint fails
+				imageFinal.dispose();	
+				asyncRedraw();
+			}
+			// free resources 
+			bufferGC.dispose();
+			origGC.dispose();
+			imageOrig.dispose();
+			
+			queue.remove(detailPaint);
+		}
+		
+		@Override
+		public void awake(IJobChangeEvent event) {}
+		
+		@Override
+		public void aboutToRun(IJobChangeEvent event) {}
+	}
+
+	
 	/*************************************************************************
 	 * 
 	 * Resizing thread by listening to the event if a user has finished

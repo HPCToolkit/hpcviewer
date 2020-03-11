@@ -166,7 +166,13 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 	public void updateView(SpaceTimeDataController _stData) 
 	{
 		depthEditor.setMaximum(_stData.getMaxDepth());
-		depthEditor.setSelection(0);
+
+		// this call to setSelection causes deadlock on MacOS
+		// When setSelection is called, it forces to render the data, then
+		//  trigger another job which then tries cancels the current job
+		
+		//depthEditor.setSelection(0);
+		
 		depthEditor.setVisible(true);
 		depthEditor.setToolTipText("Change the current depth.\nMax depth is " + _stData.getMaxDepth());
 		//this.csViewer.updateView();
