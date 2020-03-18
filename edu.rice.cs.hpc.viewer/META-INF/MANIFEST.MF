@@ -6,31 +6,15 @@ Bundle-Version: 5.5.1.qualifier
 Bundle-Activator: edu.rice.cs.hpc.viewer.framework.Activator
 Bundle-Vendor: Rice University
 Require-Bundle: org.eclipse.ui,
- edu.rice.cs.hpc.data,
  org.swtchart,
- org.swtchart.ext
+ org.swtchart.ext,
+ edu.rice.cs.hpc.common;bundle-version="5.5.1",
+ edu.rice.cs.hpc.data;bundle-version="5.5.1",
+ edu.rice.cs.hpc.filter;bundle-version="5.5.1"
 Bundle-ActivationPolicy: lazy
 Import-Package: 
  com.graphbuilder.math,
  com.graphbuilder.math.func,
- edu.rice.cs.hpc.common.ui,
- edu.rice.cs.hpc.common.util,
- edu.rice.cs.hpc.data.db,
- edu.rice.cs.hpc.data.experiment,
- edu.rice.cs.hpc.data.experiment.extdata,
- edu.rice.cs.hpc.data.experiment.merge,
- edu.rice.cs.hpc.data.experiment.metric,
- edu.rice.cs.hpc.data.experiment.scope,
- edu.rice.cs.hpc.data.experiment.scope.filters,
- edu.rice.cs.hpc.data.experiment.scope.visitors,
- edu.rice.cs.hpc.data.experiment.source,
- edu.rice.cs.hpc.data.experiment.xml,
- edu.rice.cs.hpc.data.filter,
- edu.rice.cs.hpc.data.framework,
- edu.rice.cs.hpc.data.util,
- edu.rice.cs.hpc.filter,
- edu.rice.cs.hpc.filter.service,
- edu.rice.cs.hpc.filter.view,
  org.eclipse.core.filesystem,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
