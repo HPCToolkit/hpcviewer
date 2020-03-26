@@ -231,7 +231,7 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 		
 		for (int i=0; i<attributes.length; i++) {
 			if (attributes[i].charAt(0) == FORMULA_TYPE) {
-				// type of formala
+				// type of formula
 				formula_type = values[i].charAt(0);
 				
 			} else if (attributes[i].charAt(0) == FORMULA_EXPRESSION) {
@@ -392,8 +392,6 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 			// this metric is not for inclusive, the display name should be the same as the native one
 			sDisplayName = sNativeName;
 		}
-		
-		if (sDescription == null) sDescription = sDisplayName;
 		
 		// set the metric
 		BaseMetric metricInc;
