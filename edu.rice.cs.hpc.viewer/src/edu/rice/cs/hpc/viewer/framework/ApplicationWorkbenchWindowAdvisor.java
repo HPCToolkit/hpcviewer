@@ -169,9 +169,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor
 		    		}
 		    	} else {
 		    		final String sMsg = "File doesn't exist: " + fileStore.getName();
-		    		System.err.println(sMsg );
+		    		//System.err.println(sMsg );
 		    		MessageDialog.openError(window.getShell(), "Fail to open a database", sMsg);
-					this.removeViews();
+					//this.removeViews();
 		    	}
 
 				return;
@@ -252,7 +252,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor
 		// in some platforms such as Mac OS, in order to close window, we don't need to activate it first.
 		// ----------------------------------------------------------------------------------------------
 		closeAllEditors();
-		removeViews();
+		
+		// in some cases, "removing" views cause Eclipse to make other views visible, and then
+		// activate it. This causes the creation of bottom-up tree or flat tree.
+		//removeViews();
 		
 		ViewerWindowManager.removeWindow(window);
 
@@ -273,7 +276,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor
 				if (pageCurrent != null){
 					// somehow, closeEditors method works better than closeAllEditors.
 					pageCurrent.closeEditors(pageCurrent.getEditorReferences(), false);
-					removeViews( pageCurrent );
+
+					// in some cases, "removing" views cause Eclipse to make other views visible, and then
+					// activate it. This causes the creation of bottom-up tree or flat tree.
+					//removeViews( pageCurrent );
 				}
 				
 				return true;

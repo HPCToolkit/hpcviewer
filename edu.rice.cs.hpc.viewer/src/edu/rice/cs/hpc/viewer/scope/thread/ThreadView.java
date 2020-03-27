@@ -13,6 +13,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbenchWindow;
 import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.extdata.IThreadDataCollection;
@@ -137,6 +138,17 @@ public class ThreadView extends AbstractBaseScopeView
         	objViewActions.finalizeContent(myRootScope);
         	objViewActions.checkNodeButtons();
         }
+		
+		// pack the columns, either to fit the title of the header, or 
+		// the item in the column
+		
+		final TreeColumn []columns = treeViewer.getTree().getColumns();
+		
+		for (final TreeColumn col : columns) {
+			if (col.getData() != null) {
+				col.pack();
+			}
+		}
 	}
 	
 	

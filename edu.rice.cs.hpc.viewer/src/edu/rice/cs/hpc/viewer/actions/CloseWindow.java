@@ -24,6 +24,7 @@ public class CloseWindow extends AbstractHandler {
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		final IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
+		
 		// get an array of open databases for this window
 		// do not remove the window yet right now
 		// ViewerWindowManager.removeWindow(window);

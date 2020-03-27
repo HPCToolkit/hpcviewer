@@ -171,9 +171,18 @@ implements IDynamicRootTree
 			if ( (ViewerWindowManager.size()>0) && isMyView(partRef) ) {
 
 				IWorkbenchPart part = partRef.getPart(false);
+				
+				// check if the window is closing
+				
+				final IWorkbenchWindow window  = part.getSite().getWorkbenchWindow();
+				final ViewerWindow viewerWindow = ViewerWindowManager.getViewerWindow(window);
+				if (viewerWindow != null) {
+					if (viewerWindow.isClosing())
+						return false;
+				}
+				
 				DynamicScopeView view = (DynamicScopeView) part;
 
-				IWorkbenchWindow window = part.getSite().getWorkbenchWindow();
 				final ViewerWindow vw 	= ViewerWindowManager.getViewerWindow(window);
 				if (vw != null && view.database != null) {
 					File file = view.database.getExperiment().getXMLExperimentFile();

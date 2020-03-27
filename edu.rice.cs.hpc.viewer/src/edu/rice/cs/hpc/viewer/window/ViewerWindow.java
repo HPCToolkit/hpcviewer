@@ -36,7 +36,9 @@ import edu.rice.cs.hpc.viewer.provider.DatabaseState;
  * @author mohrg
  *
  */
-public class ViewerWindow {
+public class ViewerWindow 
+{
+	public static enum WindowState { WINDOW_INIT, WINDOW_TERMINATE };
 	/**
 	 * The maximum number of performance databases that can be 
 	 * opened in one window.
@@ -56,6 +58,8 @@ public class ViewerWindow {
 	private Command cmdDebugFlat;
 	private ISourceProviderListener srcProviderListener;
 	
+	private WindowState windowState;
+	
 	/** number of databases (whether has been closed or not) 
 	 *  this number is useful to make sure the view is always unique */
 	private AtomicInteger numAggregateDatabase = new AtomicInteger(0);
@@ -67,8 +71,10 @@ public class ViewerWindow {
 	public void setWinObj(IWorkbenchWindow window) {
 		winObj = window;
 		ICommandService commandService = (ICommandService) winObj.getService(ICommandService.class);
-		cmdDebugCCT = commandService.getCommand( DebugShowCCT.commandId );
+		cmdDebugCCT  = commandService.getCommand( DebugShowCCT.commandId );
 		cmdDebugFlat = commandService.getCommand( DebugShowFlatID.commandId );
+		
+		windowState  = WindowState.WINDOW_INIT;
 		
 		// listen to filter change of states
 		final ISourceProviderService service = (ISourceProviderService) window.getService(ISourceProviderService.class);
@@ -223,6 +229,7 @@ public class ViewerWindow {
 	 * Remove (nullify) all the allocated resources
 	 */
 	public void dispose() {
+		
 		for (Database db : dbObj) {
 			if (db != null)
 				db.dispose();
@@ -236,6 +243,16 @@ public class ViewerWindow {
 			final FilterStateProvider service_provider = (FilterStateProvider) service.getSourceProvider(FilterStateProvider.FILTER_REFRESH_PROVIDER);
 			service_provider.removeSourceProviderListener(srcProviderListener);
 		}
+		windowState = WindowState.WINDOW_TERMINATE;
+	}
+	
+	/**
+	 * Check if the current window (or the application) is closing or not
+	 * 
+	 * @return true if the window is in the middle of closing
+	 */
+	public boolean isClosing() {
+		return windowState == WindowState.WINDOW_TERMINATE;
 	}
 	
 	public Database[] getDatabases() {

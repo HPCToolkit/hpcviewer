@@ -18,7 +18,7 @@ Release 2020.03  (C) Copyright 2020, Rice University.
    </configIni>
 
    <launcherArgs>
-      <programArgs>-consoleLog
+      <programArgs>-consoleLog -clearPersistedState
       </programArgs>
       <vmArgs>-Dosgi.locking=none
 -Dosgi.requiredJavaVersion=1.8
@@ -44,7 +44,6 @@ Release 2020.03  (C) Copyright 2020, Rice University.
             winLargeHigh="/edu.rice.cs.hpc.viewer/icons/hpcviewer-icon-48x48-32bit.bmp"/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>
