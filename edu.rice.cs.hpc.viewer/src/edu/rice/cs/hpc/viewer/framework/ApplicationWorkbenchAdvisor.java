@@ -19,8 +19,13 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 	// laks: we need to save and restore the configuration
 	public void initialize(IWorkbenchConfigurer configurer) {
 		super.initialize(configurer);
-		// enable the workbench state save mechanism
-		configurer.setSaveAndRestore(true);
+		
+		// disable the workbench state save mechanism.
+		// saving the state causes problems with E4 compatibility layer
+		// it spurs many java exceptions because the layout is incorrect
+		// plus, sometimes it causes the perspective to be weird
+		
+		configurer.setSaveAndRestore(false);
 	}
 	
 	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(
