@@ -414,22 +414,29 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 			int iWidth = 0;
 			if (toShow[i]) {
 				// display column
-       			// Laks: bug no 131: we need to have special key for storing the column width
-        		Object o = column.getData(ScopeTreeViewer.COLUMN_DATA_WIDTH);
-       			if((o != null) && (o instanceof Integer) ) {
-       				iWidth = ((Integer)o).intValue();
-       			} else {
-	        		iWidth = ScopeTreeViewer.COLUMN_DEFAULT_WIDTH;
-       			}
+				// bug #78: we should keep the original width
+				if (column.getWidth() > 1)
+					continue; // it's already shown
+
+				if (iWidth <= 0) {
+	       			// Laks: bug no 131: we need to have special key for storing the column width
+	        		Object o = column.getData(ScopeTreeViewer.COLUMN_DATA_WIDTH);
+	       			if((o != null) && (o instanceof Integer) ) {
+	       				iWidth = ((Integer)o).intValue();
+	       			} else {
+		        		iWidth = ScopeTreeViewer.COLUMN_DEFAULT_WIDTH;
+	       			}
+				}
 			} else {
 				// hide column					
-				int currentWidth = column.getWidth();
-				if(currentWidth > 0) {
-		   			Integer objWidth = Integer.valueOf(currentWidth); 
-		   			// Laks: bug no 131: we need to have special key for storing the column width
-		   			column.setData(ScopeTreeViewer.COLUMN_DATA_WIDTH, objWidth);
-
-				}
+				if (column.getWidth() <= 0) 
+					continue; // it's already hidden
+				
+	   			Integer objWidth = Integer.valueOf( column.getWidth() );
+	   			
+	   			// Laks: bug no 131: we need to have special key for storing the column width
+	   			column.setData(ScopeTreeViewer.COLUMN_DATA_WIDTH, objWidth);
+	   			
 				// need a special treatment for Linux/GTK platform:
 				// Explicitly set column pixel into zero due to SWT/GTK implementation that
 				// inhibit changes for the last column
