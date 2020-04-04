@@ -3,11 +3,16 @@ package edu.rice.cs.hpc.traceviewer.misc;
 import java.util.Map;
 
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
@@ -27,16 +32,20 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 	
 	public static final String ID = "hpccallstackview.view";
 	
-	CallStackViewer csViewer;
+	private CallStackViewer csViewer;
 	
 	/** Paints and displays the miniMap.*/
-	SpaceTimeMiniCanvas miniCanvas;
+	private SpaceTimeMiniCanvas miniCanvas;
 	
 	Spinner depthEditor;
 	
+	private Button maxDepthButton;
+	
+	private boolean enableAction = false;
 
 	public void createPartControl(Composite master) 
 	{
+		setEnableAction(false);
 		setupEverything(master);
 		setListener();
 	}
@@ -51,22 +60,61 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 		master.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, true));
 		
 		/*************************************************************************
-		 * Depth View Spinner (the thing with the text box and little arrow buttons)
+		 * Depth area. Consist of:
+		 * - Depth View Spinner (the thing with the text box and little arrow buttons)
+		 * - max depth (a shortcut to go to the maximum depth). See issue #64
 		 ************************************************************************/
-		depthEditor = new Spinner(master, SWT.EMBEDDED);
+		
+		Composite depthArea = new Composite(master, SWT.BORDER); 
+		
+		final Label lblDepth = new Label(depthArea, SWT.LEFT);
+		lblDepth.setText("Depth: ");
+		
+		depthEditor = new Spinner(depthArea, SWT.EMBEDDED);
 		depthEditor.setMinimum(0);
 		depthEditor.setPageIncrement(1);
 		
 		depthEditor.setLayout(new GridLayout());
-		GridData depthData = new GridData(SWT.CENTER, SWT.TOP, true, false);
-		depthData.widthHint = 100;
+		GridData depthData = new GridData(SWT.CENTER, SWT.CENTER, true, false);
+		depthData.widthHint = 50;
 		depthEditor.setLayoutData(depthData);
 		depthEditor.setVisible(false);
+		
+		maxDepthButton = new Button(depthArea, 0);
+		maxDepthButton.setText("Max depth");
+		maxDepthButton.setEnabled(false);
+		
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(depthArea);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(depthArea);
+		
+		maxDepthButton.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (!getEnableAction())
+					return;
+				
+				Integer depth = (Integer) maxDepthButton.getData();
+				if (depth == null || depth.intValue() <= 0)
+					return;
+
+				depthEditor.setSelection(depth);
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		
 		depthEditor.addModifyListener(new ModifyListener() {
 			
 			@Override
 			public void modifyText(ModifyEvent e) {
+				if (!getEnableAction())
+					return;
+				
 				String string = depthEditor.getText();
 				int value = 0;
 				if (string.length()<1) {
@@ -142,6 +190,10 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 			public void sourceChanged(int sourcePriority, Map sourceValuesByName) {	}
 			public void sourceChanged(int sourcePriority, String sourceName,
 					Object sourceValue) {
+				
+				if (!getEnableAction())
+					return;
+
 				// eclipse bug: even if we set a very specific source provider, eclipse still
 				//	gather event from other source. we then require to put a guard to avoid this.
 				if (sourceName.equals(DataService.DATA_UPDATE)) {
@@ -165,18 +217,19 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 	
 	public void updateView(SpaceTimeDataController _stData) 
 	{
-		depthEditor.setMaximum(_stData.getMaxDepth());
-
-		// this call to setSelection causes deadlock on MacOS
-		// When setSelection is called, it forces to render the data, then
-		//  trigger another job which then tries cancels the current job
-		
-		//depthEditor.setSelection(0);
-		
+		// guard : no action has to be taken at the moment;
+		setEnableAction(false);
+				
+		final int maxDepth = _stData.getMaxDepth();
+		depthEditor.setSelection(0);
+		depthEditor.setMaximum(maxDepth);		
 		depthEditor.setVisible(true);
-		depthEditor.setToolTipText("Change the current depth.\nMax depth is " + _stData.getMaxDepth());
-		//this.csViewer.updateView();
-		
+		depthEditor.setToolTipText("Change the current depth.\nMax depth is " + maxDepth);
+
+		maxDepthButton.setToolTipText("Set to max depth: " + maxDepth);
+		maxDepthButton.setData(Integer.valueOf(maxDepth));
+		maxDepthButton.setEnabled(true);
+
 		// instead of updating the content of the view, we just make the table
 		// visible, and let other event to trigger the update content.
 		// at this point, a data may not be ready to be processed
@@ -185,8 +238,19 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 		this.miniCanvas.updateView(_stData);
 		
 		miniCanvas.setVisible(true);
+		
+		// enable action
+		setEnableAction(true);
 	}
 
+	private void setEnableAction(boolean enabled) {
+		enableAction = enabled;
+	}
+	
+	private boolean getEnableAction() {
+		return enableAction;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
