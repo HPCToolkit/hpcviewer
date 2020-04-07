@@ -210,6 +210,7 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 		dm.setOrder        (metric.getOrder());
 		dm.setDisplayFormat(metric.getDisplayFormat());
 		dm.setDisplayed	   (metric.getVisibility()); // fix issue #63
+		dm.setPartner	   (metric.getPartner());
 
 		listOfDerivedMetrics.add(dm);
 		
@@ -412,6 +413,9 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 				break;
 			case Derived:
 				metricInc = new DerivedMetric(sDisplayName, sID, nbMetrics, percent, objType);
+				
+				metricInc.setPartner(partner);
+				metricInc.setOrder  (order);
 				
 				listOfDerivedMetrics.add( (DerivedMetric) metricInc);
 				break;
