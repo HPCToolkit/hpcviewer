@@ -407,9 +407,13 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 		}
 		TreeColumnLayout layout = (TreeColumnLayout) treeViewer.getTree().getParent().getLayout();
 		
-		int i = 0;
+		int i = -1; // index of the column
+		
 		for (TreeColumn column : columns) {
+			
 			if (column.getData() == null) continue; // not a metric column 
+			
+			i++;
 
 			int iWidth = 0;
 			if (toShow[i]) {
@@ -448,8 +452,6 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 			// eclipse bug: forcing to refresh the table has no effect either
 			
 			column.setWidth(iWidth);
-
-			i++;
 		}
 		treeViewer.getTree().setRedraw(true);
     }
