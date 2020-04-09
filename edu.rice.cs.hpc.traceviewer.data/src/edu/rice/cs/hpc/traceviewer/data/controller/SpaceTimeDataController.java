@@ -259,6 +259,34 @@ public abstract class SpaceTimeDataController
 		return minBegTime;
 	}
 
+	/**************************************************************************
+	 * retrieve the unit time per second of the trace
+	 * The information is from experiment.xml
+	 * 
+	 * @return double unit time oer second
+	 **************************************************************************/
+	public double getUnitTimePerSecond() 
+	{
+		long unit_time = TraceAttribute.PER_NANO_SECOND;
+		
+		if (getExperiment().getMajorVersion() == 2) {
+			if (getExperiment().getMinorVersion() < 2) {
+				// old version of database: always microsecond
+				unit_time = 1000000;
+			} else {
+				// new version of database:
+				// - if the measurement is from old hpcrun: microsecond
+				// - if the measurement is from new hpcrun: nanosecond
+				
+				BaseExperiment be = getExperiment();
+				ExperimentWithoutMetrics exp = (ExperimentWithoutMetrics) be;
+				unit_time = exp.getTraceAttribute().dbUnitTime;
+			}
+		}
+		return (double)unit_time;
+	}
+
+	
 	public ColorTable getColorTable() {
 		return colorTable;
 	}

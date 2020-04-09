@@ -551,32 +551,6 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		restoreMessage.showWarning(message);
 	}
 	
-	/**************************************************************************
-	 * retrieve the unit time per second of the trace
-	 * The information is from experiment.xml
-	 * 
-	 * @return double unit time oer second
-	 **************************************************************************/
-	private double getUnitTimePerSecond() 
-	{
-		long unit_time = TraceAttribute.PER_NANO_SECOND;
-		
-		if (stData.getExperiment().getMajorVersion() == 2) {
-			if (stData.getExperiment().getMinorVersion() < 2) {
-				// old version of database: always microsecond
-				unit_time = PER_MICRO_SECOND;
-			} else {
-				// new version of database:
-				// - if the measurement is from old hpcrun: microsecond
-				// - if the measurement is from new hpcrun: nanosecond
-				
-				BaseExperiment be = this.stData.getExperiment();
-				ExperimentWithoutMetrics exp = (ExperimentWithoutMetrics) be;
-				unit_time = exp.getTraceAttribute().dbUnitTime;
-			}
-		}
-		return (double)unit_time;
-	}
 	
 	/**************************************************************************
 	 * Updates what the labels display to the viewer's current state.
@@ -584,7 +558,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	private void adjustLabels()
     {
 		final ImageTraceAttributes attributes = stData.getAttributes();
-		double unit_time = getUnitTimePerSecond();
+		double unit_time = stData.getUnitTimePerSecond();
 		
 		double timeInSec = attributes.getTimeBegin()/unit_time;
 		final String timeStart = formatTime.format(timeInSec);
@@ -643,7 +617,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
             	//crossHairLabel.setText("Cross Hair: (" + (selectedTime/1000)/1000.0 + "s, " + processes[rank] + ")");
     		} else {
     			// in case of incorrect filtering where user may have empty ranks or incorrect filters, we don't display the rank
-    			crossHairLabel.setText("Cross Hair: (" + (selectedTime/getUnitTimePerSecond())/.0 + "s, ?)");
+    			crossHairLabel.setText("Cross Hair: (" + (selectedTime/stData.getUnitTimePerSecond())/.0 + "s, ?)");
     		}
         }
         
@@ -661,7 +635,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	 **************************************************************************/
 	private String getCrossHairText(long closeTime, int selectedProcess) 
 	{
-		final float selectedTime = (float) ((float)closeTime / getUnitTimePerSecond());
+		final float selectedTime = (float) ((float)closeTime / stData.getUnitTimePerSecond());
         final IBaseData traceData = stData.getBaseData();
         final String processes[] = traceData.getListOfRanks();
 

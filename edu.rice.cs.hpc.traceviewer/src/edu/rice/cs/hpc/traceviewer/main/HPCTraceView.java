@@ -52,6 +52,8 @@ implements ITraceViewAction
 	/** Stores/Creates all of the data that is used in the view.*/
 	private SpaceTimeDataController stData = null;
 	
+	private TimeAxisCanvas axisArea = null;
+	
 	/** Paints and displays the detail view.*/
 	SpaceTimeDetailCanvas detailCanvas;
 	
@@ -87,6 +89,7 @@ implements ITraceViewAction
 		this.detailCanvas.updateView(_stData);
 		
 		detailCanvas.setVisible(true);
+		axisArea.setData(stData);
 	}
 	
 	
@@ -152,12 +155,6 @@ implements ITraceViewAction
 					// changing painting policy means changing the content
 					// we should force all views to refresh
 					detailCanvas.refresh(true);
-/*					RefreshOperation r_op = new RefreshOperation("painting policy change");
-					try {
-						TraceOperation.getOperationHistory().execute(r_op, null, null);
-					} catch (ExecutionException e) {
-						e.printStackTrace();
-					}*/
 				}
 			}
 		});
@@ -181,6 +178,7 @@ implements ITraceViewAction
 		detailCanvas = new SpaceTimeDetailCanvas(getSite().getWorkbenchWindow(), parent); 
 		
 		detailCanvas.setLabels(labelGroup);
+
 		GridLayoutFactory.fillDefaults().numColumns(4).generateLayout(labelGroup);
 		GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(labelGroup);
 		
@@ -190,6 +188,13 @@ implements ITraceViewAction
 		
 		detailCanvas.setVisible(false);
 		
+		/*************************************************************************
+		 * axis label 
+		 *************************************************************************/
+		
+		axisArea = new TimeAxisCanvas(parent, SWT.NO_BACKGROUND);
+		GridDataFactory.fillDefaults().grab(true, false).hint(400, 20).applyTo(axisArea);
+
 		//--------------------------------------
 		// memory checking
 		//--------------------------------------
