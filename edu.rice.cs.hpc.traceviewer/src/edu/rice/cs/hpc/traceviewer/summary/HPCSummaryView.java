@@ -2,15 +2,19 @@ package edu.rice.cs.hpc.traceviewer.summary;
 
 import java.util.Map;
 
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
+import edu.rice.cs.hpc.traceviewer.main.HPCTraceView;
 import edu.rice.cs.hpc.traceviewer.services.DataService;
 import edu.rice.cs.hpc.traceviewer.services.SummaryDataService;
 import edu.rice.cs.hpc.traceviewer.ui.AbstractDynamicView;
@@ -29,22 +33,33 @@ public class HPCSummaryView extends AbstractDynamicView
 	SummaryTimeCanvas summaryCanvas;
 	
 	public void createPartControl(Composite master)
-	{
+	{		
 		/*************************************************************************
-		 * Master Composite
-		 */
+		 * Padding Canvas
+		 *************************************************************************/
 		
-		master.setLayout(new GridLayout());
-		master.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		final Canvas axisCanvas = new Canvas(master, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, true).hint(HPCTraceView.AXIS_WIDTH, 40).applyTo(axisCanvas);
 		
 		/*************************************************************************
 		 * Summary View Canvas
-		 */
+		 *************************************************************************/
 		
 		summaryCanvas = new SummaryTimeCanvas(master);
 		summaryCanvas.setLayout(new GridLayout());
 		summaryCanvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		summaryCanvas.setVisible(false);
+
+		/*************************************************************************
+		 * Master Composite
+		 *************************************************************************/
+		
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(master);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(master);
+
+		/*************************************************************************
+		 * Add listeners
+		 *************************************************************************/
 		
 		setListener();
 		super.addListener();

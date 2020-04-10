@@ -22,7 +22,7 @@ import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimelineService;
  *********************/
 public class ThreadAxisCanvas extends AbstractAxisCanvas 
 {
-	static final private int COLUMN_WIDTH = 18;
+	static final private int COLUMN_WIDTH = 15;
 	
 	private final Color COLOR_PROC[];
 	private final Color COLOR_THREAD[];
@@ -60,7 +60,7 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
         final String processes[] = traceData.getListOfRanks();
 
 		// -----------------------------------------------------
-		// draw MPI column
+		// collect the position and the length of each process
 		// -----------------------------------------------------
 		List<Integer> listProcPosition   = new ArrayList<Integer>();
 		List<Integer> listThreadPosition = new ArrayList<Integer>();
@@ -113,6 +113,9 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 		listProcPosition.  add(getClientArea().height);
 		listThreadPosition.add(getClientArea().height);
 		
+		// -----------------------------------------------------
+		// draw MPI column
+		// -----------------------------------------------------
 		int currentColor = 0;
 		
 		for (int i=0; i<listProcPosition.size()-1; i++) {
@@ -142,17 +145,4 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 			currentColor   = 1 - currentColor;
 		}
 	}
-	
-	private int getProc(String process) {
-		
-		int indexDot = process.indexOf('.');
-		if (indexDot >= 0) {
-			String strProc = process.substring(0, indexDot);
-			
-			return Integer.valueOf(strProc);
-		}
-		return Integer.valueOf(process);
-	}
-	
-	
 }
