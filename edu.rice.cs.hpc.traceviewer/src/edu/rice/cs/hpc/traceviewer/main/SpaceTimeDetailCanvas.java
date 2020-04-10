@@ -511,7 +511,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	@Override
 	public double getScalePixelsPerRank()
 	{
-		return (double)stData.getAttributes().numPixelsV / this.getNumProcessesDisplayed();
+		return (double)stData.getAttributes().getScalePixelsPerRank();
 	}
 	
 	/**************************************************************************
@@ -866,18 +866,9 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	private Position updatePosition(Point mouseDown)
 	{
     	final ImageTraceAttributes attributes = stData.getAttributes();
-    	final Rectangle view = getClientArea();
-    	int selectedProcess;
+    	
+    	int selectedProcess = attributes.convertToPosition(mouseDown.y);
 
-    	//need to do different things if there are more traces to paint than pixels
-    	if(view.height > getNumProcessesDisplayed())
-    	{
-    		selectedProcess = (int)(attributes.getProcessBegin()+mouseDown.y/getScalePixelsPerRank());
-    	}
-    	else
-    	{
-    		selectedProcess = (int)(attributes.getProcessBegin()+(mouseDown.y*(getNumProcessesDisplayed()))/view.height);
-    	}
     	long closeTime = attributes.getTimeBegin() + (long)(mouseDown.x / getScalePixelsPerTime());
     	
     	if (closeTime > attributes.getTimeEnd()) {

@@ -1,10 +1,17 @@
 package edu.rice.cs.hpc.traceviewer.data.db;
 
+import org.eclipse.swt.graphics.Point;
 
 /***********
- * Struct class to store attributes of a trace view
- * 
- *
+ * Struct class to store attributes of a trace view like:
+ * <ul>
+ * <li> {@link Frame} : ROI and current position
+ * <li> Number of horizontal pixels
+ * <li> Number of vertical pixels for the main view
+ * <li> Number of vertical pixels for the depth view
+ * </ul>
+ * <br/>
+ * It contains methods to check the bounds and to covert from pixel to position 
  */
 public class ImageTraceAttributes {
 	
@@ -129,6 +136,40 @@ public class ImageTraceAttributes {
 	public Position getPosition()
 	{
 		return frame.position;
+	}
+	
+	public double getScalePixelsPerRank()
+	{
+		return (double)numPixelsV / getProcessInterval();
+	}
+
+	public int convertToPosition(int pixelY) 
+	{
+		int process = 0;
+		
+    	//need to do different things if there are more traces to paint than pixels
+    	if(numPixelsV > getProcessInterval())
+    	{
+    		process = (int)(getProcessBegin()+pixelY/getScalePixelsPerRank());
+    	}
+    	else
+    	{
+    		process = (int)(getProcessBegin()+(pixelY*(getProcessInterval()))/numPixelsV);
+    	}
+    	return process;
+	}
+	
+	public int convertToPixel(int process)
+	{
+		int pixel = 0;
+		if (numPixelsV > getProcessInterval()) 
+		{
+			pixel = (int) ((process - getProcessBegin()) * getScalePixelsPerRank());
+		}
+		else {
+			pixel = (process - getProcessBegin()) * numPixelsV / getProcessInterval();
+		}
+		return pixel;
 	}
 	
 	/***

@@ -61,7 +61,16 @@ public class ProcessTimeline {
 			data = new TraceDataByRank(new DataRecord[0]);
 	}
 
-	//Remote version
+	/**
+	 * Remote version for ProcessTimeline constructor
+	 * 
+	 * @param _data
+	 * @param _scopeMap
+	 * @param _processNumber
+	 * @param _numPixelH
+	 * @param _timeRange
+	 * @param _startingTime
+	 */
 	public ProcessTimeline(TraceDataByRank _data,
 			HashMap<Integer, CallPath> _scopeMap, int _processNumber,
 			int _numPixelH, long _timeRange, long _startingTime) {
@@ -117,10 +126,11 @@ public class ProcessTimeline {
 		CallPath cp = scopeMap.get(cpid);
  		return cp;
 	}
-/**
- * Fills this one with the data from another
- * @param another
- */
+	
+	/**
+	 * Fills this one with the data from another
+	 * @param another
+	 */
 	public void copyDataFrom(ProcessTimeline another) {
 		data.duplicate(another.data);
 	}
@@ -136,10 +146,9 @@ public class ProcessTimeline {
 	}
 	
 	/***
-	 * return the current depth process number, which is the current
-	 * selected process
+	 * return the process ID number
 	 * 
-	 * @return current selected process
+	 * @return the process id
 	 */
 	public int getProcessNum() {
 		return processNumber;

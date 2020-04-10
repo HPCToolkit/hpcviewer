@@ -83,17 +83,8 @@ public abstract class BaseTimelineThread implements Callable<Integer> {
 			// ---------------------------------
 			if (init(trace))
 			{	
-				// this height computation causes inconsistency between different lines
-				// we need to find a better way, more deterministic and consistent
-				int h1 = (int) Math.round(scaleY*trace.line());
-				int h2 = (int) Math.round(scaleY*(trace.line()+1)) ;			
-				int imageHeight = h2 - h1;
+				int imageHeight = getRenderingHeight(scaleY, trace.line(), trace.line()+1);
 				
-				if (scaleY > MIN_HEIGHT_FOR_SEPARATOR_LINES)
-					imageHeight--;
-				else
-					imageHeight++;
-
     			// ---------------------------------
     			// do the data preparation
     			// ---------------------------------
@@ -130,6 +121,31 @@ public abstract class BaseTimelineThread implements Callable<Integer> {
 		return Integer.valueOf(num_invalid_samples);
 	}
 
+	/***
+	 * compute the height of a given line
+	 *  
+	 * @param scaleY vertical scale
+	 * @param line1  the line number of process 1
+	 * @param line2  the line number of process 2
+	 * 
+	 * @return the height of process 1
+	 */
+	static public int getRenderingHeight(double scaleY, int line1, int line2) {
+		
+		// this height computation causes inconsistency between different lines
+		// we need to find a better way, more deterministic and consistent
+		int h1 = (int) Math.round(scaleY*line1);
+		int h2 = (int) Math.round(scaleY*line2);			
+		int imageHeight = h2 - h1;
+		
+		if (scaleY > MIN_HEIGHT_FOR_SEPARATOR_LINES)
+			imageHeight--;
+		else
+			imageHeight++;
+
+		return imageHeight;
+	}
+	
 	/****
 	 * Retrieve the next available trace, null if no more trace available 
 	 * 

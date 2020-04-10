@@ -7,7 +7,17 @@ import org.eclipse.ui.AbstractSourceProvider;
 
 import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimeline;
 
-public class ProcessTimelineService extends AbstractSourceProvider {
+
+/***************************************
+ * 
+ * This service provider serves as a global variable to store
+ * the list of process time-lines.
+ * Other classes like depth and call stack will need to access
+ * the process time lines to get the information of a certain process
+ * 
+ ***************************************/
+public class ProcessTimelineService extends AbstractSourceProvider 
+{
 
 	final static public String PROCESS_TIMELINE_PROVIDER = "edu.rice.cs.hpc.traceviewer.services.ProcessTimelineService.data";
 	private ProcessTimeline []traces;

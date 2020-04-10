@@ -2,10 +2,12 @@ package edu.rice.cs.hpc.traceviewer.data.db;
 
 import java.io.Serializable;
 
+/**
+ * Struct class to store the time (x-axis) and the process (y-axis) 
+ * 
+ */
 public class Position  implements Serializable {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -2287052521974687520L;
 	
 	public long time;

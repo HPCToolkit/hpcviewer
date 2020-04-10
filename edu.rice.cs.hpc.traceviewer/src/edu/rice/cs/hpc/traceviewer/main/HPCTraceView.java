@@ -23,6 +23,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISourceProviderListener;
@@ -35,6 +36,7 @@ import edu.rice.cs.hpc.traceviewer.actions.OptionMidpoint;
 import edu.rice.cs.hpc.traceviewer.actions.OptionRecordsDisplay;
 import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
 import edu.rice.cs.hpc.traceviewer.data.db.Frame;
+import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimelineService;
 import edu.rice.cs.hpc.traceviewer.services.DataService;
 
 
@@ -53,6 +55,7 @@ implements ITraceViewAction
 	private SpaceTimeDataController stData = null;
 	
 	private TimeAxisCanvas axisArea = null;
+	private ThreadAxisCanvas processCanvas = null;
 	
 	/** Paints and displays the detail view.*/
 	SpaceTimeDetailCanvas detailCanvas;
@@ -72,9 +75,6 @@ implements ITraceViewAction
 		master.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
 		createToolbar(master);
-
-        GridLayoutFactory.fillDefaults().numColumns(1).generateLayout(detailCanvas);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(detailCanvas);
 		
 		addTraceViewListener();
 	}
@@ -90,6 +90,7 @@ implements ITraceViewAction
 		
 		detailCanvas.setVisible(true);
 		axisArea.setData(stData);
+		processCanvas.setData(stData);
 	}
 	
 	
@@ -170,21 +171,36 @@ implements ITraceViewAction
          * Process and Time dimension labels
          *************************************************************************/
 		final Composite labelGroup = new Composite(parent, SWT.NONE);
+
+		GridLayoutFactory.fillDefaults().numColumns(4).generateLayout(labelGroup);
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(labelGroup);
 				
 		/*************************************************************************
 		 * Detail View Canvas
 		 ************************************************************************/
 		
-		detailCanvas = new SpaceTimeDetailCanvas(getSite().getWorkbenchWindow(), parent); 
 		
-		detailCanvas.setLabels(labelGroup);
+		ISourceProviderService service = (ISourceProviderService)getSite().getWorkbenchWindow().
+				getService(ISourceProviderService.class);
+		ProcessTimelineService ptlService = (ProcessTimelineService) service.
+				getSourceProvider(ProcessTimelineService.PROCESS_TIMELINE_PROVIDER);
 
-		GridLayoutFactory.fillDefaults().numColumns(4).generateLayout(labelGroup);
-		GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(labelGroup);
+		Composite plotArea = new Composite(parent, SWT.NONE);
 		
+		GridLayoutFactory.fillDefaults().numColumns(2).generateLayout(plotArea);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(plotArea);
+		
+		processCanvas = new ThreadAxisCanvas(ptlService, plotArea, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, true).hint(30, 500).applyTo(processCanvas);
+
+		detailCanvas = new SpaceTimeDetailCanvas(getSite().getWorkbenchWindow(), plotArea); 
+
+		detailCanvas.setLabels(labelGroup);
 		detailCanvas.setButtons(new Action[]{traceCoolBar.home, traceCoolBar.open, traceCoolBar.save, null,
 				null, traceCoolBar.tZoomIn, traceCoolBar.tZoomOut, traceCoolBar.pZoomIn, traceCoolBar.pZoomOut,
 				traceCoolBar.goEast, traceCoolBar.goNorth, traceCoolBar.goSouth, traceCoolBar.goWest});
+		
+		GridDataFactory.fillDefaults().grab(true, true).hint(500, 500).applyTo(detailCanvas);
 		
 		detailCanvas.setVisible(false);
 		
@@ -192,8 +208,11 @@ implements ITraceViewAction
 		 * axis label 
 		 *************************************************************************/
 		
-		axisArea = new TimeAxisCanvas(parent, SWT.NO_BACKGROUND);
-		GridDataFactory.fillDefaults().grab(true, false).hint(400, 20).applyTo(axisArea);
+		Label lblPadding = new Label(plotArea, SWT.NONE);
+		
+		axisArea = new TimeAxisCanvas(plotArea, SWT.NO_BACKGROUND);
+		GridDataFactory.fillDefaults().grab(true, false).hint(500, 20).applyTo(axisArea);
+		
 
 		//--------------------------------------
 		// memory checking
