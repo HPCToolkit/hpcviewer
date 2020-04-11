@@ -202,7 +202,14 @@ public abstract class SpaceTimeDataController
 		return  ptlService.getProcessTimeline(scaledDTProcess);
 	}
 	
-
+	/******
+	 * return the service provider for timelines.
+	 * 
+	 * @return
+	 */
+	public ProcessTimelineService getProcessTimelineService() {
+		return ptlService;
+	}
 	
 	public IBaseData getBaseData(){
 		return dataTrace;

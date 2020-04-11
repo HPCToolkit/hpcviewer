@@ -3,16 +3,22 @@ package edu.rice.cs.hpc.traceviewer.main;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 
 import edu.rice.cs.hpc.data.experiment.extdata.IBaseData;
 import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
 import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
 import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimeline;
 import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimelineService;
+import edu.rice.cs.hpc.traceviewer.painter.ITraceCanvas;
+import edu.rice.cs.hpc.traceviewer.painter.ITraceCanvas.MouseState;
 
 
 /*********************
@@ -23,11 +29,16 @@ import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimelineService;
 public class ThreadAxisCanvas extends AbstractAxisCanvas 
 {
 	static final private int COLUMN_WIDTH = 15;
-	
+
 	private final Color COLOR_PROC[];
 	private final Color COLOR_THREAD[];
 	
 	private final ProcessTimelineService timeLine;
+	
+	/** Relates to the condition that the mouse is in.*/
+	private ITraceCanvas.MouseState mouseState;
+	
+	private AxisToolTip tooltip = null;
 
 	public ThreadAxisCanvas(ProcessTimelineService timeLine, Composite parent, int style) {
 		super(parent, style);
@@ -41,8 +52,25 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 		COLOR_THREAD[1] = getDisplay().getSystemColor(SWT.COLOR_DARK_MAGENTA);
 		
 		this.timeLine = timeLine;
+		
+		mouseState = MouseState.ST_MOUSE_INIT;
 	}
 
+	public void init(SpaceTimeDataController data) {
+		if (mouseState == MouseState.ST_MOUSE_INIT) {
+			
+			tooltip = new AxisToolTip(this, data);
+			
+			mouseState = MouseState.ST_MOUSE_NONE;
+		}
+	}
+	
+	public void setData(Object data) {
+		super.setData(data);
+		
+		init( (SpaceTimeDataController)data);
+	}
+	
 	@Override
 	public void paintControl(PaintEvent e) {
 
@@ -143,6 +171,62 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 			e.gc.fillRectangle(COLUMN_WIDTH, threadPosition, xEnd, nextPosition);
 			
 			currentColor   = 1 - currentColor;
+		}
+	}
+	
+	
+	@Override
+	public void dispose() {
+		if (tooltip != null) {
+			tooltip.deactivate();
+			tooltip = null;
+		}
+		super.dispose();
+	}
+	
+	static private class AxisToolTip extends DefaultToolTip
+	{
+		private final SpaceTimeDataController data;
+
+		public AxisToolTip(Control control, SpaceTimeDataController data) {
+			super(control);
+			
+			this.data = data;
+		}
+	
+		@Override
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.window.DefaultToolTip#getText(org.eclipse.swt.widgets.Event)
+		 */
+		protected String getText(Event event) {
+			
+	        final IBaseData traceData = data.getBaseData();
+
+	        if (traceData == null)
+	        	return null;
+
+			final ImageTraceAttributes attribute = data.getAttributes();
+			int process = attribute.convertToPosition(event.y);
+			
+			String procNames[] = traceData.getListOfRanks();
+			
+			if (process >= 0 && process < procNames.length)
+				return procNames[process];
+			
+			return null;
+		}
+		
+		@Override
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.window.ToolTip#getLocation(org.eclipse.swt.graphics.Point, org.eclipse.swt.widgets.Event)
+		 */
+		public Point getLocation(Point tipSize, Event event) {
+			Object obj = getToolTipArea(event);
+			Control control = (Control) obj;
+			
+			return control.toDisplay(event.x+5, event.y-15);
 		}
 	}
 }
