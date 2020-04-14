@@ -18,8 +18,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -51,7 +49,8 @@ implements ITraceViewAction
 	/**The ID needed to create this view (used in plugin.xml).*/
 	public static final String ID = "hpctraceview.view";
 	
-	public static final int AXIS_WIDTH = 30;
+	public static final int Y_AXIS_WIDTH  = 30;
+	public static final int X_AXIS_HEIGHT = 20;
 	
 	/** Stores/Creates all of the data that is used in the view.*/
 	private SpaceTimeDataController stData = null;
@@ -66,18 +65,87 @@ implements ITraceViewAction
 	 *	Creates the view.
 	 ************************************************************************/
 	public void createPartControl(Composite master)
-	{
-		// Laksono: do NOT maximize. On Linux with some WM, you can't restore it back !
-		//this.getViewSite().getShell().setMaximized(true);
+	{		
+		/**************************************************************************
+         * Process and Time dimension labels
+         *************************************************************************/
+		final Composite headerArea = new Composite(master, SWT.NONE);
+		
+		Canvas headerCanvas = new Canvas(headerArea, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, false).
+						hint(Y_AXIS_WIDTH, 20).applyTo(headerCanvas);
+		
+		final Composite labelGroup = new Composite(headerArea, SWT.NONE);
+
+		GridLayoutFactory.fillDefaults().numColumns(5).generateLayout(labelGroup);
+		GridDataFactory.fillDefaults().grab(true, false).
+						align(SWT.BEGINNING, SWT.CENTER).applyTo(labelGroup);
+
+		GridLayoutFactory.fillDefaults().numColumns(2).generateLayout(headerArea);
+		GridDataFactory.fillDefaults().grab(true, false).
+						applyTo(headerArea);
+
+		
 		/*************************************************************************
-		 * Master Composite
+		 * Detail View Canvas
 		 ************************************************************************/
 		
-		master.setLayout(new GridLayout());
-		master.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		ISourceProviderService service = (ISourceProviderService)getSite().getWorkbenchWindow().
+				getService(ISourceProviderService.class);
+		ProcessTimelineService ptlService = (ProcessTimelineService) service.
+				getSourceProvider(ProcessTimelineService.PROCESS_TIMELINE_PROVIDER);
+
+		Composite plotArea = new Composite(master, SWT.NONE);
 		
-		createToolbar(master);
+		processCanvas = new ThreadAxisCanvas(ptlService, plotArea, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, true).
+						hint(Y_AXIS_WIDTH, 500).applyTo(processCanvas);
+
 		
+		final IToolBarManager tbMgr     = getViewSite().getActionBars().getToolBarManager();
+		final TraceCoolBar traceCoolBar = new TraceCoolBar(tbMgr, this, SWT.NONE);
+
+		detailCanvas = new SpaceTimeDetailCanvas(getSite().getWorkbenchWindow(), plotArea); 
+
+		detailCanvas.setLabels(labelGroup);
+		detailCanvas.setButtons(new Action[]{traceCoolBar.home, traceCoolBar.open, traceCoolBar.save, null,
+				null, traceCoolBar.tZoomIn, traceCoolBar.tZoomOut, traceCoolBar.pZoomIn, traceCoolBar.pZoomOut,
+				traceCoolBar.goEast, traceCoolBar.goNorth, traceCoolBar.goSouth, traceCoolBar.goWest});
+		
+		GridDataFactory.fillDefaults().grab(true, true).
+						hint(500, 500).applyTo(detailCanvas);
+		
+		detailCanvas.setVisible(false);
+		
+		
+		/*************************************************************************
+		 * Horizontal axis label 
+		 *************************************************************************/
+		
+		Canvas footerCanvas = new Canvas(plotArea, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, false).
+						hint(Y_AXIS_WIDTH, X_AXIS_HEIGHT).applyTo(footerCanvas);
+
+		axisArea = new TimeAxisCanvas(plotArea, SWT.NO_BACKGROUND);
+		GridDataFactory.fillDefaults().grab(true, false).
+						hint(500, X_AXIS_HEIGHT).applyTo(axisArea);
+				
+		GridLayoutFactory.fillDefaults().numColumns(2).generateLayout(plotArea);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(plotArea);
+		
+		
+		/*************************************************************************
+		 * Master layout 
+		 *************************************************************************/
+		
+		GridLayoutFactory.fillDefaults().numColumns(1).generateLayout(master);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(master);
+
+		//--------------------------------------
+		// memory checking
+		//--------------------------------------
+		final Display display = getSite().getShell().getDisplay();
+		SleakManager.init(display);		
 		addTraceViewListener();
 	}
 
@@ -163,72 +231,6 @@ implements ITraceViewAction
 		});
 	}
 	
-	private void createToolbar(Composite parent) {
-		
-		final IToolBarManager tbMgr = getViewSite().getActionBars().getToolBarManager();
-		
-		final TraceCoolBar traceCoolBar = new TraceCoolBar(tbMgr, this, SWT.NONE);
-		
-		/**************************************************************************
-         * Process and Time dimension labels
-         *************************************************************************/
-		final Composite headerArea = new Composite(parent, SWT.NONE);
-		
-		Canvas headerCanvas = new Canvas(headerArea, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, false).hint(AXIS_WIDTH, 20).applyTo(headerCanvas);
-		
-		final Composite labelGroup = new Composite(headerArea, SWT.NONE);
-
-		GridLayoutFactory.fillDefaults().numColumns(5).generateLayout(labelGroup);
-		GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).applyTo(labelGroup);
-
-		GridLayoutFactory.fillDefaults().numColumns(2).generateLayout(headerArea);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(headerArea);
-
-		/*************************************************************************
-		 * Detail View Canvas
-		 ************************************************************************/
-		
-		ISourceProviderService service = (ISourceProviderService)getSite().getWorkbenchWindow().
-				getService(ISourceProviderService.class);
-		ProcessTimelineService ptlService = (ProcessTimelineService) service.
-				getSourceProvider(ProcessTimelineService.PROCESS_TIMELINE_PROVIDER);
-
-		Composite plotArea = new Composite(parent, SWT.NONE);
-		
-		processCanvas = new ThreadAxisCanvas(ptlService, plotArea, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, true).hint(AXIS_WIDTH, 500).applyTo(processCanvas);
-
-		detailCanvas = new SpaceTimeDetailCanvas(getSite().getWorkbenchWindow(), plotArea); 
-
-		detailCanvas.setLabels(labelGroup);
-		detailCanvas.setButtons(new Action[]{traceCoolBar.home, traceCoolBar.open, traceCoolBar.save, null,
-				null, traceCoolBar.tZoomIn, traceCoolBar.tZoomOut, traceCoolBar.pZoomIn, traceCoolBar.pZoomOut,
-				traceCoolBar.goEast, traceCoolBar.goNorth, traceCoolBar.goSouth, traceCoolBar.goWest});
-		
-		GridDataFactory.fillDefaults().grab(true, true).hint(500, 500).applyTo(detailCanvas);
-		
-		detailCanvas.setVisible(false);
-		
-		/*************************************************************************
-		 * axis label 
-		 *************************************************************************/
-		
-		Canvas footerCanvas = new Canvas(plotArea, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, false).hint(30, 20).applyTo(footerCanvas);
-
-		axisArea = new TimeAxisCanvas(plotArea, SWT.NO_BACKGROUND);
-		GridDataFactory.fillDefaults().grab(true, false).hint(500, 20).applyTo(axisArea);
-				
-		GridLayoutFactory.fillDefaults().numColumns(2).generateLayout(plotArea);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(plotArea);
-
-		//--------------------------------------
-		// memory checking
-		//--------------------------------------
-		final Display display = getSite().getShell().getDisplay();
-		SleakManager.init(display);
-	}
 
 
 	//----------------------------------------------------------------------------------------------------

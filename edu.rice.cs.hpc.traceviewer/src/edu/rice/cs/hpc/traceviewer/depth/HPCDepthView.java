@@ -5,8 +5,6 @@ import java.util.Map;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.ISourceProvider;
@@ -27,6 +25,7 @@ public class HPCDepthView extends AbstractTimeView
 {
 	public static final String ID = "hpcdepthview.view";
 
+	private static final int VIEW_HEIGHT_HINT = 40;
 	
 	/** Paints and displays the detail view. */
 	DepthTimeCanvas depthCanvas;
@@ -40,29 +39,32 @@ public class HPCDepthView extends AbstractTimeView
 	
 	private void setupEverything(Composite master)
 	{
+		final Composite plotArea = new Composite(master, SWT.NONE);
 		
 		/*************************************************************************
 		 * Padding Canvas
 		 *************************************************************************/
 		
-		final Canvas axisCanvas = new Canvas(master, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, true).hint(HPCTraceView.AXIS_WIDTH, 40).applyTo(axisCanvas);
+		final Canvas axisCanvas = new Canvas(plotArea, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(false, true).
+						hint(HPCTraceView.Y_AXIS_WIDTH, VIEW_HEIGHT_HINT).applyTo(axisCanvas);
 		
 		/*************************************************************************
 		 * Depth View Canvas
 		 *************************************************************************/
 		
-		depthCanvas = new DepthTimeCanvas(master);
-		depthCanvas.setLayout(new GridLayout());
-		depthCanvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		depthCanvas = new DepthTimeCanvas(plotArea);
+		GridDataFactory.fillDefaults().grab(true, true).
+						hint(500, VIEW_HEIGHT_HINT).applyTo(depthCanvas);
+
 		depthCanvas.setVisible(false);		
 
 		/*************************************************************************
 		 * Master Composite
 		 *************************************************************************/
 		
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(master);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(master);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(plotArea);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(plotArea);
 	}
 	
 	private void setListener() {

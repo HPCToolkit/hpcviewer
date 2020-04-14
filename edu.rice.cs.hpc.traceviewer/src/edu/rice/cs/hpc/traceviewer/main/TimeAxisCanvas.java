@@ -28,13 +28,10 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 	implements PaintListener, IOperationHistoryListener
 {	
 	static private final int TICK_X_PIXEL = 100;
-
-	static final private int MAX_HEIGHT  = 20;
+	
 	static final private int PADDING_Y   = 2;
 	static final private int TICK_MARK_Y = 3;
-	
-	static final private double SEC_TO_MILISEC = 1000;
-	
+		
 	final private DecimalFormat formatTime;
 
 	/***
@@ -70,7 +67,7 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 		final double unit_time   = data.getUnitTimePerSecond();
 
 		final ImageTraceAttributes attribute = data.getAttributes();
-		final long timeLength = attribute.getTimeEnd() - attribute.getTimeBegin();
+		final long timeLength = attribute.getTimeInterval();
 		
 		int numAxisLabel = area.width / TICK_X_PIXEL;
 		double numTicks  = (double)area.width / TICK_X_PIXEL;
@@ -86,8 +83,10 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 
 			int position_x   = axis_x_pos;
 			if (i>0) {
+				// by default x position is in the middle of the tick
 				position_x   = axis_x_pos - (textArea.x/2);
 				
+				// make sure x position is not beyond the view's width
 				if (position_x + textArea.x > area.width) {
 					position_x = axis_x_pos - textArea.x;
 				}

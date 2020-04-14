@@ -39,7 +39,8 @@ public class HPCSummaryView extends AbstractDynamicView
 		 *************************************************************************/
 		
 		final Canvas axisCanvas = new Canvas(master, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, true).hint(HPCTraceView.AXIS_WIDTH, 40).applyTo(axisCanvas);
+		GridDataFactory.fillDefaults().grab(false, true).
+						hint(HPCTraceView.Y_AXIS_WIDTH, 40).applyTo(axisCanvas);
 		
 		/*************************************************************************
 		 * Summary View Canvas
