@@ -503,6 +503,8 @@ abstract public class AbstractBaseScopeView  extends ViewPart
 		
     	if (gc != null)
     		gc.dispose();
+    	
+    	super.dispose();
     }
     
     /*****
