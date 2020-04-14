@@ -49,7 +49,7 @@ implements ITraceViewAction
 	/**The ID needed to create this view (used in plugin.xml).*/
 	public static final String ID = "hpctraceview.view";
 	
-	public static final int Y_AXIS_WIDTH  = 30;
+	public static final int Y_AXIS_WIDTH  = 13;
 	public static final int X_AXIS_HEIGHT = 20;
 	
 	/** Stores/Creates all of the data that is used in the view.*/

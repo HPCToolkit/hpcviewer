@@ -28,10 +28,12 @@ import edu.rice.cs.hpc.traceviewer.painter.ITraceCanvas.MouseState;
  *********************/
 public class ThreadAxisCanvas extends AbstractAxisCanvas 
 {
-	static final private int COLUMN_WIDTH = 15;
-
+	static final private int COLUMN_WIDTH = 5;
+	
 	private final Color COLOR_PROC[];
 	private final Color COLOR_THREAD[];
+
+	private final Color ColorLightBlue;
 	
 	private final ProcessTimelineService timeLine;
 	
@@ -43,8 +45,10 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 	public ThreadAxisCanvas(ProcessTimelineService timeLine, Composite parent, int style) {
 		super(parent, style);
 		
+		ColorLightBlue = new Color(getDisplay(), 173, 216, 250);
+		
 		COLOR_PROC = new Color[2];
-		COLOR_PROC[0] = getDisplay().getSystemColor(SWT.COLOR_BLUE);
+		COLOR_PROC[0] = ColorLightBlue;
 		COLOR_PROC[1] = getDisplay().getSystemColor(SWT.COLOR_DARK_BLUE);
 		
 		COLOR_THREAD = new Color[2];
@@ -168,7 +172,7 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 			Integer threadPosition = listThreadPosition.get(i);
 			Integer nextPosition   = listThreadPosition.get(i+1);
 			
-			e.gc.fillRectangle(COLUMN_WIDTH, threadPosition, xEnd, nextPosition);
+			e.gc.fillRectangle(COLUMN_WIDTH+1, threadPosition, xEnd, nextPosition);
 			
 			currentColor   = 1 - currentColor;
 		}
@@ -180,6 +184,9 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 		if (tooltip != null) {
 			tooltip.deactivate();
 			tooltip = null;
+		}
+		if (ColorLightBlue != null && !ColorLightBlue.isDisposed()) {
+			ColorLightBlue.dispose();
 		}
 		super.dispose();
 	}
