@@ -431,6 +431,10 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 		        		iWidth = ScopeTreeViewer.COLUMN_DEFAULT_WIDTH;
 	       			}
 				}
+				// Specific fix for Linux+gtk+ppcle64: need to set the layout here
+				// to avoid SWT/GTK to remove the last column
+				
+				layout.setColumnData(column, new ColumnPixelData(iWidth, true));
 			} else {
 				// hide column					
 				if (column.getWidth() <= 0) 
