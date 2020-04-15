@@ -20,12 +20,11 @@ public class ImageTraceAttributes
 								 SECOND, 
 								 MINUTE, 
 								 HOUR};
-
-	
-	private Frame frame;
 	
 	public int numPixelsH, numPixelsV;
 	public int numPixelsDepthV;
+
+	private Frame frame;
 
 	public ImageTraceAttributes()
 	{

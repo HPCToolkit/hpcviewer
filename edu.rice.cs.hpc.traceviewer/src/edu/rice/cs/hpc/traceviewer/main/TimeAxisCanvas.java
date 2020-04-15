@@ -1,7 +1,6 @@
 package edu.rice.cs.hpc.traceviewer.main;
 
 import java.text.DecimalFormat;
-
 import org.eclipse.core.commands.operations.IOperationHistoryListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -9,9 +8,9 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import edu.rice.cs.hpc.data.experiment.extdata.IBaseData;
 import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
 import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
+import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes.TimeUnit;
 
 
 /*******************************************************
@@ -27,13 +26,19 @@ import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
 public class TimeAxisCanvas extends AbstractAxisCanvas 
 	implements PaintListener, IOperationHistoryListener
 {	
-	static private final int TICK_X_PIXEL = 100;
+	
+	static private final int TICK_X_PIXEL = 120;
 	
 	static final private int PADDING_Y   = 2;
 	static final private int TICK_MARK_Y = 3;
-		
+
+	final private TimeUnit[] listTimeUnit;
+	final private String[]	 listStringUnit;
+	
 	final private DecimalFormat formatTime;
 
+
+	
 	/***
 	 * Constructor of time axis canvas.
 	 * 
@@ -43,8 +48,22 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 	public TimeAxisCanvas(Composite parent, int style) {
 		super(parent, SWT.NO_BACKGROUND | style);
 		
-		formatTime = new DecimalFormat("#.###");
+		formatTime = new DecimalFormat("###,###");
+		
+		listTimeUnit = new TimeUnit[4];
+		listTimeUnit[0] = TimeUnit.SECOND;
+		listTimeUnit[1] = TimeUnit.MILISECOND;
+		listTimeUnit[2] = TimeUnit.MICROSECOND;
+		listTimeUnit[3] = TimeUnit.NANOSECOND;
+		
+		listStringUnit = new String[4];
+		listStringUnit[0] = "s";
+		listStringUnit[1] = "ms";
+		listStringUnit[2] = "us";
+		listStringUnit[3] = "ns";
 	}
+
+	
 
 	
 	@Override
@@ -58,13 +77,12 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 		
 		e.gc.drawLine(area.x, position_y, area.width, position_y);
 		
-		final SpaceTimeDataController data   = (SpaceTimeDataController) getData();
-        final IBaseData traceData 		     = data.getBaseData();
+		final SpaceTimeDataController data = (SpaceTimeDataController) getData();
 
-        if (traceData == null)
+        if (data == null)
         	return;
         
-		final double unit_time   = data.getUnitTimePerSecond();
+		final double unit_time = data.getUnitTimePerSecond();
 
 		final ImageTraceAttributes attribute = data.getAttributes();
 		final long timeLength = attribute.getTimeInterval();
@@ -73,10 +91,33 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 		double numTicks  = (double)area.width / TICK_X_PIXEL;
 		double fraction  = (double)timeLength / numTicks;
 		
+		int unit = 0;
+		
+		// find the right unit time that the different between ticks is equal or bigger than 10
+		// we want to display ticks to something like:
+		//  10 .... 20 ... 30 ... 40
+		// 
+		// if the t0 is 12345670, the t1 should be at least 12345680:
+		//  12345670 ... 12345680 ... 12345690 ... 12345700 ...
+		
+		do {			
+			double t1 =  (attribute.getTimeBegin() * Math.pow(10, unit)+ fraction) / unit_time ;
+			double t2 =  t1 + (fraction * 2 / unit_time);
+
+			if (t2-t1 >= 10.0 || unit >= listStringUnit.length-1)
+				break;
+			
+			unit++;
+			fraction = fraction * Math.pow(10, 3);
+
+		} while(unit < listStringUnit.length);
+		
+		double multiplier = Math.pow(10, 3*unit);
+		
 		for(int i=0; i <= numAxisLabel; i++) {
-			double time 	 = attribute.getTimeBegin() + fraction * i;
+			double time 	 = attribute.getTimeBegin() * multiplier + fraction * i;
 			double timeInSec = time/unit_time;
-			String strTime   = formatTime.format(timeInSec) + "s";
+			String strTime   = formatTime.format((long)timeInSec) + listStringUnit[unit];
 			
 			Point textArea   = e.gc.stringExtent(strTime);
 			int axis_x_pos	 = TICK_X_PIXEL * i;
