@@ -63,10 +63,11 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 	public void init(SpaceTimeDataController data) {
 		if (mouseState == MouseState.ST_MOUSE_INIT) {
 			
-			tooltip = new AxisToolTip(this, data);
+			tooltip = new AxisToolTip(this);
 			
 			mouseState = MouseState.ST_MOUSE_NONE;
 		}
+		tooltip.setData(data);
 	}
 	
 	public void setData(Object data) {
@@ -191,13 +192,24 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 		super.dispose();
 	}
 	
+	
+	/********************************************************
+	 * 
+	 * Tooltip class to show the rank and/or the thread of the 
+	 *  current position.
+	 *  
+	 *  Caller needs to set data every time there is a new data
+	 *
+	 ********************************************************/
 	static private class AxisToolTip extends DefaultToolTip
 	{
-		private final SpaceTimeDataController data;
+		private SpaceTimeDataController data;
 
-		public AxisToolTip(Control control, SpaceTimeDataController data) {
+		public AxisToolTip(Control control) {
 			super(control);
-			
+		}
+		
+		void setData(SpaceTimeDataController data) {
 			this.data = data;
 		}
 	

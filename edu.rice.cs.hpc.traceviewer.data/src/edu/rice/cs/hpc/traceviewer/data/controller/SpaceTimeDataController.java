@@ -17,6 +17,7 @@ import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.experiment.scope.RootScopeType;
 import edu.rice.cs.hpc.data.trace.TraceAttribute;
 import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
+import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes.TimeUnit;
 import edu.rice.cs.hpc.traceviewer.data.graph.ColorTable;
 import edu.rice.cs.hpc.traceviewer.data.graph.CallPath;
 import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimeline;
@@ -266,6 +267,27 @@ public abstract class SpaceTimeDataController
 		return minBegTime;
 	}
 
+	public TimeUnit getTimeUnit() {
+		
+		if (getExperiment().getMajorVersion() == 2) {
+			if (getExperiment().getMinorVersion() < 2) {
+				// old version of database: always microsecond
+				return TimeUnit.MICROSECOND;
+			}
+			// new version of database:
+			// - if the measurement is from old hpcrun: microsecond
+			// - if the measurement is from new hpcrun: nanosecond
+			
+			BaseExperiment be = getExperiment();
+			ExperimentWithoutMetrics exp = (ExperimentWithoutMetrics) be;
+			if (exp.getTraceAttribute().dbUnitTime == TraceAttribute.PER_NANO_SECOND) {
+				return TimeUnit.NANOSECOND;
+			}
+			return TimeUnit.MICROSECOND;
+		}
+		return TimeUnit.UNKNOWN;
+	}
+	
 	/**************************************************************************
 	 * retrieve the unit time per second of the trace
 	 * The information is from experiment.xml
@@ -274,23 +296,19 @@ public abstract class SpaceTimeDataController
 	 **************************************************************************/
 	public double getUnitTimePerSecond() 
 	{
-		long unit_time = TraceAttribute.PER_NANO_SECOND;
+		double unitTimePerSecond = 0;
 		
-		if (getExperiment().getMajorVersion() == 2) {
-			if (getExperiment().getMinorVersion() < 2) {
-				// old version of database: always microsecond
-				unit_time = 1000000;
-			} else {
-				// new version of database:
-				// - if the measurement is from old hpcrun: microsecond
-				// - if the measurement is from new hpcrun: nanosecond
-				
-				BaseExperiment be = getExperiment();
-				ExperimentWithoutMetrics exp = (ExperimentWithoutMetrics) be;
-				unit_time = exp.getTraceAttribute().dbUnitTime;
-			}
+		switch(getTimeUnit()) {
+		case MICROSECOND:
+			unitTimePerSecond = 1000000d;
+			break;
+		case NANOSECOND:
+			unitTimePerSecond = TraceAttribute.PER_NANO_SECOND;
+		default:
+			unitTimePerSecond = exp.getTraceAttribute().dbUnitTime; 
+			break;
 		}
-		return (double)unit_time;
+		return unitTimePerSecond;
 	}
 
 	

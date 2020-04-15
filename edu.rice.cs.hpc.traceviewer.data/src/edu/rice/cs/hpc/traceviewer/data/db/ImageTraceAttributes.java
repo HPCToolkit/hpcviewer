@@ -1,7 +1,5 @@
 package edu.rice.cs.hpc.traceviewer.data.db;
 
-import org.eclipse.swt.graphics.Point;
-
 /***********
  * Struct class to store attributes of a trace view like:
  * <ul>
@@ -13,7 +11,16 @@ import org.eclipse.swt.graphics.Point;
  * <br/>
  * It contains methods to check the bounds and to covert from pixel to position 
  */
-public class ImageTraceAttributes {
+public class ImageTraceAttributes 
+{
+	static public enum TimeUnit {UNKNOWN,
+								 NANOSECOND, 
+								 MICROSECOND, 
+								 MILISECOND, 
+								 SECOND, 
+								 MINUTE, 
+								 HOUR};
+
 	
 	private Frame frame;
 	
