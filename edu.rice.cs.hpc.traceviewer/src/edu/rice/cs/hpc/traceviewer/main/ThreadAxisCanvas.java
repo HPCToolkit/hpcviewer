@@ -91,12 +91,16 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 		final ImageTraceAttributes attribute = data.getAttributes();
 		
         final String processes[] = traceData.getListOfRanks();
+        boolean isHybridProgram  = traceData.isHybridRank();
 
 		// -----------------------------------------------------
 		// collect the position and the length of each process
 		// -----------------------------------------------------
 		List<Integer> listProcPosition   = new ArrayList<Integer>();
 		List<Integer> listThreadPosition = new ArrayList<Integer>();
+
+		listProcPosition.  add(0);
+		listThreadPosition.add(0);
 		
 		int oldRank   = 0;
 		int oldThread = 0;
@@ -112,26 +116,29 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 	
 			int rank = 0;
 			int thread = 0;
+
+			if (!isHybridProgram) {
+				
+				// either pure MPI or pure OpenMP threads
+				
+				rank = Integer.valueOf(procName);
+				
+				if (oldRank != rank) {
+					listProcPosition.add(position);
+					oldRank = rank;
+				}
+				continue;
+			}
+			
+			// hybrid application
 			
 			int dotIndex = procName.indexOf('.');
 			if (dotIndex >= 0) {
-				// hybrid application
-				String strRank = procName.substring(0, dotIndex);
+				String strRank   = procName.substring(0, dotIndex);
 				String strThread = procName.substring(dotIndex+1);
 				
 				rank   = Integer.valueOf(strRank);
 				thread = Integer.valueOf(strThread);
-			} else {
-				// either pure MPI or pure OpenMP threads
-				rank = Integer.valueOf(procName);
-			}
-
-			if (i == 0) {
-				oldRank   = rank;
-				oldThread = thread;
-				
-				listProcPosition.add(position);
-				listThreadPosition.add(position);
 			}
 			
 			if (oldRank != rank) {
@@ -150,6 +157,7 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 		// draw MPI column
 		// -----------------------------------------------------
 		int currentColor = 0;
+		int x_end = isHybridProgram ? COLUMN_WIDTH : COLUMN_WIDTH * 2;
 		
 		for (int i=0; i<listProcPosition.size()-1; i++) {
 			e.gc.setBackground(COLOR_PROC[currentColor]);
@@ -157,13 +165,16 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 			Integer procPosition = listProcPosition.get(i);
 			Integer nextPosition = listProcPosition.get(i+1);
 			
-			e.gc.fillRectangle(0, procPosition, COLUMN_WIDTH, nextPosition);
+			e.gc.fillRectangle(0, procPosition, x_end, nextPosition);
 			
 			currentColor   = 1 - currentColor;
 		}
+		if (!isHybridProgram)
+			return;
 		
 		// -----------------------------------------------------
 		// draw thread column
+		// only for hybrid application
 		// -----------------------------------------------------
 		int xEnd = 2 * COLUMN_WIDTH;
 		
