@@ -25,16 +25,22 @@ import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
 public class TimeAxisCanvas extends AbstractAxisCanvas 
 	implements PaintListener, IOperationHistoryListener
 {	
+	static final private int UNIT_HOUR     = 5;
+	static final private int UNIT_MINUTE   = 4;
+	static final private int UNIT_SECOND   = 3;
+	static final private int UNIT_MILLISEC = 2;
+	static final private int UNIT_MICROSEC = 1;
+	static final private int UNIT_NANOSEC  = 0;
 	
-	static private final int TICK_X_PIXEL = 120;
+	static private final int TICK_X_PIXEL = 110;
 	
 	static final private int PADDING_Y   = 2;
 	static final private int TICK_MARK_Y = 3;
 
-	final private String[]	 listStringUnit;
+	final private String[] listStringUnit;
+	final private long[]   unitConversion; 
 	
 	final private DecimalFormat formatTime;
-
 
 	
 	/***
@@ -46,13 +52,25 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 	public TimeAxisCanvas(Composite parent, int style) {
 		super(parent, SWT.NO_BACKGROUND | style);
 		
-		formatTime = new DecimalFormat("###,###");
+		formatTime = new DecimalFormat("###,###,###");
 		
-		listStringUnit = new String[4];
-		listStringUnit[0] = "s";
-		listStringUnit[1] = "ms";
-		listStringUnit[2] = "us";
-		listStringUnit[3] = "ns";
+		listStringUnit = new String[6];
+		
+		listStringUnit[UNIT_HOUR]     = "hr";	// hour
+		listStringUnit[UNIT_MINUTE]   = "mnt";	// minute
+		listStringUnit[UNIT_SECOND]   = "s";	// second
+		listStringUnit[UNIT_MILLISEC] = "ms";	// Millisecond
+		listStringUnit[UNIT_MICROSEC] = "us";	// microsecond
+		listStringUnit[UNIT_NANOSEC]  = "ns";	// nanosecond
+		
+		unitConversion = new long[6];
+		
+		unitConversion[UNIT_NANOSEC]  = 1; 				// from nanosecond  to nanosecond
+		unitConversion[UNIT_MICROSEC] = 1000; 		 	// from us to nanosecond
+		unitConversion[UNIT_MILLISEC] = 1000000; 		// from ms to nanosecond
+		unitConversion[UNIT_SECOND]   = 1000000000; 	// from s  to nanosecond
+		unitConversion[UNIT_MINUTE]   = 1000000000*60; 	// from minute to nanosecond
+		unitConversion[UNIT_HOUR] 	  = 1000000000*60*60; 	// from hour to nanosecond
 	}
 
 	
@@ -74,14 +92,11 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
         if (data == null)
         	return;
         
-		final double unit_time = data.getUnitTimePerSecond();
-
 		final ImageTraceAttributes attribute = data.getAttributes();
-		final long timeLength = attribute.getTimeInterval();
 		
 		int numAxisLabel = area.width / TICK_X_PIXEL;
 		double numTicks  = (double)area.width / TICK_X_PIXEL;
-		double fraction  = (double)timeLength / numTicks;
+		double fraction  = (double)attribute.getTimeInterval() / numTicks  * data.getUnitTimePerNanosecond();
 		
 		int unit = 0;
 		
@@ -89,32 +104,53 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 		// we want to display ticks to something like:
 		//  10 .... 20 ... 30 ... 40
 		// 
-		// if the t0 is 12345670, the t1 should be at least 12345680:
-		//  12345670 ... 12345680 ... 12345690 ... 12345700 ...
 		
 		do {			
-			double t1 =  (attribute.getTimeBegin() * Math.pow(10, unit)+ fraction) / unit_time ;
-			double t2 =  t1 + (fraction * 2 / unit_time);
+			double t1 = attribute.getTimeBegin() * data.getUnitTimePerNanosecond() / unitConversion[unit];
+			double t2 = t1 + fraction / unitConversion[unit];
+			double dt = t2 - t1;
 
-			if (t2-t1 >= 10.0 || unit >= listStringUnit.length-1)
+			if (t2-t1 < 100.0) {
+				if (dt < 2)
+					unit--;
+				
 				break;
-			
+			}
 			unit++;
-			fraction = fraction * Math.pow(10, 3);
 
-		} while(unit < listStringUnit.length);
+		} while(unit < unitConversion.length);
 		
-		double multiplier = Math.pow(10, 3*unit);
+		if (unit >= unitConversion.length)
+			unit = unitConversion.length - 1;
+		
+		// find the nice rounded number
+		// for second: 10, 20, 30, ...
+		// for ms:     100, 200, 300, ...
+		// for us:     1000, 2000, 3000, ...
+		// etc.
+
+		double timeBegin = attribute.getTimeBegin() * data.getUnitTimePerNanosecond() / unitConversion[unit];
+		long unit_time   = unitConversion[unit];
 		
 		for(int i=0; i <= numAxisLabel; i++) {
-			double time 	 = attribute.getTimeBegin() * multiplier + fraction * i;
-			double timeInSec = time/unit_time;
-			String strTime   = formatTime.format((long)timeInSec) + listStringUnit[unit];
+			
+			double time      = timeBegin + fraction * i / unit_time;
+			
+/*			long remainder   = (long) (time % 10);
+			
+			if (remainder > 0)
+				time = time + (10-remainder);*/
+
+			String strTime   = formatTime.format((long)time) + listStringUnit[unit];
 			
 			Point textArea   = e.gc.stringExtent(strTime);
-			int axis_x_pos	 = TICK_X_PIXEL * i;
-
-			int position_x   = axis_x_pos;
+			
+			int axis_x_pos	 = (int) (TICK_X_PIXEL * i);
+			int position_x   = (int) (axis_x_pos);
+			
+/*			if (remainder > 0)
+				position_x   = (int) (axis_x_pos  +( TICK_X_PIXEL / (10-remainder)));*/
+			
 			if (i>0) {
 				// by default x position is in the middle of the tick
 				position_x   = axis_x_pos - (textArea.x/2);
@@ -125,7 +161,10 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 				}
 			} 
 			e.gc.drawLine(axis_x_pos, position_y, axis_x_pos, position_y+2);
-			e.gc.drawText(strTime, position_x, position_y + 4);
+
+			// give more space for nano and micro-seconds
+			if (unit >= UNIT_MILLISEC || (i%2==0))
+				e.gc.drawText(strTime, position_x, position_y + 4);
 		}
 	}
 }

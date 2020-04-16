@@ -318,6 +318,27 @@ public abstract class SpaceTimeDataController
 		}
 		return unitTimePerSecond;
 	}
+	
+	/**************************************************************************
+	 * get the conversion from the database's unit time to nano second.
+	 *  
+	 * @return
+	 **************************************************************************/
+	@SuppressWarnings("incomplete-switch")
+	public double getUnitTimePerNanosecond()
+	{
+		double unitTimePerSecond = 1;
+		
+		switch(getTimeUnit()) {
+		case MICROSECOND:
+			unitTimePerSecond = 1000d;
+			break;
+		case NANOSECOND:
+			unitTimePerSecond = 1;
+			break;
+		}
+		return unitTimePerSecond;
+	}
 
 	
 	public ColorTable getColorTable() {
