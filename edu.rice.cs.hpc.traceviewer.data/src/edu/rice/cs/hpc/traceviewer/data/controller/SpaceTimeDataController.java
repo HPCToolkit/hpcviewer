@@ -267,6 +267,11 @@ public abstract class SpaceTimeDataController
 		return minBegTime;
 	}
 
+	/*****
+	 * return the unit of the current database
+	 * 
+	 * @return {@link ImageTraceAttributes.TimeUnit}
+	 *****/
 	public TimeUnit getTimeUnit() {
 		
 		if (getExperiment().getMajorVersion() == 2) {
@@ -285,6 +290,9 @@ public abstract class SpaceTimeDataController
 			}
 			return TimeUnit.MICROSECOND;
 		}
+		// we have no idea what kind of database is this.
+		// this must be an error. Should we raise an exception?
+		
 		return TimeUnit.UNKNOWN;
 	}
 	

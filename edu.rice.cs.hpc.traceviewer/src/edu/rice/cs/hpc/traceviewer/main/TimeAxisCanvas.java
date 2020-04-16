@@ -10,7 +10,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
 import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
-import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes.TimeUnit;
 
 
 /*******************************************************
@@ -32,7 +31,6 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 	static final private int PADDING_Y   = 2;
 	static final private int TICK_MARK_Y = 3;
 
-	final private TimeUnit[] listTimeUnit;
 	final private String[]	 listStringUnit;
 	
 	final private DecimalFormat formatTime;
@@ -49,12 +47,6 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 		super(parent, SWT.NO_BACKGROUND | style);
 		
 		formatTime = new DecimalFormat("###,###");
-		
-		listTimeUnit = new TimeUnit[4];
-		listTimeUnit[0] = TimeUnit.SECOND;
-		listTimeUnit[1] = TimeUnit.MILISECOND;
-		listTimeUnit[2] = TimeUnit.MICROSECOND;
-		listTimeUnit[3] = TimeUnit.NANOSECOND;
 		
 		listStringUnit = new String[4];
 		listStringUnit[0] = "s";

@@ -34,6 +34,7 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 	private final Color COLOR_THREAD[];
 
 	private final Color ColorLightBlue;
+	private final Color ColorLightMagenta;
 	
 	private final ProcessTimelineService timeLine;
 	
@@ -45,14 +46,15 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 	public ThreadAxisCanvas(ProcessTimelineService timeLine, Composite parent, int style) {
 		super(parent, style);
 		
-		ColorLightBlue = new Color(getDisplay(), 173, 216, 250);
+		ColorLightBlue    = new Color(getDisplay(), 173, 216, 250);
+		ColorLightMagenta = new Color(getDisplay(), 255, 128, 255);
 		
 		COLOR_PROC = new Color[2];
 		COLOR_PROC[0] = ColorLightBlue;
 		COLOR_PROC[1] = getDisplay().getSystemColor(SWT.COLOR_DARK_BLUE);
 		
 		COLOR_THREAD = new Color[2];
-		COLOR_THREAD[0] = getDisplay().getSystemColor(SWT.COLOR_MAGENTA);
+		COLOR_THREAD[0] = ColorLightMagenta;
 		COLOR_THREAD[1] = getDisplay().getSystemColor(SWT.COLOR_DARK_MAGENTA);
 		
 		this.timeLine = timeLine;
@@ -167,7 +169,7 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 			
 			e.gc.fillRectangle(0, procPosition, x_end, nextPosition);
 			
-			currentColor   = 1 - currentColor;
+			currentColor = 1 - currentColor;
 		}
 		if (!isHybridProgram)
 			return;
@@ -195,11 +197,13 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 	public void dispose() {
 		if (tooltip != null) {
 			tooltip.deactivate();
-			tooltip = null;
 		}
 		if (ColorLightBlue != null && !ColorLightBlue.isDisposed()) {
 			ColorLightBlue.dispose();
 		}
+		if (ColorLightMagenta != null && !ColorLightMagenta.isDisposed())
+			ColorLightMagenta.dispose();
+		
 		super.dispose();
 	}
 	
@@ -241,10 +245,20 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 			
 			String procNames[] = traceData.getListOfRanks();
 			
-			if (process >= 0 && process < procNames.length)
-				return procNames[process];
+			if (process < 0 && process >= procNames.length)
+				return null;
 			
-			return null;
+	        String text = procNames[process];
+	        
+	        if (traceData.isHybridRank()) {
+	        	int indexDot = text.indexOf('.');
+	        	text = text + " (rank: " + text.substring(0, indexDot) + ", thread: " + text.substring(indexDot+1) + ")";
+	        	return text;
+	        } else {
+	        	text = "Rank " + text;
+	        }
+			
+			return text;
 		}
 		
 		@Override
