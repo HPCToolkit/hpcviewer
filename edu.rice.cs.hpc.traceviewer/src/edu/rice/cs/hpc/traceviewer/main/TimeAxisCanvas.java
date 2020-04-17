@@ -34,8 +34,8 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 	
 	static private final int TICK_X_PIXEL = 110;
 	
-	static final private int PADDING_Y   = 2;
-	static final private int TICK_MARK_Y = 3;
+	static final private int PADDING_Y   = 1;
+	static final private int TICK_MARK_Y = 4;
 
 	final private String[] listStringUnit;
 	final private long[]   unitConversion; 
@@ -94,16 +94,22 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
         
 		final ImageTraceAttributes attribute = data.getAttributes();
 		
+		// --------------------------------------------------------------------------
+		// finding some HINTs of number of ticks, and distance between ticks 
+		// --------------------------------------------------------------------------
+		
 		int numAxisLabel = area.width / TICK_X_PIXEL;
 		double numTicks  = (double)area.width / TICK_X_PIXEL;
 		double fraction  = (double)attribute.getTimeInterval() / numTicks  * data.getUnitTimePerNanosecond();
 		
 		int unit = 0;
 		
-		// find the right unit time that the different between ticks is equal or bigger than 10
+		// --------------------------------------------------------------------------
+		// find the right unit time (s, ms, us, ns) 
 		// we want to display ticks to something like:
-		//  10 .... 20 ... 30 ... 40
+		//  10s .... 20s ... 30s ... 40s
 		// 
+		// --------------------------------------------------------------------------
 		
 		do {			
 			double t1 = attribute.getTimeBegin() * data.getUnitTimePerNanosecond() / unitConversion[unit];
@@ -111,6 +117,9 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 			double dt = t2 - t1;
 
 			if (t2-t1 < 1000.0) {
+				// distance between ticks is at least 2 if possible
+				// if it's 1 or 0.8, then we should degrade it to higher precision 
+				// (higher unit time)
 				if (dt < 2 && unit > 0)
 					unit--;
 				
@@ -125,10 +134,12 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 
 		long unit_time = unitConversion[unit];
 
+		// --------------------------------------------------------------------------
 		// find the nice rounded number
 		// if dt < 10:  1, 2, 3, 4...
 		// if dt < 100: 10, 20, 30, 40, ..
 		// ...
+		// --------------------------------------------------------------------------
 		
 		double t1 = attribute.getTimeBegin() * data.getUnitTimePerNanosecond() / unit_time;
 		double t2 = t1 + fraction / unit_time;
@@ -146,12 +157,21 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 		numAxisLabel = (int) (attribute.getTimeInterval() * data.getUnitTimePerNanosecond() / dtRound);
 		
 		double timeBegin    = attribute.getTimeBegin() * data.getUnitTimePerNanosecond();
+		
+		// round the time to the upper bound
+		// if the time is 22, we round it to 30
+		
 		long remainder      = (long) timeBegin % dtRound;
 		if (remainder > 0)
-			timeBegin           = timeBegin + (dtRound - remainder);
+			timeBegin       = timeBegin + (dtRound - remainder);
+		
 		Point prevTextArea  = new Point(0, 0);
 		int   prevPositionX = 0;
-		
+
+		// --------------------------------------------------------------------------
+		// draw the ticks and the labels if there's enough space
+		// --------------------------------------------------------------------------
+
 		for(int i=0; i <= numAxisLabel; i++) {
 			
 			double time      = timeBegin + dtRound * i;
@@ -173,19 +193,30 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 				}
 			} 
 			int axis_tick_mark_height = position_y+2;
+			
+			// draw the label only if we have space
 			if (i==0 || prevPositionX+prevTextArea.x + 10 < position_x) {
 				e.gc.drawText(strTime, position_x, position_y + 4);
 
 				prevTextArea.x = textArea.x;
 				prevPositionX  = position_x;
 				
-				axis_tick_mark_height++;
+				axis_tick_mark_height+=2;
 			}
+			// always draw the ticks
 			e.gc.drawLine(axis_x_pos, position_y, axis_x_pos, axis_tick_mark_height);
 		}
 	}
 	
-	
+	/*****
+	 * convert from time to pixel
+	 * 
+	 * @param attribute current attribute time configuration
+	 * @param unitTimeNs conversion multipler from time to nanosecond 
+	 * @param time the time to convert
+	 * 
+	 * @return pixel (x-axis)
+	 */
 	private int convertTimeToPixel(ImageTraceAttributes attribute, double unitTimeNs, long time)
 	{
 		// define pixel : (time - TimeBegin) x number_of_pixel_per_time 
