@@ -110,8 +110,8 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 			double t2 = t1 + fraction / unitConversion[unit];
 			double dt = t2 - t1;
 
-			if (t2-t1 < 100.0) {
-				if (dt < 2)
+			if (t2-t1 < 1000.0) {
+				if (dt < 2 && unit > 0)
 					unit--;
 				
 				break;
@@ -122,34 +122,46 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 		
 		if (unit >= unitConversion.length)
 			unit = unitConversion.length - 1;
-		
-		// find the nice rounded number
-		// for second: 10, 20, 30, ...
-		// for ms:     100, 200, 300, ...
-		// for us:     1000, 2000, 3000, ...
-		// etc.
 
-		double timeBegin = attribute.getTimeBegin() * data.getUnitTimePerNanosecond() / unitConversion[unit];
-		long unit_time   = unitConversion[unit];
+		long unit_time = unitConversion[unit];
+
+		// find the nice rounded number
+		// if dt < 10:  1, 2, 3, 4...
+		// if dt < 100: 10, 20, 30, 40, ..
+		// ...
+		
+		double t1 = attribute.getTimeBegin() * data.getUnitTimePerNanosecond() / unit_time;
+		double t2 = t1 + fraction / unit_time;
+		double dt = t2 - t1;
+		
+		// find rounded delta_time
+		// if delta_time is 12 --> rounded to 10
+		// 					3  --> rounded to 1
+		// 					32 --> rounded to 10
+		// 					312 --> rounded to 100
+		
+		int logdt 	 = (int) Math.log10(dt);
+		long dtRound = (int) Math.pow(10, logdt) ;
+		dtRound     *= unit_time;
+		numAxisLabel = (int) (attribute.getTimeInterval() * data.getUnitTimePerNanosecond() / dtRound);
+		
+		double timeBegin    = attribute.getTimeBegin() * data.getUnitTimePerNanosecond();
+		long remainder      = (long) timeBegin % dtRound;
+		if (remainder > 0)
+			timeBegin           = timeBegin + (dtRound - remainder);
+		Point prevTextArea  = new Point(0, 0);
+		int   prevPositionX = 0;
 		
 		for(int i=0; i <= numAxisLabel; i++) {
 			
-			double time      = timeBegin + fraction * i / unit_time;
+			double time      = timeBegin + dtRound * i;
 			
-/*			long remainder   = (long) (time % 10);
-			
-			if (remainder > 0)
-				time = time + (10-remainder);*/
-
-			String strTime   = formatTime.format((long)time) + listStringUnit[unit];
+			String strTime   = formatTime.format((long)time / unit_time) + listStringUnit[unit];
 			
 			Point textArea   = e.gc.stringExtent(strTime);
 			
-			int axis_x_pos	 = (int) (TICK_X_PIXEL * i);
+			int axis_x_pos	 = (int) convertTimeToPixel(attribute, data.getUnitTimePerNanosecond(), (long)time);
 			int position_x   = (int) (axis_x_pos);
-			
-/*			if (remainder > 0)
-				position_x   = (int) (axis_x_pos  +( TICK_X_PIXEL / (10-remainder)));*/
 			
 			if (i>0) {
 				// by default x position is in the middle of the tick
@@ -160,11 +172,29 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 					position_x = axis_x_pos - textArea.x;
 				}
 			} 
-			e.gc.drawLine(axis_x_pos, position_y, axis_x_pos, position_y+2);
-
-			// give more space for nano and micro-seconds
-			if (unit >= UNIT_MILLISEC || (i%2==0))
+			int axis_tick_mark_height = position_y+2;
+			if (i==0 || prevPositionX+prevTextArea.x + 10 < position_x) {
 				e.gc.drawText(strTime, position_x, position_y + 4);
+
+				prevTextArea.x = textArea.x;
+				prevPositionX  = position_x;
+				
+				axis_tick_mark_height++;
+			}
+			e.gc.drawLine(axis_x_pos, position_y, axis_x_pos, axis_tick_mark_height);
 		}
 	}
+	
+	
+	private int convertTimeToPixel(ImageTraceAttributes attribute, double unitTimeNs, long time)
+	{
+		// define pixel : (time - TimeBegin) x number_of_pixel_per_time 
+		//				  (time - TimeBegin) x (numPixelsH/timeInterval)
+		double dT = attribute.numPixelsH / (unitTimeNs*attribute.getTimeInterval());
+		long dTime = (long) (time-(attribute.getTimeBegin()*unitTimeNs));
+		int pixel = (int) (dTime * dT);
+		
+		return pixel;
+	}
+
 }

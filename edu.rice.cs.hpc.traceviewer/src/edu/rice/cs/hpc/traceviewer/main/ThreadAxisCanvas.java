@@ -114,7 +114,7 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 			
 			final int procNumber  = procTimeline.getProcessNum();
 			final String procName = processes[procNumber]; 
-			final int position    = attribute.convertToPixel(procNumber);
+			final int position    = attribute.convertRankToPixel(procNumber);
 	
 			int rank = 0;
 			int thread = 0;
@@ -241,7 +241,7 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 	        	return null;
 
 			final ImageTraceAttributes attribute = data.getAttributes();
-			int process = attribute.convertToPosition(event.y);
+			int process = attribute.convertPixelToRank(event.y);
 			
 			String procNames[] = traceData.getListOfRanks();
 			

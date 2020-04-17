@@ -15,11 +15,10 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class MessageLabelManager 
 {
-	final Label   messageLabel;
-	final Display display;
+	final private Label   messageLabel;
+	final private Display display;
 
-	Color colorBackground;
-	Shell shell;
+	private Color colorBackground;
 
 	public MessageLabelManager(final Display display, Label messageLabel) {
 
@@ -38,8 +37,11 @@ public class MessageLabelManager
 				// the message
 				// we need to be careful not to use disposed display
 				
-				if (display != null && !display.isDisposed())
-					colorBackground = display.getActiveShell().getBackground();	
+				if (display != null && !display.isDisposed()) {
+					Shell shell = display.getActiveShell();
+					if (shell != null && !shell.isDisposed())
+						colorBackground = display.getActiveShell().getBackground();	
+				}
 			}
 			
 		});

@@ -149,7 +149,7 @@ public class ImageTraceAttributes
 		return (double)numPixelsV / getProcessInterval();
 	}
 
-	public int convertToPosition(int pixelY) 
+	public int convertPixelToRank(int pixelY) 
 	{
 		int process = 0;
 		
@@ -165,7 +165,7 @@ public class ImageTraceAttributes
     	return process;
 	}
 	
-	public int convertToPixel(int process)
+	public int convertRankToPixel(int process)
 	{
 		int pixel = 0;
 		if (numPixelsV > getProcessInterval()) 
@@ -176,6 +176,14 @@ public class ImageTraceAttributes
 			pixel = (process - getProcessBegin()) * numPixelsV / getProcessInterval();
 		}
 		return pixel;
+	}
+	
+	public long convertPixelToTime(int pixelX)
+	{
+		double pixelsPerTime = numPixelsH / (double) getTimeInterval();
+		long   time = (long) (getTimeBegin() + (long) pixelX / pixelsPerTime);
+		
+		return time;
 	}
 	
 	/***

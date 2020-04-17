@@ -864,7 +864,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	{
     	final ImageTraceAttributes attributes = stData.getAttributes();
     	
-    	int selectedProcess = attributes.convertToPosition(mouseDown.y);
+    	int selectedProcess = attributes.convertPixelToRank(mouseDown.y);
 
     	long closeTime = attributes.getTimeBegin() + (long)(mouseDown.x / getScalePixelsPerTime());
     	
