@@ -5,6 +5,7 @@ import org.eclipse.core.commands.operations.IOperationHistoryListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -35,13 +36,12 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 	static private final int TICK_X_PIXEL = 110;
 	
 	static final private int PADDING_Y   = 1;
-	static final private int TICK_MARK_Y = 4;
-
 	final private String[] listStringUnit;
 	final private long[]   unitConversion; 
 	
 	final private DecimalFormat formatTime;
 
+	final private Color bgColor;
 	
 	/***
 	 * Constructor of time axis canvas.
@@ -51,6 +51,8 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 	 */
 	public TimeAxisCanvas(Composite parent, int style) {
 		super(parent, SWT.NO_BACKGROUND | style);
+		
+		bgColor = parent.getBackground();
 		
 		formatTime = new DecimalFormat("###,###,###");
 		
@@ -82,17 +84,14 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 		if (getData() == null)
 			return;
 		
-		final int position_y = Integer.min(0, e.height - PADDING_Y - TICK_MARK_Y);
-		final Rectangle area = getClientArea();
-		
-		e.gc.drawLine(area.x, position_y, area.width, position_y);
-		
 		final SpaceTimeDataController data = (SpaceTimeDataController) getData();
 
         if (data == null)
         	return;
         
 		final ImageTraceAttributes attribute = data.getAttributes();
+
+		final Rectangle area = getClientArea();
 		
 		// --------------------------------------------------------------------------
 		// finding some HINTs of number of ticks, and distance between ticks 
@@ -164,6 +163,24 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 		long remainder      = (long) timeBegin % dtRound;
 		if (remainder > 0)
 			timeBegin       = timeBegin + (dtRound - remainder);
+		
+		// --------------------------------------------------------------------------
+        // Manually fill the client area with the default background color
+        // Some platforms don't paint the backround properly 
+		// --------------------------------------------------------------------------
+        
+		e.gc.setBackground(bgColor);
+		e.gc.fillRectangle(getClientArea());
+		
+		// --------------------------------------------------------------------------
+		// draw the x-axis
+		// --------------------------------------------------------------------------
+		
+		// it is possible in some cases that the height is so small that we cannot
+		// display axis
+		
+		final int position_y = PADDING_Y;
+		e.gc.drawLine(area.x, position_y, area.width, position_y);
 		
 		Point prevTextArea  = new Point(0, 0);
 		int   prevPositionX = 0;

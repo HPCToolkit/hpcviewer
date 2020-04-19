@@ -37,6 +37,8 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 	private final Color ColorLightMagenta;
 	
 	private final ProcessTimelineService timeLine;
+
+	final private Color bgColor;
 	
 	/** Relates to the condition that the mouse is in.*/
 	private ITraceCanvas.MouseState mouseState;
@@ -45,6 +47,8 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 
 	public ThreadAxisCanvas(ProcessTimelineService timeLine, Composite parent, int style) {
 		super(parent, style);
+		
+		bgColor = parent.getBackground();
 		
 		ColorLightBlue    = new Color(getDisplay(), 173, 216, 250);
 		ColorLightMagenta = new Color(getDisplay(), 255, 128, 255);
@@ -72,6 +76,7 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 		tooltip.setData(data);
 	}
 	
+	@Override
 	public void setData(Object data) {
 		super.setData(data);
 		
@@ -94,6 +99,14 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 		
         final String processes[] = traceData.getListOfRanks();
         boolean isHybridProgram  = traceData.isHybridRank();
+		
+		// --------------------------------------------------------------------------
+        // Manually fill the client area with the default background color
+        // Some platforms don't paint the background properly 
+		// --------------------------------------------------------------------------
+        
+		e.gc.setBackground(bgColor);
+		e.gc.fillRectangle(getClientArea());
 
 		// -----------------------------------------------------
 		// collect the position and the length of each process
@@ -197,6 +210,7 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 	public void dispose() {
 		if (tooltip != null) {
 			tooltip.deactivate();
+			tooltip = null;
 		}
 		if (ColorLightBlue != null && !ColorLightBlue.isDisposed()) {
 			ColorLightBlue.dispose();
