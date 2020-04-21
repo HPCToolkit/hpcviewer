@@ -1,5 +1,11 @@
 package edu.rice.cs.hpc.traceviewer.data.db;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import edu.rice.cs.hpc.traceviewer.data.controller.SpaceTimeDataController;
+
 /***********
  * Struct class to store attributes of a trace view like:
  * <ul>
@@ -13,13 +19,8 @@ package edu.rice.cs.hpc.traceviewer.data.db;
  */
 public class ImageTraceAttributes 
 {
-	static public enum TimeUnit {UNKNOWN,
-								 NANOSECOND, 
-								 MICROSECOND, 
-								 MILISECOND, 
-								 SECOND, 
-								 MINUTE, 
-								 HOUR};
+	final private Map<Integer, TimeUnit> mapIntegerToUnit;
+	final private Map<TimeUnit, String>  mapUnitToString;
 	
 	public int numPixelsH, numPixelsV;
 	public int numPixelsDepthV;
@@ -29,8 +30,111 @@ public class ImageTraceAttributes
 	public ImageTraceAttributes()
 	{
 		frame = new Frame();
+
+		mapIntegerToUnit = new HashMap<Integer, TimeUnit>(6);
+		
+		mapIntegerToUnit.put(0, TimeUnit.NANOSECONDS);
+		mapIntegerToUnit.put(1, TimeUnit.MICROSECONDS);
+		mapIntegerToUnit.put(2, TimeUnit.MILLISECONDS);
+		mapIntegerToUnit.put(3, TimeUnit.SECONDS);
+		mapIntegerToUnit.put(4, TimeUnit.MINUTES);
+		mapIntegerToUnit.put(5, TimeUnit.HOURS);
+		
+		mapUnitToString = new HashMap<TimeUnit, String>(6);
+		
+		mapUnitToString.put(TimeUnit.NANOSECONDS, "ns");
+		mapUnitToString.put(TimeUnit.MICROSECONDS, "us");
+		mapUnitToString.put(TimeUnit.MILLISECONDS, "ms");
+		mapUnitToString.put(TimeUnit.SECONDS, "s");
+		mapUnitToString.put(TimeUnit.MINUTES, "mnt");
+		mapUnitToString.put(TimeUnit.HOURS, "hr");
+	}
+
+	/****
+	 * return the position in the list of a given time unit.
+	 * This is an inverse version of {@code getTimeUnit}
+	 * @param timeUnit
+	 * @return
+	 */
+	public int getTimeUnitOrdinal(TimeUnit timeUnit) {
+
+		for (Map.Entry<Integer, TimeUnit> entry : mapIntegerToUnit.entrySet()) {
+			if (entry.getValue() == timeUnit) {
+				return entry.getKey();
+			}
+		}
+		return -1;
 	}
 	
+	/****
+	 * return the time unit for a given ordinal. 
+	 * This is an inverse version of {@code getTimeUnitOrdinal}
+	 * @param ordinal
+	 * @return
+	 */
+	public TimeUnit getTimeUnit(int ordinal) {
+		return mapIntegerToUnit.get(ordinal);
+	}
+	
+	/***
+	 * Returns the name of the give time unit
+	 * 
+	 * @param unit
+	 * @return
+	 */
+	public String getTimeUnitName(TimeUnit unit) {
+		return mapUnitToString.get(unit);
+	}
+	
+	
+	/****
+	 * Compute the suggested time unit for a give space time data
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public TimeUnit getDisplayTimeUnit(SpaceTimeDataController data) {
+				
+		TimeUnit unitInDatabase = data.getTimeUnit();
+		
+		int unit = 0;
+		
+		// --------------------------------------------------------------------------
+		// find the right unit time (s, ms, us, ns) 
+		// To pick the time unit, the time interval should be comfortably within the 
+		//  range of the unit. 
+		// If the database time unit is ns, and the interval is:
+		//   10,000,000,000 --> 10 sec
+		//      100,000,000 --> 100ms
+		//           20,000 --> 20 us
+		//              100 --> 100ns
+		// --------------------------------------------------------------------------
+		
+		do {
+			TimeUnit timeUnit = mapIntegerToUnit.get(unit);
+			
+			long t1 = getTimeBegin();
+			long t2 = getTimeEnd();
+			long dt = timeUnit.convert(t2 - t1, unitInDatabase);
+
+			if (dt < 5000) {
+				// distance between ticks is at least 2 if possible
+				// if it's 1 or 0.8, then we should degrade it to higher precision 
+				// (higher unit time)
+				if (dt <= 2 && unit > 0)
+					unit--;
+				
+				break;
+			}
+			unit++;
+
+		} while(unit < mapIntegerToUnit.size());
+		
+		if (unit >= mapIntegerToUnit.size())
+			unit = mapIntegerToUnit.size() - 1;
+		
+		return mapIntegerToUnit.get(unit);
+	}
 	
 	/*************************************************************************
 	 * Asserts the process bounds to make sure they're within the actual

@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IOperationHistoryListener;
@@ -150,7 +151,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		
 		// set the number of maximum threads in the pool to the number of hardware threads
 		threadExecutor = Executors.newFixedThreadPool( Utility.getNumThreads(0) ); 
-		formatTime = new DecimalFormat("#.###");
+		formatTime = new DecimalFormat("###,###,###.##");
 		
 		addDisposeListener( new DisposeListener() {
 			
@@ -555,15 +556,19 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	private void adjustLabels()
     {
 		final ImageTraceAttributes attributes = stData.getAttributes();
-		double unit_time = stData.getUnitTimePerSecond();
 		
-		double timeInSec = attributes.getTimeBegin()/unit_time;
+		final TimeUnit dbTimeUnit = stData.getTimeUnit();
+		final TimeUnit displayTimeUnit = attributes.getDisplayTimeUnit(stData);
+		
+		double timeInSec 	   = displayTimeUnit.convert(attributes.getTimeBegin(), dbTimeUnit);
 		final String timeStart = formatTime.format(timeInSec);
 		
-		timeInSec = attributes.getTimeEnd()/unit_time;
+		timeInSec = displayTimeUnit.convert(attributes.getTimeEnd(), dbTimeUnit);
 		final String timeEnd   = formatTime.format(timeInSec);
         
-		timeLabel.setText("Time Range: [" + timeStart + "s, " + timeEnd +  "s]");
+		String timeUnit = attributes.getTimeUnitName(displayTimeUnit);
+		
+		timeLabel.setText("Time Range: [" + timeStart + timeUnit + ", " + timeEnd + timeUnit + "]");
         timeLabel.setSize(timeLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT));
         
 
@@ -611,10 +616,11 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
     		
     		if ( selectedProc >= 0 && selectedProc < processes.length ) {  
     			crossHairLabel.setText("Cross Hair: " + getCrossHairText(selectedTime, selectedProc));
-            	//crossHairLabel.setText("Cross Hair: (" + (selectedTime/1000)/1000.0 + "s, " + processes[rank] + ")");
+
     		} else {
+    			long time = displayTimeUnit.convert(selectedTime, dbTimeUnit);
     			// in case of incorrect filtering where user may have empty ranks or incorrect filters, we don't display the rank
-    			crossHairLabel.setText("Cross Hair: (" + (selectedTime/stData.getUnitTimePerSecond())/.0 + "s, ?)");
+    			crossHairLabel.setText("Cross Hair: (" + time + stData.getAttributes().getTimeUnitName(displayTimeUnit) + ", ?)");
     		}
         }
         
@@ -632,11 +638,16 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	 **************************************************************************/
 	private String getCrossHairText(long closeTime, int selectedProcess) 
 	{
-		final float selectedTime = (float) ((float)closeTime / stData.getUnitTimePerSecond());
+		final TimeUnit dbTimeUnit = stData.getTimeUnit();
+		final ImageTraceAttributes attribute = stData.getAttributes();
+		
+		final TimeUnit currentUnit = attribute.getDisplayTimeUnit(stData);
+		
+		final long selectedTime = currentUnit.convert(closeTime, dbTimeUnit);
         final IBaseData traceData = stData.getBaseData();
         final String processes[] = traceData.getListOfRanks();
 
-        final String buffer = "(" + formatTime.format(selectedTime) + "s, " + 
+        final String buffer = "(" + formatTime.format(selectedTime) + attribute.getTimeUnitName(currentUnit) + ", " + 
         						processes[selectedProcess] + ")";
         return buffer;
 	}

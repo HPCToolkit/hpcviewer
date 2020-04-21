@@ -266,7 +266,13 @@ public class ThreadAxisCanvas extends AbstractAxisCanvas
 	        
 	        if (traceData.isHybridRank()) {
 	        	int indexDot = text.indexOf('.');
-	        	text = text + " (rank: " + text.substring(0, indexDot) + ", thread: " + text.substring(indexDot+1) + ")";
+	        	String rank = text.substring(0, indexDot);
+	        	
+	        	if (event.x <= COLUMN_WIDTH) {
+	        		text = "Rank " + rank;
+	        	} else {
+		        	text = text + " (rank: " + rank + ", thread: " + text.substring(indexDot+1) + ")";
+	        	}
 	        	return text;
 	        } else {
 	        	text = "Rank " + text;

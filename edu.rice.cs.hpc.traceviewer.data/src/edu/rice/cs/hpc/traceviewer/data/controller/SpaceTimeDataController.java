@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.services.ISourceProviderService;
@@ -17,7 +19,6 @@ import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.experiment.scope.RootScopeType;
 import edu.rice.cs.hpc.data.trace.TraceAttribute;
 import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes;
-import edu.rice.cs.hpc.traceviewer.data.db.ImageTraceAttributes.TimeUnit;
 import edu.rice.cs.hpc.traceviewer.data.graph.ColorTable;
 import edu.rice.cs.hpc.traceviewer.data.graph.CallPath;
 import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimeline;
@@ -277,7 +278,7 @@ public abstract class SpaceTimeDataController
 		if (getExperiment().getMajorVersion() == 2) {
 			if (getExperiment().getMinorVersion() < 2) {
 				// old version of database: always microsecond
-				return TimeUnit.MICROSECOND;
+				return TimeUnit.MICROSECONDS;
 			}
 			// new version of database:
 			// - if the measurement is from old hpcrun: microsecond
@@ -286,59 +287,16 @@ public abstract class SpaceTimeDataController
 			BaseExperiment be = getExperiment();
 			ExperimentWithoutMetrics exp = (ExperimentWithoutMetrics) be;
 			if (exp.getTraceAttribute().dbUnitTime == TraceAttribute.PER_NANO_SECOND) {
-				return TimeUnit.NANOSECOND;
+				return TimeUnit.NANOSECONDS;
 			}
-			return TimeUnit.MICROSECOND;
+			return TimeUnit.MICROSECONDS;
 		}
 		// we have no idea what kind of database is this.
 		// this must be an error. Should we raise an exception?
 		
-		return TimeUnit.UNKNOWN;
+		return TimeUnit.MICROSECONDS;
 	}
 	
-	/**************************************************************************
-	 * retrieve the unit time per second of the trace
-	 * The information is from experiment.xml
-	 * 
-	 * @return double unit time oer second
-	 **************************************************************************/
-	public double getUnitTimePerSecond() 
-	{
-		double unitTimePerSecond = 0;
-		
-		switch(getTimeUnit()) {
-		case MICROSECOND:
-			unitTimePerSecond = 1000000d;
-			break;
-		case NANOSECOND:
-			unitTimePerSecond = TraceAttribute.PER_NANO_SECOND;
-		default:
-			unitTimePerSecond = exp.getTraceAttribute().dbUnitTime; 
-			break;
-		}
-		return unitTimePerSecond;
-	}
-	
-	/**************************************************************************
-	 * get the conversion from the database's unit time to nano second.
-	 *  
-	 * @return
-	 **************************************************************************/
-	@SuppressWarnings("incomplete-switch")
-	public double getUnitTimePerNanosecond()
-	{
-		double unitTimePerSecond = 1;
-		
-		switch(getTimeUnit()) {
-		case MICROSECOND:
-			unitTimePerSecond = 1000d;
-			break;
-		case NANOSECOND:
-			unitTimePerSecond = 1;
-			break;
-		}
-		return unitTimePerSecond;
-	}
 
 	
 	public ColorTable getColorTable() {

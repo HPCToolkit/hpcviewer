@@ -315,6 +315,10 @@ public class DepthTimeCanvas extends AbstractTimeCanvas
 		long topLeftTime 	 = attributes.getTimeBegin() + (long)(region.x / getScalePixelsPerTime());
 		long bottomRightTime = attributes.getTimeBegin() + (long)((region.width+region.x) / getScalePixelsPerTime());
 		
+		if (bottomRightTime-topLeftTime<=1) {
+			// should send error message that the length is too small
+			return;
+		}
 		final Frame oldFrame 	= attributes.getFrame();
 		final Position position = oldFrame.position;
 		
