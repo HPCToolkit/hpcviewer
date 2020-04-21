@@ -99,14 +99,14 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 		// there is nothing we can do if the difference between the ticks is less than 1 ns.
 		if (dt<1) {
 			int ordinal = attribute.getTimeUnitOrdinal(displayTimeUnit);
-			if (ordinal>0) {
+			if (ordinal>0 && (t1 != t2)) {
 				ordinal--;
 				displayTimeUnit = attribute.getTimeUnit(ordinal);
 				
 				// recompute dt with the new time unit
 				dt = displayTimeUnit.convert(t2-t1, dbTimeUnit);
 			} else {
-				return;
+				dt = 1;
 			}
 		}
 		
@@ -163,17 +163,18 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 			Point textArea   = e.gc.stringExtent(strTime);
 			
 			int axis_x_pos	 = (int) convertTimeToPixel(attribute, dbTimeUnit, (long)time, displayTimeUnit);
-			int position_x   = (int) (axis_x_pos);
+
+			// by default x position is in the middle of the tick
+			int position_x   = (int) axis_x_pos - (textArea.x/2);
 			
-			if (i>0) {
-				// by default x position is in the middle of the tick
-				position_x   = axis_x_pos - (textArea.x/2);
-				
-				// make sure x position is not beyond the view's width
-				if (position_x + textArea.x > area.width) {
-					position_x = axis_x_pos - textArea.x;
-				}
-			} 
+			// make sure we don't trim the text in the beginning of the axis
+			if (position_x<0) {
+				position_x = 0;
+			}
+			// make sure x position is not beyond the view's width
+			else if (position_x + textArea.x > area.width) {
+				position_x = axis_x_pos - textArea.x;
+			}
 			int axis_tick_mark_height = position_y+2;
 			
 			// draw the label only if we have space

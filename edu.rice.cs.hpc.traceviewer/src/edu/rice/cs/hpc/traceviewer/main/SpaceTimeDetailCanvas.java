@@ -606,51 +606,31 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
             crossHairLabel.setText("Select Sample For Cross Hair");
         else
         {
-        	final Position position = stData.getAttributes().getPosition();
-    		final long selectedTime = position.time;
-    		
     		ProcessTimeline ptl     = stData.getCurrentDepthTrace();
     		if (ptl == null) return;
+    		
+        	final Position position = stData.getAttributes().getPosition();
+    		final long selectedTime = displayTimeUnit.convert(position.time, dbTimeUnit);
     		
     		final int selectedProc  = ptl.getProcessNum();
     		
     		if ( selectedProc >= 0 && selectedProc < processes.length ) {  
-    			crossHairLabel.setText("Cross Hair: " + getCrossHairText(selectedTime, selectedProc));
+    	        final String buffer = "(" + formatTime.format(selectedTime) + 
+    	        						timeUnit + ", " + 
+    	        						processes[selectedProc] + ")";
+
+    	        crossHairLabel.setText("Cross Hair: " + buffer);
 
     		} else {
     			long time = displayTimeUnit.convert(selectedTime, dbTimeUnit);
     			// in case of incorrect filtering where user may have empty ranks or incorrect filters, we don't display the rank
-    			crossHairLabel.setText("Cross Hair: (" + time + stData.getAttributes().getTimeUnitName(displayTimeUnit) + ", ?)");
+    			crossHairLabel.setText("Cross Hair: (" + time + timeUnit + ", ?)");
     		}
         }
         
         labelGroup.setSize(labelGroup.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 	
-	/**************************************************************************
-	 * get formatted text to indicate the current position of the cursor
-	 * this function is a bit buggy if the number of process to display is higher
-	 * than the height resolution. somehow, the selected process is over 1 position 
-	 * 
-	 * @param closeTime
-	 * @param selectedProcess
-	 * @return
-	 **************************************************************************/
-	private String getCrossHairText(long closeTime, int selectedProcess) 
-	{
-		final TimeUnit dbTimeUnit = stData.getTimeUnit();
-		final ImageTraceAttributes attribute = stData.getAttributes();
-		
-		final TimeUnit currentUnit = attribute.getDisplayTimeUnit(stData);
-		
-		final long selectedTime = currentUnit.convert(closeTime, dbTimeUnit);
-        final IBaseData traceData = stData.getBaseData();
-        final String processes[] = traceData.getListOfRanks();
-
-        final String buffer = "(" + formatTime.format(selectedTime) + attribute.getTimeUnitName(currentUnit) + ", " + 
-        						processes[selectedProcess] + ")";
-        return buffer;
-	}
 	
     /**************************************************************************
 	 * Updates what the position of the selected box is.
