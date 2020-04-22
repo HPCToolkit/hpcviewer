@@ -2,6 +2,7 @@ package edu.rice.cs.hpc.traceviewer.util;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -79,6 +80,11 @@ public class MessageLabelManager
 				messageLabel.setForeground(colorFont);
 				messageLabel.setBackground(colorBack);
 				messageLabel.setText(message);
+				messageLabel.setSize(messageLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+				
+				// force the composite parent to adapt the size of the message
+				Composite parent = messageLabel.getParent();
+				parent.setSize(parent.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});		
 	}

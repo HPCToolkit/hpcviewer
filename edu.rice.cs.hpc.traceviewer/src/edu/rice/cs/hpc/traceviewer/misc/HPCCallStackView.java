@@ -83,6 +83,7 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 		maxDepthButton = new Button(depthArea, 0);
 		maxDepthButton.setText("Max depth");
 		maxDepthButton.setEnabled(false);
+		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(maxDepthButton);
 		
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(depthArea);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(depthArea);
@@ -225,6 +226,9 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 		depthEditor.setMaximum(maxDepth);		
 		depthEditor.setVisible(true);
 		depthEditor.setToolTipText("Change the current depth.\nMax depth is " + maxDepth);
+		
+		int depth = _stData.getAttributes().getFrame().depth;
+		depthEditor.setSelection(depth);
 
 		maxDepthButton.setToolTipText("Set to max depth: " + maxDepth);
 		maxDepthButton.setData(Integer.valueOf(maxDepth));

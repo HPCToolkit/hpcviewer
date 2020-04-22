@@ -15,6 +15,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -193,7 +195,9 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		stData.getAttributes().setPosition(p);
 		stData.getAttributes().setDepth(0);
 		
-		this.home();
+		Frame frame = new Frame(stData.getAttributes().getFrame());
+		frame.depth = _stData.getMaxDepth() / 3;
+		this.home(frame);
 
 		this.saveButton.setEnabled(true);
 		this.openButton.setEnabled(true);
@@ -345,8 +349,15 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		//if this is the first time painting,
 		//some stuff needs to get initialized
 		Frame frame = new Frame(stData.getAttributes().getFrame());
+		
+		home(frame);
+	}
+	
+	private void home(Frame frame) 
+	{
 		frame.begProcess = 0;
 		frame.endProcess = stData.getTotalTraceCount();
+		
 		frame.begTime = 0;
 		frame.endTime = stData.getTimeWidth();
 		
@@ -461,6 +472,12 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		
 		long t2 = xMid + (long)(numTimeUnitsDisp * SCALE);
 		long t1 = xMid - (long)(numTimeUnitsDisp * SCALE);
+		
+		if (t2-t1 <= 1) {
+			// error: we cannot zoom in to less than 1
+			setMessage("Zoom-in is not allowed: the interval is too small.");
+			return;
+		}
 
 		final Frame frame = new Frame(stData.getAttributes().getFrame());
 		frame.begTime = t1;
@@ -530,6 +547,10 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	public void setLabels(Composite _labelGroup)
     {
 		labelGroup = _labelGroup;
+
+		GridLayoutFactory.fillDefaults().numColumns(4).generateLayout(labelGroup);
+		GridDataFactory.fillDefaults().grab(true, false).
+						align(SWT.BEGINNING, SWT.CENTER).applyTo(labelGroup);
         
         timeLabel  	   = new Label(labelGroup, SWT.LEFT);
         processLabel   = new Label(labelGroup, SWT.CENTER);

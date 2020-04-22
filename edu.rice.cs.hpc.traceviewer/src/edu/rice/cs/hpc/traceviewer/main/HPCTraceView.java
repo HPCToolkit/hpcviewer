@@ -77,10 +77,6 @@ implements ITraceViewAction
 		
 		final Composite labelGroup = new Composite(headerArea, SWT.NONE);
 
-		GridLayoutFactory.fillDefaults().numColumns(5).generateLayout(labelGroup);
-		GridDataFactory.fillDefaults().grab(true, false).
-						align(SWT.BEGINNING, SWT.CENTER).applyTo(labelGroup);
-
 		GridLayoutFactory.fillDefaults().numColumns(2).generateLayout(headerArea);
 		GridDataFactory.fillDefaults().grab(true, false).
 						applyTo(headerArea);
