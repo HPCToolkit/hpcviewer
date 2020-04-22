@@ -95,6 +95,8 @@ public class ColorTable
 		predefinedColorMatcher.clear();
 		classMap.clear();
 		
+		classMap.refresh();
+		
 		Object []entries = classMap.getEntrySet();
 		for (Object obj:entries) {
 			Entry<String, ProcedureClassData> entry = (Entry<String, ProcedureClassData>) obj;

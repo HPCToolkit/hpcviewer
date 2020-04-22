@@ -95,5 +95,8 @@ public class ProcedureClassMap extends AliasMap<String,ProcedureClassData> {
 		return data.remove(key);
 	}
 	
-
+	public void refresh() {
+		super.dispose();
+		super.checkData();
+	}
 }
