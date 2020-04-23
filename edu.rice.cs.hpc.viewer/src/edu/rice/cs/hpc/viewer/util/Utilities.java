@@ -3,6 +3,7 @@
  */
 package edu.rice.cs.hpc.viewer.util;
 
+import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 
 import org.eclipse.swt.SWT;
@@ -59,7 +60,13 @@ import edu.rice.cs.hpc.viewer.window.ViewerWindowManager;
  * @author laksono
  *
  */
-public class Utilities {
+public class Utilities 
+{
+	// list of available fixed fonts.
+	// the order is important: if the font in first element is available, then we'll use this one.
+	
+	static public final String []LIST_METRIC_FONTS = { "Monospaced", "Courier", "Courier New"};
+	
 	//special font for the metric columns. It supposed to be fixed font
 	static public Font fontMetric;
 	/* generic font for view and editor */
@@ -123,12 +130,7 @@ public class Utilities {
 		FontData []objFontMetric = display.getSystemFont().getFontData();
 		FontData []objFontGeneric = display.getSystemFont().getFontData();
 		
-		if (OSValidator.isWindows())
-			// On Windows 7 Courier New has better look 
-			objFontMetric[0].setName("Courier New"); 
-		else
-			// For most platforms, Courier is fine 
-			objFontMetric[0].setName("Courier"); 
+		objFontMetric[0].setName(getMetricFont()); 
 
 		// get the font for metrics columns based on user preferences
 		if (objPref != null) {
@@ -588,5 +590,42 @@ public class Utilities {
 			}
 		}
 		return experiment;
+    }
+    
+    /***
+     * get the best way to find fixed font for metric columns
+     * If no font is supported, it will return the first element in the LIST_METRIC_FONTS
+     * since Eclipse requires a name. Doesn't matter if it exists or not.
+     * 
+     * @return fixed font
+     */
+    static private String getMetricFont() {
+		String []availableFonts = getAvailableFonts();
+		
+		for (String font : LIST_METRIC_FONTS) {
+			for (String availableFont : availableFonts) {
+				if (font.equals(availableFont)) {
+					return availableFont;
+				}
+			}
+		}
+		// we don't find any font supported by the system.
+		// since we cannot return null (Eclipse doesn't like null font)
+		// we just return the first font in the list. 
+		// Let Eclipse find out what is the best font for us.
+		return LIST_METRIC_FONTS[0];
+    }
+    
+    /***
+     * Returns the list of supported font by the system.
+     * Since Eclipse 3.x doesn't support this function, we use Java AWT.
+     * Once we move to Eclipse 4, we can use its theme/css function.
+     *  
+     * @return list of supported fonts
+     */
+    static private String[] getAvailableFonts() {
+
+    	GraphicsEnvironment g=GraphicsEnvironment.getLocalGraphicsEnvironment();
+    	return g.getAvailableFontFamilyNames();
     }
 }

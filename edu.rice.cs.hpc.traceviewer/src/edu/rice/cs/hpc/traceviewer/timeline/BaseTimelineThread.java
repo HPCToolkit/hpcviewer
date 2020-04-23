@@ -27,7 +27,7 @@ import edu.rice.cs.hpc.traceviewer.data.timeline.ProcessTimeline;
 public abstract class BaseTimelineThread implements Callable<Integer> {
 
 	/**The minimum height the samples need to be in order to paint the white separator lines.*/
-	final static byte MIN_HEIGHT_FOR_SEPARATOR_LINES = 15;
+	final static public byte MIN_HEIGHT_FOR_SEPARATOR_LINES = 15;
 
 	/**The SpaceTimeData that this thread gets its files from and adds it data and images to.*/
 	final protected SpaceTimeDataController stData;

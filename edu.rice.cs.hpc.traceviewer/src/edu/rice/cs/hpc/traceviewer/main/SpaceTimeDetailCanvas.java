@@ -195,6 +195,9 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		stData.getAttributes().setPosition(p);
 		stData.getAttributes().setDepth(0);
 		
+		// initialize the depth
+		// we don't know which depth is the best to viewed, but heuristically
+		// the first third is a better one.
 		Frame frame = new Frame(stData.getAttributes().getFrame());
 		frame.depth = _stData.getMaxDepth() / 3;
 		this.home(frame);
@@ -473,7 +476,7 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 		long t2 = xMid + (long)(numTimeUnitsDisp * SCALE);
 		long t1 = xMid - (long)(numTimeUnitsDisp * SCALE);
 		
-		if (t2-t1 <= 1) {
+		if (t2-t1 <= Constants.MIN_TIME_UNITS_DISP) {
 			// error: we cannot zoom in to less than 1
 			setMessage("Zoom-in is not allowed: the interval is too small.");
 			return;
