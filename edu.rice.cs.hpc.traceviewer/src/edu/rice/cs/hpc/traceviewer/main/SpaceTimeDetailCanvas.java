@@ -495,17 +495,18 @@ public class SpaceTimeDetailCanvas extends AbstractTimeCanvas
 	 **************************************************************************/
 	public void timeZoomOut()
 	{
-		final double SCALE = 0.625;
+		final double SCALE = 0.65;
 		final ImageTraceAttributes attributes = stData.getAttributes();
 		
 		//zoom out works as follows: find mid point of times (xMid).
 		//Add/Subtract 1/2 of the scaled numTimeUnitsDisp to xMid to get new endTime and begTime
-		long xMid = (attributes.getTimeEnd() + attributes.getTimeBegin()) / 2;
+
+		double xMid = attributes.getTimeBegin() + (attributes.getTimeInterval() * 0.5);
 		
-		final long td2 = (long)(this.getNumTimeUnitDisplayed() * SCALE); 
-		long t2 = Math.min( stData.getTimeWidth(), xMid + td2);
-		final long td1 = (long)(this.getNumTimeUnitDisplayed() * SCALE);
-		long t1 = Math.max(0, xMid - td1);
+		final double td2 = (double)(this.getNumTimeUnitDisplayed() * SCALE); 
+		long t2 = (long) Math.ceil( Math.min( stData.getTimeWidth(), xMid + td2) );
+		final double td1 = (long)(this.getNumTimeUnitDisplayed() * SCALE);
+		long t1 = (long) Math.floor( Math.max(0, xMid - td1) );
 
 		final Frame frame = new Frame(stData.getAttributes().getFrame());
 		frame.begTime = t1;
