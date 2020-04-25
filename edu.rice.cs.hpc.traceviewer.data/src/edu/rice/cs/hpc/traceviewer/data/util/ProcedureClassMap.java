@@ -67,6 +67,22 @@ public class ProcedureClassMap extends AliasMap<String,ProcedureClassData> {
 	}
 
 	public ProcedureClassData get(String key) {
+		Entry<String, ProcedureClassData> entry = getEntry(key);
+		if (entry != null) {
+			return entry.getValue();
+		}
+		return null;
+	}
+
+	/***
+	 * Return the pair of <glob_pattern, procedure data> of a given key.
+	 * This method is useful if the caller wants to know which pattern that
+	 * matches the key.
+	 * 
+	 * @param key
+	 * @return a set of glob_pattern and procedure data if the key exists.
+	 */
+	public Entry<String, ProcedureClassData> getEntry(String key) {
 		checkData();
 		Iterator<Entry<String, ProcedureClassData>> iterator = data.entrySet().iterator();
 		while (iterator.hasNext()) {
@@ -76,12 +92,12 @@ public class ProcedureClassMap extends AliasMap<String,ProcedureClassData> {
 			//entry.getKey().replace("*", ".*").replace("?", ".?");
 			String glob = Util.convertGlobToRegex(entry.getKey()); 
 			if (key.equals(glob) || key.matches(glob)) {
-				return entry.getValue();
+				return entry;
 			}
 		}
 		return null;
 	}
-
+	
 	public void put(String key, String val, Color image) {
 		if (image != null)
 		put(key,new ProcedureClassData(val,image));

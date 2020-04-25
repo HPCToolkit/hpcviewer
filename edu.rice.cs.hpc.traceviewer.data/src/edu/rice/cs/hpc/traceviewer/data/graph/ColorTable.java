@@ -1,8 +1,12 @@
 package edu.rice.cs.hpc.traceviewer.data.graph;
 
+import java.util.AbstractCollection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.TreeSet;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -45,7 +49,7 @@ public class ColorTable
 	private ColorImagePair IMAGE_WHITE;
 	private	HashMap<String, ColorImagePair> colorMatcher;
 	private	HashMap<String, ColorImagePair> predefinedColorMatcher;
-	private HashMap<Integer, String>        mapRGBtoProcedure;
+	private HashMap<Integer, AbstractCollection<String>>        mapRGBtoProcedure;
 	private HashMap<Integer, String>		mapReservedColor;
 
 	/**Creates a new ColorTable with Display _display.*/
@@ -64,7 +68,7 @@ public class ColorTable
 		initializeWhiteColor();
 		
 		predefinedColorMatcher = new HashMap<String, ColorTable.ColorImagePair>();
-		mapRGBtoProcedure	   = new HashMap<Integer, String>();
+		mapRGBtoProcedure	   = new HashMap<Integer, AbstractCollection<String>>();
 	}
 	
 	/**
@@ -106,7 +110,17 @@ public class ColorTable
 			ColorImagePair cip = createColorImagePair(proc, rgb);
 			
 			predefinedColorMatcher.put(proc, cip);
-			mapRGBtoProcedure.put(rgb.hashCode(), proc);
+			
+			AbstractCollection<String> colProcs = mapRGBtoProcedure.get(rgb.hashCode());
+			
+			if (colProcs == null) {
+				colProcs = new TreeSet<String>();
+				colProcs.add(proc);
+			} else if (!colProcs.contains(proc)){
+				colProcs.add(proc);
+				
+			}
+			mapRGBtoProcedure.put(rgb.hashCode(), colProcs);
 		}
 	}
 	
@@ -160,10 +174,17 @@ public class ColorTable
 			return proc;
 		
 		// get the normal procedure (if exist)
-		proc = mapRGBtoProcedure.get(Integer.valueOf(hashcode));
-		if (proc == null)
+		AbstractCollection<String> collProc = mapRGBtoProcedure.get(Integer.valueOf(hashcode));
+		if (collProc == null)
 			return UNKNOWN_PROCNAME;
 		
+		proc = "";
+		Iterator<String> iterator = collProc.iterator();
+		while(iterator.hasNext()) {
+			proc += iterator.next();
+			if (iterator.hasNext()) 
+				proc += SEPARATOR_PROCNAME;
+		}
 		return proc;
 	}
 	
@@ -218,18 +239,21 @@ public class ColorTable
 		ColorImagePair cip;
 		
 		// 1. check if it matches predefined colors
-		ProcedureClassData value = this.classMap.get(procName);
-		if (value != null) {
+		Entry<String, ProcedureClassData> data = classMap.getEntry(procName);
+		if (data != null) {
 			
 			cip = predefinedColorMatcher.get(procName);
 			if (cip != null)
 				return cip;
 			
+			ProcedureClassData value = data.getValue();
+			
 			final RGB rgb = value.getRGB();
 			cip = createColorImagePair(procName, rgb);
 			predefinedColorMatcher.put(procName, cip);
 			
-			storeProcedureName(rgb, procName);
+			// store the key, not the procedure name
+			storeProcedureName(rgb, data.getKey());
 			
 			return cip;
 		}
@@ -279,14 +303,16 @@ public class ColorTable
 		// store in a hashmap the pair of RGB hashcode and procedure name
 		// if the hash is already stored, we concatenate the procedure name
 		Integer key = Integer.valueOf(rgb.hashCode());
-		String name = mapRGBtoProcedure.get(key);
+		AbstractCollection<String> setOfProcs = mapRGBtoProcedure.get(key);
 		
-		if (name != null) {
-			name += SEPARATOR_PROCNAME + procName;
+		if (setOfProcs != null) {
+			if (setOfProcs.contains(procName))
+				return;
 		} else {
-			name = procName;
+			setOfProcs = new TreeSet<String>();
 		}
-		mapRGBtoProcedure.put(key, name);
+		setOfProcs.add(procName);
+		mapRGBtoProcedure.put(key, setOfProcs);
 
 	}
 	
