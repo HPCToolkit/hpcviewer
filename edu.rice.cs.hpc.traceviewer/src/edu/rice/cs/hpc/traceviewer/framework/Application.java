@@ -15,6 +15,13 @@ public class Application implements IApplication {
 	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
 	 */
 	public Object start(IApplicationContext context) {
+		
+		
+		if (!edu.rice.cs.hpc.data.util.Versions.checkJava()) {
+			
+			return IApplication.EXIT_OK;
+		}
+		
 		Display display = PlatformUI.createDisplay();
 		try {
 			String[] args = (String[])context.getArguments().get("application.args");

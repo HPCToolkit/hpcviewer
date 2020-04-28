@@ -1,12 +1,11 @@
 package edu.rice.cs.hpc.viewer.framework;
 
-import javax.swing.JOptionPane;
-
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
+
 
 /**
  * This class controls all aspects of the application's execution
@@ -19,44 +18,6 @@ public class HPCViewer implements IApplication
 		return args;
 	}
 
-	private boolean checkVersion(String version) {
-		
-		if (version == null)
-			return false;
-		
-		String verNumber[]  = version.split("\\.", 3);
-		String majorVersion = verNumber[0];
-		
-		try {
-			Integer major = Integer.valueOf(majorVersion);
-			if (major == 1) {
-				Integer minor = Integer.valueOf(verNumber[1]);
-				return minor == 8;
-			}
-			return major == 8;
-		} catch (Exception e) {
-			System.err.println("Unknown java version: " + version);
-		}
-		return false;
-	}
-	
-	private boolean checkJava() {
-		String version = System.getProperty("java.version");
-
-		System.out.println("java version: " + version);
-
-		boolean isCorrect = checkVersion(version);
-		if (!isCorrect) {
-			String message = "Error: Java " + 
-					  System.getProperty("java.version") +
-					  " is not supported.\nOnly Java 8 is supported.";
-			
-			System.out.println(message);
-			
-			JOptionPane.showMessageDialog(null, message);
-		}
-		return isCorrect;
-	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
@@ -64,7 +25,7 @@ public class HPCViewer implements IApplication
 	@Override
 	public Object start(IApplicationContext context) {
 		
-		if (!checkJava()) {
+		if (!edu.rice.cs.hpc.data.util.Versions.checkJava()) {
 			
 			return IApplication.EXIT_OK;
 		}
