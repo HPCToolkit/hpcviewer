@@ -29,6 +29,7 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 	implements PaintListener, IOperationHistoryListener
 {		
 	static private final int TICK_X_PIXEL = 110;
+	static private final int MINIMUM_PIXEL_BETWEEN_TICKS = 10;
 	
 	final private DecimalFormat formatTime;
 
@@ -117,8 +118,14 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 		// 					312 --> rounded to 100
 		
 		int logdt 	 = (int) Math.log10(dt);
-		long dtRound = (int) Math.pow(10, logdt) ;
-		numAxisLabel = (int) (displayTimeUnit.convert(attribute.getTimeInterval(), dbTimeUnit) / dtRound);
+		long dtRound = (int) Math.pow(10, logdt);
+		int maxTicks = (area.width/MINIMUM_PIXEL_BETWEEN_TICKS); 
+		do {
+			numAxisLabel = (int) (displayTimeUnit.convert(attribute.getTimeInterval(), dbTimeUnit) / dtRound);
+			if (numAxisLabel > maxTicks) {
+				dtRound *= 10;
+			}
+		} while (numAxisLabel > maxTicks);
 		
 		double timeBegin    = displayTimeUnit.convert(attribute.getTimeBegin(), dbTimeUnit);
 		
