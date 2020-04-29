@@ -230,6 +230,30 @@ public static final String convertGlobToRegex(String pattern) {
     return sb.toString();
 }
 
+/***
+ * check if the current display is correct or not.
+ * This method only check the display configuration on Linux only.
+ * 
+ * @return true if the display is correct, false otherwise.
+ */
+static public boolean isCorrectDisplay() {
+	
+	if (!OSValidator.isUnix())
+		return true;
+	
+	String display = System.getenv("DISPLAY");
+	if (display != null) {
+		return display.length()>0;
+	}
+	return false;
+}
+
+static public void main(String argv[]) {
+	
+	System.out.println("Display: " +  System.getenv("DISPLAY"));
+	System.out.println("Display correct: " + isCorrectDisplay());
+}
+
 }
 
 

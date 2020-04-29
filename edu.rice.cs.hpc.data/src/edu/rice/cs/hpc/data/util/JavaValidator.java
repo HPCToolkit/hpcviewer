@@ -2,15 +2,21 @@ package edu.rice.cs.hpc.data.util;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
+
+import javax.swing.JOptionPane;
+
 import java.util.Properties;
 import java.util.Set;
 
-public class JavaValidator {
-
+public class JavaValidator 
+{
 	// minimum Java supported
-	private final static int JavaMinVersion = 5;
+	//private final static int JavaMinVersion = 5;
+	private final static int JavaVersionSupported = 8;
 	
 	static public void main(String []args) {
+		System.out.println();
+		
 		if (isGCJ()) {
 			System.out.println("Unsupported JVM: GNU GCJ");
 		} else {
@@ -18,7 +24,7 @@ public class JavaValidator {
 				System.out.println("Valid JVM");
 			else
 				System.out.println("Invalid JVM: Needs to be higher or equal than " 
-						+ JavaMinVersion);
+						+ JavaVersionSupported);
 		}
 	}
 	
@@ -46,16 +52,6 @@ public class JavaValidator {
 		return getJavaVendor().indexOf("Free")>=0;
 	}
 	
-	/****
-	 * check if JVM has the correct version
-	 * @return
-	 */
-	static public boolean isCorrectJavaVersion() {
-		String version = getJavaVersion();
-		String []items = version.split("\\.");
-		int v = Integer.valueOf(items[1]);
-		return (v>=JavaMinVersion);
-	}
 	
 	/****
 	 * retrieve the vendor (Sun, IBM, Free Foundation, ....)
@@ -72,4 +68,57 @@ public class JavaValidator {
 	static public String getJavaVersion() {
 		return System.getProperty("java.version");
 	}
+	
+	/****
+	 * Check Java version. If the version is not supported,
+	 *   display an error message and return false.
+	 *   
+	 * @return true if Java is supported. False otherwise.
+	 */
+	static public boolean isCorrectJavaVersion() {
+		String version = getJavaVersion();
+
+		System.out.println("java version: " + version);
+
+		boolean isCorrect = checkVersion(version);
+		if (!isCorrect) {
+			String message = "Error: Java " + 
+					System.getProperty("java.version") +
+					" is not supported.\nOnly Java 8 is supported.";
+
+			System.out.println(message);
+
+			JOptionPane.showMessageDialog(null, message);
+		}
+		return isCorrect;
+	}
+
+	//////////////////////////////////////////////////////////////
+	///
+	/// Private methods
+	///
+	//////////////////////////////////////////////////////////////
+	
+
+	static private boolean checkVersion(String version) {
+
+		if (version == null)
+			return false;
+
+		String verNumber[]  = version.split("\\.", 3);
+		String majorVersion = verNumber[0];
+
+		try {
+			Integer major = Integer.valueOf(majorVersion);
+			if (major == 1) {
+				Integer minor = Integer.valueOf(verNumber[1]);
+				return minor == JavaVersionSupported;
+			}
+			return major == JavaVersionSupported;
+		} catch (Exception e) {
+			System.err.println("Unknown java version: " + version);
+		}
+		return false;
+	}
+
 }
