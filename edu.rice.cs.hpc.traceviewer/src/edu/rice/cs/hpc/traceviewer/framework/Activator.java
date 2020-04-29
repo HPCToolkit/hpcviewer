@@ -5,6 +5,7 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import edu.rice.cs.hpc.data.util.Util;
 import edu.rice.cs.hpc.traceviewer.icon.IconManager;
 
 /**
@@ -22,6 +23,10 @@ public class Activator extends AbstractUIPlugin {
 	 * The constructor
 	 */
 	public Activator() {
+		if (!Util.isCorrectDisplay()) {
+			System.out.println("Error: Display is not properly set.\n");
+			System.exit(1);
+		}
 	}
 
 	/*

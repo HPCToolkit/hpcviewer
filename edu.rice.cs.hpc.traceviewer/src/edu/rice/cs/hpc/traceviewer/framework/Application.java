@@ -6,8 +6,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
-import edu.rice.cs.hpc.data.util.Util;
-
 /**
  * This class controls all aspects of the application's execution
  */
@@ -17,11 +15,6 @@ public class Application implements IApplication {
 	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
 	 */
 	public Object start(IApplicationContext context) {
-		
-		if (!Util.isCorrectDisplay()) {
-			System.out.println("Error: Display is not properly set.\n");
-			return IApplication.EXIT_OK;
-		}
 		
 		if (!edu.rice.cs.hpc.data.util.JavaValidator.isCorrectJavaVersion()) {
 			return IApplication.EXIT_OK;

@@ -27,10 +27,6 @@ public class HPCViewer implements IApplication
 	@Override
 	public Object start(IApplicationContext context) {
 		
-		if (!Util.isCorrectDisplay()) {
-			System.out.println("Error: Display is not properly set.\n");
-			return IApplication.EXIT_OK;
-		}
 		if (!edu.rice.cs.hpc.data.util.JavaValidator.isCorrectJavaVersion()) {
 			return IApplication.EXIT_OK;
 		}
