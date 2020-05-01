@@ -3,7 +3,8 @@
 <plugin>
 
    <extension
-         id="hpcviewer"
+         id="edu.rice.cs.hpcviewer.hpcviewer"
+         name="hpcviewer"
          point="org.eclipse.core.runtime.products">
       <product
             application="org.eclipse.e4.ui.workbench.swt.E4Application"
@@ -12,6 +13,14 @@
                name="appName"
                value="hpcviewer">
          </property>
+      </product>
+   </extension>
+   <extension
+         id="hpcviewer"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.e4.ui.workbench.swt.E4Application"
+            name="hpcviewer">
       </product>
    </extension>
 

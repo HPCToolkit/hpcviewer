@@ -72,39 +72,11 @@
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
-            application="edu.rice.cs.hpc.viewer.application"
+            application="org.eclipse.e4.ui.workbench.swt.E4Application"
             name="hpcviewer">
          <property
                name="appName"
                value="hpcviewer">
-         </property>
-         <property
-               name="startupProgressRect"
-               value="0,275,445,15">
-         </property>
-         <property
-               name="aboutImage"
-               value="icons/hpcviewerEclipseShadow128.png">
-         </property>
-         <property
-               name="aboutText"
-               value="hpcviewer is a user interface for analyzing a database of performance metrics in conjunction with an application&apos;s source code.&#x0A;&#x0A;hpcviewer is part of Rice University&apos;s HPCToolkit project. Development of HPCToolkit is principally funded by the Department of Energy&apos;s Office of Science, Lawrence Livermore National Laboratory and National Science Foundation.&#x0A;&#x0A;Release 2020.05  (C) Copyright 2020, Rice University.">
-         </property>
-         <property
-               name="windowImages"
-               value="icons/hpcviewerEclipse16.gif,icons/hpcviewerEclipse32.gif,icons/hpcviewerEclipse48.gif,icons/hpcviewerEclipse64.gif,icons/hpcviewerEclipse128.gif">
-         </property>
-         <property
-               name="startupForegroundColor"
-               value="000000">
-         </property>
-         <property
-               name="startupMessageRect"
-               value="7,252,445,20">
-         </property>
-         <property
-               name="preferenceCustomization"
-               value="plugin_customization.ini">
          </property>
       </product>
    </extension>
