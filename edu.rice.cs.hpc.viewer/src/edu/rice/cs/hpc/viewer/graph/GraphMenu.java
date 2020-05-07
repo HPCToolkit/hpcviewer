@@ -14,6 +14,8 @@ import org.eclipse.ui.PartInitException;
 import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.extdata.IThreadDataCollection;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
+import edu.rice.cs.hpc.data.experiment.metric.MetricValue;
+import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.experiment.scope.Scope;
 import edu.rice.cs.hpc.viewer.editor.BaseEditorManager;
 import edu.rice.cs.hpc.viewer.window.Database;
@@ -42,6 +44,18 @@ public class GraphMenu
 			
 			final int num_metrics = metrics.length;
 			for (int i=0; i<num_metrics; i++) {
+				
+				// do not display empty metric 
+				// this is important to keep consistency with the table
+				// which doesn't display empty metrics
+				
+				RootScope root = scope.getRootScope();
+				MetricValue mv = root.getMetricValue(metrics[i]);
+				if (mv == MetricValue.NONE)
+					continue;
+				
+				// display the menu
+				
 				MenuManager subMenu = new MenuManager("Graph "+ metrics[i].getDisplayName() );
 				createGraphMenus(window, database, subMenu, scope, metrics[i]);
 				mgr.add(subMenu);
