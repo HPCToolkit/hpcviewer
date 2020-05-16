@@ -32,8 +32,10 @@ public class CallerScopeView extends DynamicScopeView {
 	 */
 	@Override
 	protected ScopeViewActions createActions(Composite parent, CoolBar coolbar) {
+		
+		setTitleToolTip("The view to show a procedure's costs to its callers and its calling contexts");
+		
     	final IWorkbenchWindow window = this.getSite().getWorkbenchWindow();
-    	
         return new BaseScopeViewActions(this.getViewSite().getShell(), window, parent, coolbar); 
 	}
 

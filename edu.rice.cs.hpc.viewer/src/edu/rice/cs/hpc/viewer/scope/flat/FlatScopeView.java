@@ -29,6 +29,9 @@ public class FlatScopeView extends DynamicScopeView {
     
         
     protected ScopeViewActions createActions(Composite parent, CoolBar coolbar) {
+    	
+    	setTitleToolTip("The view to show the performance data according to the code structure of an application");
+    	
     	IWorkbenchWindow window = this.getSite().getWorkbenchWindow();
         return new FlatScopeViewActions(this.getViewSite().getShell(), window, parent, coolbar); 
     }

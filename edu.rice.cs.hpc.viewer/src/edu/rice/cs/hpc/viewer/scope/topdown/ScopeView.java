@@ -39,6 +39,9 @@ public class ScopeView extends BaseScopeView
     
 	@Override
     protected ScopeViewActions createActions(Composite parent, CoolBar coolbar) {
+		
+		setTitleToolTip("The view to show the dynamic calling contexts (call paths) in which costs were incurred");
+		
     	IWorkbenchWindow window = this.getSite().getWorkbenchWindow();
     	ScopeViewActions action = new CallingContextViewActions(this.getViewSite().getShell(), window, parent, coolbar);
     	
