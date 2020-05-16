@@ -65,6 +65,9 @@ public class HPCDepthView extends AbstractTimeView
 		
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(plotArea);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(plotArea);
+		
+		setTitleToolTip("The view to show for a given process, its virtual time along the horizontal axis, and a call path" +
+				" along the vertical axis, where `main' is at the top and leaves (samples) are at the bottom.");
 	}
 	
 	private void setListener() {

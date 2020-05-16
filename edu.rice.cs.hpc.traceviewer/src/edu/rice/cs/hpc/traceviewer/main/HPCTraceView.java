@@ -137,6 +137,8 @@ implements ITraceViewAction
 		GridLayoutFactory.fillDefaults().numColumns(1).generateLayout(master);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(master);
 
+		setTitleToolTip("The view to show traces with time on the horizontal axis and process (or thread) rank on the vertical axis; time moves from left to right");
+		
 		//--------------------------------------
 		// memory checking
 		//--------------------------------------

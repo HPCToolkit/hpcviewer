@@ -167,6 +167,8 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 		 ************************************************************************/
 		csViewer = new CallStackViewer(master, this);
 		
+		setTitleToolTip("The view to show the depth and the actual call path for the point selected by the Trace View's crosshair");
+		
 		/*************************************************************************
 		 * MiniMap
 		 ************************************************************************/
@@ -181,6 +183,9 @@ public class HPCCallStackView extends ViewPart implements ISizeProvider
 		miniCanvas.setLayoutData(miniCanvasData);
 		
 		miniCanvas.setVisible(false);
+		
+		miniCanvas.setToolTipText("The view to show the portion of the execution shown by the Trace View," +
+								  "relative to process/time dimensions");
 	}
 	
 	private void setListener() {

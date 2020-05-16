@@ -64,6 +64,8 @@ public class HPCSummaryView extends AbstractDynamicView
 		
 		setListener();
 		super.addListener();
+		
+		setTitleToolTip("The view to show for the whole time range dislayed, the proportion of each subroutine in a certain time.");
 	}
 	
 	private void setListener() {
