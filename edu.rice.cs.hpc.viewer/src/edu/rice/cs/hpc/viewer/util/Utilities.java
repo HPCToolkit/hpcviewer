@@ -65,7 +65,7 @@ public class Utilities
 	// list of available fixed fonts.
 	// the order is important: if the font in first element is available, then we'll use this one.
 	
-	static public final String []LIST_METRIC_FONTS = { "Monospaced", "Courier", "Courier New"};
+	static public final String []LIST_METRIC_FONTS = { "Courier", "Monospaced", "Courier New"};
 	
 	//special font for the metric columns. It supposed to be fixed font
 	static public Font fontMetric;

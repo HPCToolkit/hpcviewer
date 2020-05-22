@@ -20,6 +20,7 @@ import edu.rice.cs.hpc.data.experiment.extdata.IThreadDataCollection;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
 import edu.rice.cs.hpc.data.experiment.metric.IMetricManager;
 import edu.rice.cs.hpc.data.experiment.metric.MetricRaw;
+import edu.rice.cs.hpc.data.experiment.metric.MetricType;
 import edu.rice.cs.hpc.data.experiment.metric.MetricValue;
 import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.experiment.scope.RootScopeType;
@@ -275,10 +276,12 @@ public class ThreadView extends AbstractBaseScopeView
 					mdup.setShortName(metricID);
 					listOfDuplicates.put(mr[j].getIndex(), mdup);
 					
-					MetricValue value = mdup.getValue(myRootScope);
-					if (value == MetricValue.NONE || value.getValue() == 0.0)
-						continue;
-					
+/*					if (mdup.getMetricType() == MetricType.INCLUSIVE) {
+						MetricValue value = mdup.getValue(myRootScope);
+						if (value == MetricValue.NONE || value.getValue() == 0.0)
+							continue;
+					}
+*/					
 					treeViewer.addTreeColumn(mdup, sort);
 					
 					// sort initially the first column metric
