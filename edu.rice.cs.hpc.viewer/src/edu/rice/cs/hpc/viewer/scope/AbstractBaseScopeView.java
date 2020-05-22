@@ -35,6 +35,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -68,7 +69,7 @@ import edu.rice.cs.hpc.viewer.window.Database;
  */
 abstract public class AbstractBaseScopeView  extends ViewPart 
 {	
-	final int TREE_COLUMN_WIDTH  = 200;
+	final int TREE_COLUMN_WIDTH  = 300;
 	final int TREE_COLUMN_WEIGHT = 40; 
 	
 	protected ScopeTreeViewer 	 treeViewer;		// tree for the caller and callees
@@ -487,10 +488,11 @@ abstract public class AbstractBaseScopeView  extends ViewPart
         
         Tree tree = treeViewer.getTree();
         TreeColumnLayout treeLayout = (TreeColumnLayout) tree.getParent().getLayout();
+        treeLayout.setColumnData(colTree.getColumn(), new ColumnPixelData(TREE_COLUMN_WIDTH));
     			
-		treeLayout.setColumnData(colTree.getColumn(), 
+/*		treeLayout.setColumnData(colTree.getColumn(), 
 						new ColumnWeightData(TREE_COLUMN_WIDTH, TREE_COLUMN_WIDTH, true));
-
+*/
 		return colTree;
     }
 
