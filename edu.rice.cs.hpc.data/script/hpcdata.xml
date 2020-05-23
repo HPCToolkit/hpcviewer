@@ -4,12 +4,23 @@
 	    compile     - compiles java source
 	    jar         - build hpcviewer.jar (depends on compile)
 	    buildviewer - (default) does all targets
+	    
+	This script requires com.graphbuilder plugin, which can be dowloaded at
+	  github.com/hpctoolkit/hpcviewer-externals
+	
+	Please specify the property "externals" to get the directory of com.graph.builder
+	Example:
+	   $ ant -Dexternals=../hpcviewer-externals/  -buildfile hpcdata.xml
+	   
+	   this command will use ../hpcviewer-externals/ directory to find
+	   the source code of com.graph.builder.
 	-->	
 	<property name="classbase" location="edu/rice/cs/hpc/data"/>
+	<property name="externals" location="../externals"/>
 
   	<target name="compile" >
 	    <mkdir dir="bin" />
-    	<javac srcdir="../src/edu/rice/cs/hpc/data;../externals/com/graphbuilder" 
+    	<javac srcdir="../src/edu/rice/cs/hpc/data;${externals}/com.graphbuilder" 
            	   destdir="bin" >
 			<classpath>
 				<fileset dir="../external-jars" includes="**/*.jar" />
@@ -23,7 +34,7 @@
        	     <fileset dir="bin" includes="**/*.class" />
              <manifest>
                 <attribute name="Main-Class" value="edu.rice.cs.hpc.data.framework.Application"/>
-                <attribute name="Class-Path" value="lib/org.apache.xerces_2.9.0.v201005080400.jar"/>
+                <attribute name="Class-Path" value="external-jars/org.apache.xerces_2.9.0.v201005080400.jar"/>
              </manifest>
         </jar>
   		<delete dir="bin" />
