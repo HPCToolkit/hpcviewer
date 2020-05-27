@@ -96,6 +96,8 @@ public class BaseExperimentBuilder extends Builder {
 
 	private int current_cs_id = Integer.MAX_VALUE - 1;
 
+	private boolean removeInvisibleProcedure = false;
+	
 	//=============================================================
 	
 	/*************************************************************************
@@ -663,15 +665,12 @@ public class BaseExperimentBuilder extends Builder {
 			 
 			srcFile.setIsText(istext);
 			this.srcFileStack.add(srcFile);
-
-			boolean falseProcedure = false;
 			
+			int feature = 0;
 			Integer statusProc = statusProcedureMap.get(flat_id);
 			if (statusProc != null) {
-				if (statusProc.intValue() == 1) {
-					falseProcedure = true;
-					
-				} else if (statusProc.intValue() == 2) {
+				feature = statusProc.intValue();
+				if (feature == ProcedureScope.FeatureRoot) {
 					RootScope datacentricRoot = new RootScope(experiment, procAttribute, RootScopeType.DatacentricTree);
 					// push the new scope to the stack
 					scopeStack.push(datacentricRoot);
@@ -679,16 +678,13 @@ public class BaseExperimentBuilder extends Builder {
 
 					experiment.setDatacentricRootScope(datacentricRoot);
 					return;
-					
-				} else {
-					throw new RuntimeException(cct_id + ": Procedure status invalid: " + statusProc);
 				}
 			}
 							
 			
 			ProcedureScope procScope  = new ProcedureScope(rootStack.peek(), objLoadModule, srcFile, 
 					firstLn-1, lastLn-1, 
-					procAttribute, isalien, cct_id, flat_id, userData, falseProcedure);
+					procAttribute, isalien, cct_id, flat_id, userData, feature);
 
 			if ( (this.scopeStack.size()>1) && ( this.scopeStack.peek() instanceof LineScope)  ) {
 
@@ -1196,14 +1192,40 @@ public class BaseExperimentBuilder extends Builder {
 //  ------------------------------------------------------------------- //
 	
 	/*************************************************************************
+	 * Add child node to the parent.
+	 * We'll verify if the child should be invisible or not. If the child is
+	 *  invisible and we need to remove invisible node, we shouldn't add the 
+	 *  child to the parent
+	 *  
+	 * @param parent
+	 * @param child
+	 *************************************************************************/
+	private void addChildToParent(Scope parent, Scope child) {
+
+		if (removeInvisibleProcedure()) {
+			if (child instanceof ProcedureScope) {
+				if (((ProcedureScope)child).isInvisible()) {
+					// don't add to the tree if the scope has to be invisible
+					return;
+				}
+			}
+		}
+		parent.addSubscope(child);
+		child.setParent(parent);
+	}
+	
+	/*************************************************************************
 	 *	Adds a newly parsed scope to the scope tree.
 	 ************************************************************************/
 	private void beginScope(Scope scope)
 	{
-		// add to the tree
+		// add to the tree if the scope is visible
+		// if the scope is not visible, we don't add to the parent, and 
+		//   thus make it disappear from the tree.
+		
 		Scope top = getCurrentScope();
-		top.addSubscope(scope);
-		scope.setParentScope(top);
+		
+		addChildToParent(top, scope);
 		
 		// push the new scope to the stack
 		scopeStack.push(scope);
@@ -1353,7 +1375,24 @@ public class BaseExperimentBuilder extends Builder {
 		return sProcName;
 	}
 	
+	/**
+	 * Return true if we need to remove invisible procedures from the tree
+	 * 
+	 * @return
+	 */
+	private boolean removeInvisibleProcedure() {
+		return this.removeInvisibleProcedure;
+	}
 	
+	/**
+	 * set true to remove invisible procedures (like <no activity)
+	 * 
+	 * @param tobeRemoved boolean true if they are to be removed. 
+	 *   False otherwise.
+	 */
+	public void setRemoveInvisibleProcedure(boolean tobeRemoved) {
+		this.removeInvisibleProcedure = tobeRemoved;
+	}
 	
 	/*************************************************************************
 	 * Class to treat a string of line or range of lines into two lines: first line and last line 

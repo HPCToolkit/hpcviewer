@@ -58,6 +58,8 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 		
 		numberOfPrimaryMetrics = 0;
 		listOfDerivedMetrics   = new ArrayList<DerivedMetric>(2);
+		
+		setRemoveInvisibleProcedure(true);
 	}
 
 
@@ -589,8 +591,6 @@ public class ExperimentBuilder2 extends BaseExperimentBuilder
 						iState = InfoState.FLAG;
 					else if ( values[i].charAt(0) == 'a' || values[i].charAt(0) == 'c') // aggregate
 						iState = InfoState.AGGREGATE;
-					else
-						throw new RuntimeException("Unrecognize name info tag: "+values[i]);
 					
 				} else if ( attributes[i].charAt(0) == 'v' ) {
 					

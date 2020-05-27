@@ -35,6 +35,10 @@ import edu.rice.cs.hpc.data.util.IUserData;
 
 public class ProcedureScope extends Scope  implements IMergedScope 
 {
+	final static public int FeaturePlaceHolder = 1;
+	final static public int FeatureRoot 	   = 2;
+	final static public int FeatureInvisible   = 3;
+	
 	final static public String INLINE_NOTATION = "[I] ";
 
 	private static final String TheProcedureWhoShouldNotBeNamed = "-";
@@ -52,7 +56,8 @@ public class ProcedureScope extends Scope  implements IMergedScope
 		VariableAccess
 	}
 
-	final private boolean isFalseProcedure;
+	
+	final private int procedureFeature;
 	
 	private ProcedureType type;
 
@@ -81,7 +86,7 @@ public class ProcedureScope extends Scope  implements IMergedScope
 	
 public ProcedureScope(RootScope root, SourceFile file, int first, int last, 
 		String proc, boolean _isalien, int cct_id, int flat_id, 
-		IUserData<String,String> userData, boolean isFalseProcedure)
+		IUserData<String,String> userData, int procedureFeature)
 {
 	super(root, file, first, last, cct_id, flat_id);
 	this.isalien = _isalien;
@@ -102,7 +107,7 @@ public ProcedureScope(RootScope root, SourceFile file, int first, int last,
 	}
 
 	this.objLoadModule 	  = null;
-	this.isFalseProcedure = isFalseProcedure;
+	this.procedureFeature = procedureFeature;
 }
 
 
@@ -118,9 +123,9 @@ public ProcedureScope(RootScope root, SourceFile file, int first, int last,
  */
 public ProcedureScope(RootScope root, LoadModuleScope loadModule, SourceFile file, 
 		int first, int last, String proc, boolean _isalien, int cct_id, int flat_id, 
-		IUserData<String,String> userData, boolean isFalseProcedure)
+		IUserData<String,String> userData, int procedureFeature)
 {
-	this(root, file, first, last,proc,_isalien, cct_id, flat_id, userData, isFalseProcedure);
+	this(root, file, first, last,proc,_isalien, cct_id, flat_id, userData, procedureFeature);
 	//this.iScopeID = sid;
 	this.objLoadModule = loadModule;
 }
@@ -176,7 +181,7 @@ public Scope duplicate() {
 			getCCTIndex(), // Laks 2008.08.26: add the sequence ID
 			this.flat_node_index,
 			null,
-			this.isFalseProcedure);
+			this.procedureFeature);
 
 	ps.setProcedureType(type);
 	
@@ -216,7 +221,12 @@ public Object[] getAllChildren(/*AbstractFinalizeMetricVisitor finalizeVisitor, 
 
 public boolean isFalseProcedure()
 {
-	return isFalseProcedure;
+	return procedureFeature != 0;
+}
+
+public boolean isInvisible() 
+{
+	return procedureFeature == FeatureInvisible;
 }
 
 public void setProcedureType(ProcedureType type) {
