@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
+import edu.rice.cs.hpc.data.experiment.metric.BaseMetric.VisibilityType;
 import edu.rice.cs.hpc.data.experiment.metric.DerivedMetric;
 import edu.rice.cs.hpc.data.experiment.metric.IMetricManager;
 
@@ -54,9 +55,23 @@ implements IMetricManager
 	 */
 	public BaseMetric[] getMetrics()
 	{
-		return 	this.metrics.toArray(new BaseMetric[0]);
+		return 	metrics.toArray(new BaseMetric[metrics.size()]);
 	}
 
+	
+	public List<BaseMetric> getVisibleMetrics() 
+	{
+		ArrayList<BaseMetric> listMetrics = new ArrayList<>(metrics.size());
+		
+		for(BaseMetric metric : metrics) {
+			if (metric.getVisibility() != VisibilityType.INVISIBLE) {
+				listMetrics.add(metric);
+			}
+		}
+		return listMetrics;
+	}
+
+	
 	/*************************************************************************
 	 *	Returns the number of metrics in the experiment.
 	 ************************************************************************/

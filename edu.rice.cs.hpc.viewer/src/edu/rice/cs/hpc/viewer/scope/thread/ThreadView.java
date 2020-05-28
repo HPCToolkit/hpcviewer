@@ -84,7 +84,7 @@ public class ThreadView extends AbstractBaseScopeView
     	 * 
     	 */
 
-		BaseMetric []metrics = getMetricManager().getMetrics();
+		List<BaseMetric > metrics = getMetricManager().getVisibleMetrics();
 		
 		// 1. check if the threads already exist in the view
 		boolean col_exist = false;

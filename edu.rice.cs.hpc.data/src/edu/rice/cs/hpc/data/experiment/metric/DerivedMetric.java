@@ -66,18 +66,13 @@ public class DerivedMetric extends BaseMetric {
 		// set up the functions
 		this.fctMap = new ExtFuncMap();
 		this.root 	= root;		
-		BaseMetric []metrics = experiment.getMetrics(); 
-		this.fctMap.init(metrics);
+		this.fctMap.init();
 
 		// set up the variables
 		this.varMap = new MetricVarMap(root, experiment);
 		this.varMap.setMetric(this);
 		
 		setExpression(expression);
-
-		// Bug fix: always compute the aggregate value 
-		/*if(Double.compare(dRootValue, 0.0d) == 0)
-			this.annotationType = AnnotationType.NONE ;*/
 	}
 	
 	
@@ -214,7 +209,7 @@ public class DerivedMetric extends BaseMetric {
 		varMap = new MetricVarMap(root, experiment);
 		varMap.setMetric(this);
 		
-		fctMap.init(experiment.getMetrics());
+		fctMap.init();
 		
 		rootValue = null; //setRootValue(root);
 	}

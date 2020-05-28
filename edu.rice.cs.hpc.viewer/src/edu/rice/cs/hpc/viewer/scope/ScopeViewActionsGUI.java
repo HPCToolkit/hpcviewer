@@ -373,8 +373,8 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 		// here we try to correspond between metrics to show and the columns
 		
 		IMetricManager metricMgr = objViewActions.getMetricManager();
-		BaseMetric []metrics = metricMgr.getMetrics();
-		int numMetrics = metrics.length;
+		List<BaseMetric> metrics = metricMgr.getVisibleMetrics();
+		int numMetrics = metrics.size();
 		
 		for (TreeColumn column: columns) {
 
@@ -383,9 +383,9 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 				continue; // not a metric column
 			
 			int i=0;			
-			for (i=0; i<numMetrics && !metrics[i].equalIndex((BaseMetric)metric); i++);
+			for (i=0; i<numMetrics && !metrics.get(i).equalIndex((BaseMetric)metric); i++);
 			
-			if (i<numMetrics && metrics[i].equalIndex((BaseMetric) metric)) {
+			if (i<numMetrics && metrics.get(i).equalIndex((BaseMetric) metric)) {
 				toShow[numColumn] = status[i];
 				numColumn++;
 			}

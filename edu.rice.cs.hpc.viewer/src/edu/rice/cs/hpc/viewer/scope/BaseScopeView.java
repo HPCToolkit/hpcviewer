@@ -1,5 +1,6 @@
 package edu.rice.cs.hpc.viewer.scope;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.TreeViewerColumn;
@@ -260,8 +261,9 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
 	 */
 	private void addMetricColumnsToTable(Tree tree, boolean keepColumnStatus) 
 	{
-        final Experiment myExperiment = database.getExperiment();
-        final int numMetric			  = myExperiment.getMetricCount();
+        final Experiment myExperiment  = database.getExperiment();
+        final List<BaseMetric> metrics = myExperiment.getVisibleMetrics();
+        final int numMetric			   = metrics.size();
 
         int iColCount = tree.getColumnCount();
         
@@ -279,7 +281,7 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         if (!keepColumnStatus) {
         	int i=0;
 
-        	for(BaseMetric metric: myExperiment.getMetrics()) {
+        	for(BaseMetric metric: metrics) {
             	
             	// empty metric: if the root scope has no metric value
         		MetricValue mv = metric.getValue(myRootScope);
@@ -292,7 +294,7 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         	
         	TreeColumn []columns = tree.getColumns();
         	int i=0;
-        	for(BaseMetric metric: myExperiment.getMetrics()) {
+        	for(BaseMetric metric: metrics) {
         		MetricValue mv = metric.getValue(myRootScope);
         		empty[i]  = mv == MetricValue.NONE; //myRootScope.getMetricValue(metric) == MetricValue.NONE;
         		
@@ -327,7 +329,7 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
         // add table column for each metric
     	for (int i=0; i<numMetric; i++)
     	{
-    		final BaseMetric metric = myExperiment.getMetric(i);
+    		final BaseMetric metric = metrics.get(i);
     		if (metric != null  && !metric.isInvisible()) {
         		
                 boolean toBeSorted = false;

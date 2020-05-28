@@ -6,6 +6,7 @@ package edu.rice.cs.hpc.viewer.metric;
 import java.util.Formatter;
 import java.util.FormatterClosedException;
 import java.util.IllegalFormatException;
+import java.util.List;
 
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -102,8 +103,8 @@ public class ExtDerivedMetricDlg extends TitleAreaDialog {
 		super(parent);
 		metricManager = mm;
 		this.root  = root;
-		this.setMetrics(mm.getMetrics());
-		this.fctMap = new ExtFuncMap(mm.getMetrics());
+		this.setMetrics(mm.getVisibleMetrics());
+		this.fctMap = new ExtFuncMap();
 		this.varMap = new MetricVarMap ( root, s, mm );
 	}
 	
@@ -528,7 +529,7 @@ public class ExtDerivedMetricDlg extends TitleAreaDialog {
 
 			  metric = new DerivedMetric(root, metricManager, expFormula, 
 					  cbName.getText(), metricLastID, metricManager.getMetricCount(), 
-					  annType, MetricType.INCLUSIVE);
+					  annType, MetricType.UNKNOWN);
 			  
 		  } else {
 			  // update the existing metric
@@ -567,11 +568,11 @@ public class ExtDerivedMetricDlg extends TitleAreaDialog {
 	   * 
 	   * @param listOfMetrics
 	   */
-	  private void setMetrics(BaseMetric []listOfMetrics) {
-		  int nbMetrics = listOfMetrics.length;
+	  private void setMetrics(List<BaseMetric> listOfMetrics) {
+		  int nbMetrics = listOfMetrics.size();
 		  this.arrStrMetrics = new String[nbMetrics];
 		  for(int i=0;i<nbMetrics;i++) {
-			  BaseMetric metric = listOfMetrics[i];
+			  BaseMetric metric = listOfMetrics.get(i);
 			  // laksono 2009.12.15: we need to use the shortname instead of the index
 			  this.arrStrMetrics[i] = metric.getShortName() + ": "+ metric.getDisplayName();
 		  }
