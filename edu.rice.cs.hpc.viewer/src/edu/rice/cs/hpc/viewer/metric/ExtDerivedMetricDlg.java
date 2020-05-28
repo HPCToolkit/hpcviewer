@@ -529,7 +529,7 @@ public class ExtDerivedMetricDlg extends TitleAreaDialog {
 
 			  metric = new DerivedMetric(root, metricManager, expFormula, 
 					  cbName.getText(), metricLastID, metricManager.getMetricCount(), 
-					  annType, MetricType.INCLUSIVE);
+					  annType, MetricType.UNKNOWN);
 			  
 		  } else {
 			  // update the existing metric

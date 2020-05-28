@@ -16,6 +16,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
 import edu.rice.cs.hpc.data.experiment.metric.DerivedMetric;
+import edu.rice.cs.hpc.data.experiment.metric.MetricType;
 import edu.rice.cs.hpc.filter.service.FilterMap;
 import edu.rice.cs.hpc.filter.service.FilterStateProvider;
 import edu.rice.cs.hpc.viewer.actions.DebugShowCCT;
@@ -113,7 +114,12 @@ public class ViewerWindow
 					// ---------------------------------------
 					ArrayList<DerivedMetric> metrics = new ArrayList<DerivedMetric>(1);
 					for (BaseMetric metric : experiment.getMetrics()) {
-						if (metric instanceof DerivedMetric) {
+						if (metric instanceof DerivedMetric && 
+							metric.getMetricType()==MetricType.UNKNOWN) {
+							
+							// only add user derived metrics, not all derived metrics
+							//  provided by hpcprof
+							
 							metrics.add((DerivedMetric) metric);
 						}
 					}

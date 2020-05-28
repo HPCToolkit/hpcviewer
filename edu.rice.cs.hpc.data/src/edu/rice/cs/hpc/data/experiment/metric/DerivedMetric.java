@@ -73,10 +73,6 @@ public class DerivedMetric extends BaseMetric {
 		this.varMap.setMetric(this);
 		
 		setExpression(expression);
-
-		// Bug fix: always compute the aggregate value 
-		/*if(Double.compare(dRootValue, 0.0d) == 0)
-			this.annotationType = AnnotationType.NONE ;*/
 	}
 	
 	
