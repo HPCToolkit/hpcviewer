@@ -1204,8 +1204,13 @@ public class BaseExperimentBuilder extends Builder {
 
 		if (removeInvisibleProcedure()) {
 			if (child instanceof ProcedureScope) {
-				if (((ProcedureScope)child).isInvisible()) {
+				if (((ProcedureScope)child).toBeElided()) {
 					// don't add to the tree if the scope has to be invisible
+					return;
+				}
+			} else if (child instanceof CallSiteScope) {
+				ProcedureScope proc = ((CallSiteScope) child).getProcedureScope();
+				if (proc.toBeElided()) {
 					return;
 				}
 			}

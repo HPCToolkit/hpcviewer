@@ -37,7 +37,7 @@ public class ProcedureScope extends Scope  implements IMergedScope
 {
 	final static public int FeaturePlaceHolder = 1;
 	final static public int FeatureRoot 	   = 2;
-	final static public int FeatureInvisible   = 3;
+	final static public int FeatureElided      = 3;
 	
 	final static public String INLINE_NOTATION = "[I] ";
 
@@ -224,9 +224,9 @@ public boolean isFalseProcedure()
 	return procedureFeature != 0;
 }
 
-public boolean isInvisible() 
+public boolean toBeElided() 
 {
-	return procedureFeature == FeatureInvisible;
+	return procedureFeature == FeatureElided;
 }
 
 public void setProcedureType(ProcedureType type) {

@@ -330,13 +330,12 @@ public class MetricPropertyDialog extends TitleAreaDialog
 		
 		final ArrayList<PropertiesModel> arrElements = new ArrayList<PropertiesModel>();
 		
-		for(BaseMetric metric: exp.getMetrics()) {
+		for(BaseMetric metric: exp.getVisibleMetrics()) {
 			
 			// we don't want to show empty metric (if exist) and 
 			// metric with invisible type
 			
-			if (metric != null && 
-				metric.getVisibility() != BaseMetric.VisibilityType.INVISIBLE) {
+			if (metric != null) {
 
 				String sTitle = metric.getDisplayName();
 				

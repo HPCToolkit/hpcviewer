@@ -10,15 +10,8 @@ import com.graphbuilder.math.func.Function;
  * @author laksonoadhianto
  *
  */
-public class ExtFuncMap extends FuncMap {
-
-	/**
-	 * 
-	 */
-	public ExtFuncMap() {
-		// TODO Auto-generated constructor stub
-		super(false);
-	}
+public class ExtFuncMap extends FuncMap 
+{
 
 	/**
 	 * @param caseSensitive
@@ -32,12 +25,12 @@ public class ExtFuncMap extends FuncMap {
 	 * @param metrics: list of metrics
 	 * @param rootscope: a root scope (any root scope will do)
 	 */
-	public ExtFuncMap(BaseMetric []metrics) {
+	public ExtFuncMap() {
 		super(false);
-		this.init(metrics);
+		this.init();
 	}
 
-	public void init(BaseMetric []metrics) {
+	public void init() {
 
 		StdDevFunction fctStdDev = new StdDevFunction();
 
