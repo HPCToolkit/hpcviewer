@@ -397,12 +397,6 @@ public abstract class ScopeViewActions /*extends ScopeActions /* implements IToo
 		}
 	}
 
-	/**
-	 * Resize the columns
-	 */
-	public void resizeColumns() {
-		this.objActionsGUI.resizeTableColumns();
-	}
 
 
 	/**

@@ -100,12 +100,6 @@ public interface IScopeActionsGUI {
 
 	public void restoreParentNode();
 
-    
-	/**
-	 * Resize the columns automatically
-	 * ATT: Please call this method once the data has been populated
-	 */
-	public void resizeTableColumns();
 	
 	public void setColumnsStatus(boolean []status);	
 	

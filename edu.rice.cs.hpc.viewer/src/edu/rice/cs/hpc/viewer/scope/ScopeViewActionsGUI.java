@@ -211,21 +211,6 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
     	}
     }
 	
-	/**
-	 * Resize the columns automatically
-	 * ATT: Please call this method once the data has been populated
-	 */
-	public void resizeTableColumns() {
-        // resize the column according to the data size
-		TreeColumn []columns = treeViewer.getTree().getColumns(); 
-		int nbCols = columns.length;
-        for (int i=1; i<nbCols; i++) {
-        	TreeColumn column = columns[i];
-        	// do NOT resize if the column is hidden
-        	if(column.getWidth()>1)
-        		column.pack();
-        }
-	}
 
 	//======================================================
     // ................ GUI and LAYOUT ....................
