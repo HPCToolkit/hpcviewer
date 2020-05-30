@@ -35,6 +35,7 @@ import edu.rice.cs.hpc.data.util.IUserData;
 
 public class ProcedureScope extends Scope  implements IMergedScope 
 {
+	final static public int FeatureProcedure   = 0;
 	final static public int FeaturePlaceHolder = 1;
 	final static public int FeatureRoot 	   = 2;
 	final static public int FeatureElided      = 3;
@@ -221,7 +222,7 @@ public Object[] getAllChildren(/*AbstractFinalizeMetricVisitor finalizeVisitor, 
 
 public boolean isFalseProcedure()
 {
-	return procedureFeature != 0;
+	return procedureFeature != FeatureProcedure;
 }
 
 public boolean toBeElided() 

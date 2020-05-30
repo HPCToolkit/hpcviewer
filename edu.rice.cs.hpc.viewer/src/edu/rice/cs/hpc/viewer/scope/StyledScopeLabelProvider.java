@@ -159,27 +159,39 @@ public class StyledScopeLabelProvider extends DelegatingStyledCellLabelProvider
 			
 			// add the name of the load module if the node is not readable
 			// see issue #79: https://github.com/HPCToolkit/hpcviewer/issues/79
-			
-			if (node instanceof CallSiteScope || 
-					(node instanceof ProcedureScope && ((ProcedureScope)node).isAlien()) ) {
+
+			if (needToAddLoadModuleSuffix(node)) {
+				String lm = null;
 				
-				// if the file is not readable and it doesn't contain "[xxx]"
-				// we'll need to add the load module as a suffix
-				if(!Utilities.isFileReadable(node) && text.lastIndexOf(']')<0) {
-					String lm = null;
-					
-					if (node instanceof CallSiteScope) {
-						ProcedureScope ps = ((CallSiteScope)node).getProcedureScope();
-						lm = ps.getLoadModule().getModuleName();
-					} else {
-						lm = ((ProcedureScope) node).getLoadModule().getModuleName();
-					}
+				ProcedureScope proc = null;
+				
+				if (node instanceof CallSiteScope) {
+					proc = ((CallSiteScope)node).getProcedureScope();
+				} else {
+					proc = (ProcedureScope) node;
+				}
+				if (!proc.isFalseProcedure()) {
+					lm = proc.getLoadModule().getModuleName();
 					int lastDot = 1+lm.lastIndexOf('/');
 					
 					text += " [" + lm.substring(lastDot) + "]";
 				}
 			}
 			return text;
+		}
+		
+		private boolean needToAddLoadModuleSuffix(Scope node) {
+			if (node instanceof CallSiteScope || 
+			   (node instanceof ProcedureScope && ((ProcedureScope)node).isAlien())) {
+				
+				// we only add the load module suffix if:
+				// - the file is NOT readable; and
+				// - doesn't have load module suffix
+				
+				return (!Utilities.isFileReadable(node) && node.getName().lastIndexOf(']')<0);
+				
+			}
+			return false;
 		}
 	}
 }
