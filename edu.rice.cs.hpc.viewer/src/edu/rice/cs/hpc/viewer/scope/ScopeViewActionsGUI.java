@@ -278,17 +278,14 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
      */
     protected void showColumnsProperties() {
 
-    	TreeColumn []columns = treeViewer.getTree().getColumns();    	
-		BaseMetric []metrics = objViewActions.getMetricManager().getMetrics();
+    	TreeColumn []columns     = treeViewer.getTree().getColumns();    	
+		List<BaseMetric> metrics = objViewActions.getMetricManager().getVisibleMetrics();
 		if (metrics == null)
 			return;
 		
-		List<FilterDataItem> arrayOfItems = new ArrayList<FilterDataItem>(metrics.length);
-		int i= 0;
+		List<FilterDataItem> arrayOfItems = new ArrayList<FilterDataItem>(metrics.size());
 		
 		for(BaseMetric metric: metrics) {
-			
-			if (metric.isInvisible()) continue;
 			
 			FilterDataItem item = new FilterDataItem(metric.getDisplayName(), false, false);
 			
@@ -311,7 +308,6 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
 				}
 			}
 			arrayOfItems.add(item);
-			i++;
 		}
 				
     	MetricColumnDialog dialog = new MetricColumnDialog(shell, arrayOfItems);
@@ -321,7 +317,7 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
     		arrayOfItems = dialog.getResult();
     		
     		boolean []checked = new boolean[arrayOfItems.size()];
-    		i = 0;
+    		int i = 0;
     		for (FilterDataItem item : arrayOfItems) {
 				checked[i] = item.checked && item.enabled;
 				i++;
