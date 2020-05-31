@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
-import edu.rice.cs.hpc.data.experiment.metric.BaseMetric.VisibilityType;
 import edu.rice.cs.hpc.data.experiment.metric.DerivedMetric;
 import edu.rice.cs.hpc.data.experiment.metric.IMetricManager;
+import edu.rice.cs.hpc.data.experiment.metric.MetricType;
 
 
 /****************************************************************************
@@ -59,13 +59,37 @@ implements IMetricManager
 	}
 
 	
+	/*****
+	 * Return the list of "visible" metrics. <br/>
+	 * Note: visible doesn't mean "SHOW". 
+	 * Visible here means that the metrics can be displayed on metric property window
+	 * or on list of metrics. 
+	 * Perhaps we should change the term to be "displayable" metrics.
+	 */
 	public List<BaseMetric> getVisibleMetrics() 
 	{
 		ArrayList<BaseMetric> listMetrics = new ArrayList<>(metrics.size());
 		
 		for(BaseMetric metric : metrics) {
-			if (metric.getVisibility() != VisibilityType.INVISIBLE) {
+			switch (metric.getVisibility()) {
+			
+			case SHOW:
+			case HIDE:
 				listMetrics.add(metric);
+				break;
+				
+			case SHOW_INCLUSIVE:
+				if (metric.getMetricType() == MetricType.INCLUSIVE)
+					listMetrics.add(metric);
+				break;
+				
+			case SHOW_EXCLUSIVE:
+				if (metric.getMetricType() == MetricType.EXCLUSIVE)
+					listMetrics.add(metric);
+				break;
+			
+			default:
+				break;
 			}
 		}
 		return listMetrics;

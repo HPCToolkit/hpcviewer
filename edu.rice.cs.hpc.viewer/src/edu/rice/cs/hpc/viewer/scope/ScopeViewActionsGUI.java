@@ -294,11 +294,11 @@ public class ScopeViewActionsGUI implements IScopeActionsGUI {
     protected void showColumnsProperties() {
 
     	TreeColumn []columns = treeViewer.getTree().getColumns();    	
-		BaseMetric []metrics = objViewActions.getMetricManager().getMetrics();
+		List<BaseMetric> metrics = objViewActions.getMetricManager().getVisibleMetrics();
 		if (metrics == null)
 			return;
 		
-		List<FilterDataItem> arrayOfItems = new ArrayList<FilterDataItem>(metrics.length);
+		List<FilterDataItem> arrayOfItems = new ArrayList<FilterDataItem>(metrics.size());
 		int i= 0;
 		
 		for(BaseMetric metric: metrics) {
