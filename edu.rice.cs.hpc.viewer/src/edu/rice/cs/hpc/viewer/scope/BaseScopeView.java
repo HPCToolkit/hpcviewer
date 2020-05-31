@@ -330,7 +330,7 @@ abstract public class BaseScopeView  extends AbstractBaseScopeView
     	for (int i=0; i<numMetric; i++)
     	{
     		final BaseMetric metric = metrics.get(i);
-    		if (metric != null  && !metric.isInvisible()) {
+    		if (metric != null) {
         		
                 boolean toBeSorted = false;
                 

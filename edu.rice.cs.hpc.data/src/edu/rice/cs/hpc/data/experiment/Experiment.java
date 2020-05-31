@@ -16,6 +16,7 @@ package edu.rice.cs.hpc.data.experiment;
 
 
 import edu.rice.cs.hpc.data.experiment.metric.*;
+import edu.rice.cs.hpc.data.experiment.metric.BaseMetric.VisibilityType;
 import edu.rice.cs.hpc.data.experiment.scope.*;
 import edu.rice.cs.hpc.data.experiment.scope.filters.*;
 import edu.rice.cs.hpc.data.experiment.scope.visitors.*;
@@ -359,9 +360,9 @@ public class Experiment extends BaseExperimentWithMetrics
 			addPercents(firstSubTree, (RootScope) firstSubTree);
 		}
 		
-		// hide columns if the metric has no value
+		// hide columns if the metric is to be shown but has no value
 		for(BaseMetric metric: metrics) {
-			if (!metric.isInvisible() &&
+			if (metric.getVisibility() == VisibilityType.SHOW &&
 				metric.getValue(firstSubTree) == MetricValue.NONE) {
 				
 				metric.setDisplayed(BaseMetric.VisibilityType.HIDE);
