@@ -177,12 +177,13 @@ public class FlatViewScopeVisitor implements IScopeVisitor
 				proc_cct_s = findEnclosingProcedure(cct_s);
 			}
 
-			// if the procedure is a fake procedure, do not convert it to flat tree node
-			// Careful: Some inline functions are fake procedures (like macros).
-			//  we want this inline procedures to be converted to flat tree regardless 
-			//  they are fake procedure.
-			if (proc_cct_s == null || isPseudoProcedure(proc_cct_s)) {
-				//throw new RuntimeException("Cannot find the enclosing procedure for " + cct_s);
+			// ideally we shouldn't allow place folders (fake procedures) to be created in the flat tree.
+			// However, some place folders like <gpu copyin> and <gpu copyout> contains metric values 
+			// hence should be added in the tree.
+			// That's why we shouldn't throw fake procedures here.
+			
+			if (proc_cct_s == null) {
+
 				return null;
 			}
 			
@@ -499,6 +500,10 @@ public class FlatViewScopeVisitor implements IScopeVisitor
 	 * @return true if it's a pseudo procedure
 	 ****************************************************************/
 	private boolean isPseudoProcedure(ProcedureScope scope) {
+		// remove fake procedures from flat tree unless it has non zero metrics
+		// Fake procedures are normally just a place holder, but in some cases like
+		// <gpu copyout> and <gpu copyin> may contain metrics :-(
+		
 		boolean result = scope.isFalseProcedure() && !scope.isAlien();
 		return result;
 	}
