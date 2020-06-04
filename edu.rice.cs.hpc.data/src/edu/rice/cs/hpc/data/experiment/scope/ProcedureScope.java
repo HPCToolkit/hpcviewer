@@ -39,6 +39,7 @@ public class ProcedureScope extends Scope  implements IMergedScope
 	final static public int FeaturePlaceHolder = 1;
 	final static public int FeatureRoot 	   = 2;
 	final static public int FeatureElided      = 3;
+	final static public int FeatureTopDown     = 4;
 	
 	final static public String INLINE_NOTATION = "[I] ";
 
@@ -215,9 +216,14 @@ public int getSID() {
 
 public Object[] getAllChildren(/*AbstractFinalizeMetricVisitor finalizeVisitor, PercentScopeVisitor percentVisitor,*/
 		MetricValuePropagationFilter inclusiveOnly,
-		MetricValuePropagationFilter exclusiveOnly) {
-
+		MetricValuePropagationFilter exclusiveOnly) 
+{
 	return this.getChildren();
+}
+
+public boolean isTopDownProcedure() 
+{	
+	return procedureFeature == FeatureTopDown;
 }
 
 public boolean isFalseProcedure()
