@@ -99,7 +99,7 @@ public class CallersViewScopeVisitor extends CallerScopeBuilder implements IScop
 		// if there are no exclusive costs to attribute from this context, we are done here
 		//--------------------------------------------------------------------------------
 		if ( !scope.hasNonzeroMetrics() || 
-			  scope.isFalseProcedure() ) {
+			  scope.isTopDownProcedure() ) {
 			return; 
 		}
 		

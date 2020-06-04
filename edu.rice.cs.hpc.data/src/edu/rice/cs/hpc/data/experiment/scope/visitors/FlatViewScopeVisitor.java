@@ -81,7 +81,7 @@ public class FlatViewScopeVisitor implements IScopeVisitor
 		add(scope,vt, true, false); 
 	}
 	public void visit(ProcedureScope scope, ScopeVisitType vt) 		{
-		if (isPseudoProcedure(scope))
+		if (scope.isTopDownProcedure())
 			return;
 		add(scope,vt, true, false); 
 	}
@@ -182,7 +182,7 @@ public class FlatViewScopeVisitor implements IScopeVisitor
 			// hence should be added in the tree.
 			// That's why we shouldn't throw fake procedures here.
 			
-			if (proc_cct_s == null) {
+			if (proc_cct_s == null || proc_cct_s.isTopDownProcedure()) {
 
 				return null;
 			}
