@@ -131,13 +131,22 @@ public class CallerScopeBuilder {
 			CallSiteScopeCallerView existingCaller = (CallSiteScopeCallerView) callee.getSubscope(i);
 
 			//------------------------------------------------------------------------
-			// we check if the scope is identical with the existing scope in the path
-			// if it is the case, we should merge them
+			// we check if the scope is identical with the existing scope in the path:
+			//
+			// - the procedure frame has to be the same (they share the same proc struct ID)
+			// - the line number of the call site has to be the same
+			//
+			// if these conditions met, we should merge them
 			//------------------------------------------------------------------------
+			
 			final ProcedureScope firstProc  = first.getProcedureScope();
 			final ProcedureScope callerProc = existingCaller.getProcedureScope();
+			
+			final LineScope firstLineScope  = first.getLineScope();
+			final LineScope callerLineScope = existingCaller.getLineScope();
 									
-			if (firstProc.getFlatIndex() == callerProc.getFlatIndex()) {
+			if (firstProc.getFlatIndex()            == callerProc.getFlatIndex()     &&
+				firstLineScope.getFirstLineNumber() == callerLineScope.getFirstLineNumber()) {
 
 				//------------------------------------------------------------------------
 				// combine metric values for first to those of existingCaller.
