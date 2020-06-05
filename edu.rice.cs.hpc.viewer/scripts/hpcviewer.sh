@@ -36,6 +36,27 @@ warn()
 }
 
 #------------------------------------------------------------
+# help display
+#------------------------------------------------------------
+
+
+usage()
+{
+    cat <<EOF
+Usage:
+  hpviewer [viewer-options] [database-directory]
+
+Options:
+  -h, --help               Print help.
+
+  -jh, --java-heap <size>  Set the JVM maximum heap size. The value of <size> has to be
+                           in m (mega bytes) or g (giga bytes). Example:
+                              hpcviewer  -jh 3g
+                           will set the JVM maximum heap size to 3 GB.
+EOF
+}
+
+#------------------------------------------------------------
 # Find the hpctoolkit directory.
 #------------------------------------------------------------
 
@@ -69,6 +90,36 @@ if test "$java_vendor" = "gij"; then
 fi
 
 #------------------------------------------------------------
+# Look for arguments
+#------------------------------------------------------------
+
+viewer_args=""
+PARAMS=""
+while (( "$#" )); do
+  case "$1" in 
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    -jh|--java-heap)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        viewer_args="-vmargs -Xmx$2"
+        shift 2
+      else
+        echo "Error: Argument for $1 is missing" >&2
+        exit 1
+      fi
+      ;;
+    *) # preserve positional arguments
+      PARAMS="$PARAMS $1"
+      shift
+      ;;
+  esac
+done
+# set positional arguments in their proper place
+eval set -- "$PARAMS"
+
+#------------------------------------------------------------
 # Prepare the environment.
 #------------------------------------------------------------
 
@@ -92,10 +143,11 @@ export SWT_GTK3=0
 #------------------------------------------------------------
 
 if test -d "$HOME" ; then
-	stderr="$workspace"/hpcviewer.log
-	mkdir -p "$workspace"
-	echo "Redirect standard error to $stderr"
-    exec "$viewer" -data "$workspace" -configuration "$workspace" "$@" 2> $stderr
+    stderr="$workspace"/hpcviewer.log
+    mkdir -p "$workspace"
+    echo "Redirect standard error to $stderr"
+    cmd="$viewer -data $workspace -configuration $workspace $PARAMS  $viewer_args  " 
+    exec $cmd 2> $stderr
 else
     warn "HOME is not set, proceeding anyway"
     exec "$viewer" "$@"

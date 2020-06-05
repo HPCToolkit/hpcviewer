@@ -20,6 +20,7 @@ Release 2020.05   (C) Copyright 2020, Rice University.
       </programArgs>
       <vmArgs>-Dosgi.locking=none
 -Dosgi.requiredJavaVersion=1.8
+-Xmx2412m
       </vmArgs>
       <vmArgsLin>-Dorg.eclipse.swt.internal.gtk.cairoGraphics=false
       </vmArgsLin>
@@ -42,7 +43,6 @@ Release 2020.05   (C) Copyright 2020, Rice University.
             winLargeHigh="/edu.rice.cs.hpc.traceviewer/icons/hpctraceviewer048.BMP"/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>

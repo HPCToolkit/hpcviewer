@@ -22,6 +22,7 @@ Release 2020.05  (C) Copyright 2020, Rice University.
       </programArgs>
       <vmArgs>-Dosgi.locking=none
 -Dosgi.requiredJavaVersion=1.8
+-Xmx2412m
       </vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
       </vmArgsMac>

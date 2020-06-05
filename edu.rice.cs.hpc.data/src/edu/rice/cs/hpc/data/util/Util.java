@@ -257,12 +257,9 @@ static public void main(String argv[]) {
 static public void printMemory() {
 	
 	final int MegaBytes = 1024*1024;
-
-	long totalMemory = Runtime.getRuntime().totalMemory()/MegaBytes;
     long maxMemory = Runtime.getRuntime().maxMemory()/MegaBytes;
 
-    System.out.println("Total memory: " + totalMemory + " MB");
-    System.out.println("Max memory  : " + maxMemory   + " MB\n");
+    System.out.println("Max memory  : " + maxMemory   + " MB");
 
 }
 }
