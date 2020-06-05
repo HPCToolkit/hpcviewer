@@ -34,6 +34,8 @@ public class Activator extends AbstractUIPlugin {
 			System.out.println("Error: Display is not properly set.");
 			System.exit(1);
 		}
+		Util.printMemory();
+		
 		super.start(context);
 		plugin = this;
 	}
