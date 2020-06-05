@@ -34,6 +34,12 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
+		if (!Util.isCorrectDisplay()) {
+			System.out.println("Error: Display is not properly set.");
+			System.exit(1);
+		}
+		Util.printMemory();
+		
 		super.start(context);
 		plugin = this;
 	}
