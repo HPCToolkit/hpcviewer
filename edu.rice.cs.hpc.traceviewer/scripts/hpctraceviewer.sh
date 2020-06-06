@@ -49,10 +49,11 @@ Usage:
 Options:
   -h, --help               Print help.
 
-  -jh, --java-heap <size>  Set the JVM maximum heap size. The value of <size> has to be
+  -jh, --java-heap <size>  Set the JVM maximum heap size. The value of <size> must be
                            in m (mega bytes) or g (giga bytes). Example:
-                              $name  -jh 3g
-                           will set the JVM maximum heap size to 3 GB.
+                              $name -jh 3g
+                           will use a JVM maximum heap size of 3GB for this execution
+                           of $name.
 EOF
 }
 

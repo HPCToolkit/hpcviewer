@@ -44,15 +44,16 @@ usage()
 {
     cat <<EOF
 Usage:
-  hpviewer [viewer-options] [database-directory]
+  hpcviewer [viewer-options] [database-directory]
 
 Options:
   -h, --help               Print help.
 
-  -jh, --java-heap <size>  Set the JVM maximum heap size. The value of <size> has to be
-                           in m (mega bytes) or g (giga bytes). Example:
+  -jh, --java-heap <size>  Set the JVM maximum heap size. The value of <size> must be
+                           in m (megabytes) or g (gigabytes). Example:
                               hpcviewer  -jh 3g
-                           will set the JVM maximum heap size to 3 GB.
+                           will use a JVM maximum heap size of 3GB for this execution
+                           of hpcviewer.
 EOF
 }
 
