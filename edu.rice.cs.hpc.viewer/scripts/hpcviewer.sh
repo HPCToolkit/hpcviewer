@@ -44,7 +44,7 @@ usage()
 {
     cat <<EOF
 Usage:
-  hpviewer [viewer-options] [database-directory]
+  hpcviewer [viewer-options] [database-directory]
 
 Options:
   -h, --help               Print help.
