@@ -18,7 +18,7 @@ Release 2020.05  (C) Copyright 2020, Rice University.
    </configIni>
 
    <launcherArgs>
-      <programArgs>-consoleLog -clearPersistedState
+      <programArgs>-clearPersistedState
       </programArgs>
       <vmArgs>-Dosgi.locking=none
 -Dosgi.requiredJavaVersion=1.8
