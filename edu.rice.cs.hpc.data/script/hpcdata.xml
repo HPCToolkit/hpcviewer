@@ -33,7 +33,7 @@
     	<jar destfile="hpcdata.jar" >
        	     <fileset dir="bin" includes="**/*.class" />
              <manifest>
-                <attribute name="Main-Class" value="edu.rice.cs.hpc.data.framework.Application"/>
+                <attribute name="Main-Class" value="edu.rice.cs.hpc.data.framework.PrintData"/>
                 <attribute name="Class-Path" value="external-jars/org.apache.xerces_2.9.0.v201005080400.jar"/>
              </manifest>
         </jar>

@@ -15,9 +15,9 @@ bindir=`dirname "$script"`
 export HPCVIEWER_DIR_PATH="${bindir}/"
 
 JAVA_CMD=java
-MAIN_CLASS=edu.rice.cs.hpc.data.framework.Application
+MAIN_CLASS=edu.rice.cs.hpc.data.framework.PrintData
 CLASSPATH=$HPCVIEWER_DIR_PATH/lib/org.apache.xerces_2.9.0.v201005080400.jar:$HPCVIEWER_DIR_PATH/lib/hpcdata.jar
-VM_ARGS="-Xms20m -Xmx180m"
+VM_ARGS="-Xms100m -Xmx2G"
 
 # run the java main class
 "$JAVA_CMD" $VM_ARGS -cp "$CLASSPATH" $MAIN_CLASS $*

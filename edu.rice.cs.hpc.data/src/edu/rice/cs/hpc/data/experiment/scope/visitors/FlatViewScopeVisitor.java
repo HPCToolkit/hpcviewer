@@ -491,23 +491,6 @@ public class FlatViewScopeVisitor implements IScopeVisitor
 	}
 	
 
-	/*****************************************************************
-	 * Check if the scope is a pseudo procedure like <root> or <thread root>
-	 *  or <partial callpath>
-	 * A scope is a pseudo procedure iff it's a fake procedure and it isn't an alien procedure
-	 * 
-	 * @param scope
-	 * @return true if it's a pseudo procedure
-	 ****************************************************************/
-	private boolean isPseudoProcedure(ProcedureScope scope) {
-		// remove fake procedures from flat tree unless it has non zero metrics
-		// Fake procedures are normally just a place holder, but in some cases like
-		// <gpu copyout> and <gpu copyin> may contain metrics :-(
-		
-		boolean result = scope.isFalseProcedure() && !scope.isAlien();
-		return result;
-	}
-
 	/******************************************************************
 	 * check if the scope is an inlined macro
 	 * @param scope
