@@ -20,11 +20,10 @@ import edu.rice.cs.hpc.data.experiment.extdata.IThreadDataCollection;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
 import edu.rice.cs.hpc.data.experiment.metric.IMetricManager;
 import edu.rice.cs.hpc.data.experiment.metric.MetricRaw;
-import edu.rice.cs.hpc.data.experiment.metric.MetricType;
-import edu.rice.cs.hpc.data.experiment.metric.MetricValue;
 import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.experiment.scope.RootScopeType;
 import edu.rice.cs.hpc.data.experiment.scope.Scope;
+import edu.rice.cs.hpc.data.util.ScopeComparator;
 import edu.rice.cs.hpc.viewer.metric.MetricRawManager;
 import edu.rice.cs.hpc.viewer.graph.GraphMenu;
 import edu.rice.cs.hpc.viewer.scope.AbstractBaseScopeView;
@@ -231,7 +230,7 @@ public class ThreadView extends AbstractBaseScopeView
 				ScopeSelectionAdapter selectionAdapter = new ScopeSelectionAdapter(treeViewer, colTree);
 				colTree.getColumn().addSelectionListener(selectionAdapter);
 				
-				contentProvider.sort_column(colTree, ScopeSelectionAdapter.SORT_ASCENDING);
+				contentProvider.sort_column(colTree, ScopeComparator.SORT_ASCENDING);
 			}
 
 			try {
