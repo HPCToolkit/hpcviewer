@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import edu.rice.cs.hpc.data.experiment.Experiment;
 import edu.rice.cs.hpc.data.experiment.metric.BaseMetric;
@@ -13,6 +15,7 @@ import edu.rice.cs.hpc.data.experiment.scope.RootScope;
 import edu.rice.cs.hpc.data.experiment.scope.RootScopeType;
 import edu.rice.cs.hpc.data.experiment.scope.Scope;
 import edu.rice.cs.hpc.data.util.Constants;
+import edu.rice.cs.hpc.data.util.ScopeComparator;
 import edu.rice.cs.hpc.data.util.Util;
 
 
@@ -114,8 +117,9 @@ public class PrintData
 			return;
 		}
 		
-		objPrint.println("PrintData: to print the summary of a database");
-		objPrint.println();
+		//------------------------------------------------------------------------------------
+		// print information
+		//------------------------------------------------------------------------------------
 		
 		final int MegaBytes = 1024*1024;
 	    long maxMemory = Runtime.getRuntime().maxMemory()/MegaBytes;
@@ -124,17 +128,34 @@ public class PrintData
 		objPrint.println();
 		
 		//------------------------------------------------------------------------------------
+		// create derivative roots: bottom-up and flat trees
+		// these trees are not created automatically for the sake of memory usage
+		//------------------------------------------------------------------------------------
+
+		RootScope rootCCT = experiment.getRootScope(RootScopeType.CallingContextTree);
+		
+		RootScope rootFlat = experiment.getRootScope(RootScopeType.Flat);
+		experiment.createFlatView(rootCCT, rootFlat);
+		
+		RootScope rootBottomUp = experiment.getRootScope(RootScopeType.CallerTree);
+		experiment.createCallersView(rootCCT, rootBottomUp);
+		
+		//------------------------------------------------------------------------------------
 		// print the summary
 		//------------------------------------------------------------------------------------
 		BaseMetric []metrics = experiment.getMetrics();
 		
-		RootScope rootCCT = experiment.getRootScope(RootScopeType.CallingContextTree);
+		Object []roots = experiment.getRootScopeChildren();
 		
-		objPrint.println("Summary of " + rootCCT.getType());
-		
-		// print root CCT metrics
-		printScopeAndChildren(objPrint, rootCCT, metrics);
+		for(Object root: roots) {
+			objPrint.println();
 
+			RootScope aRoot = (RootScope) root;
+			objPrint.println("Summary of " + aRoot.getType());
+			
+			// print root CCT metrics
+			printScopeAndChildren(objPrint, aRoot, metrics);
+		}
 	}
 
 	
@@ -143,10 +164,25 @@ public class PrintData
 		// print root CCT metrics
 		printMetrics(objPrint, scope, metrics, "");
 		
-		// print the children
-		for(Object child: scope.getChildren()) {
+		if (!scope.hasChildren())
+			return;
+		
+		// sort the children from the highest value to the lowest based on the first metric
+		
+		Object []children = scope.getChildren();
+		
+		ScopeComparator comparator = new ScopeComparator();
+		comparator.setMetric(metrics[0]);
+		comparator.setDirection(ScopeComparator.SORT_DESCENDING);
+		
+		Arrays.sort(children, comparator);
+		
+		// print the first 5 children
+		for(int i=0; i<Math.min(5, children.length); i++) {
 			objPrint.println();
-			printMetrics(objPrint, (Scope) child, metrics, "   ");
+			
+			Scope child = (Scope) children[i];
+			printMetrics(objPrint, child, metrics, "   ");
 		}
 	}
 	
@@ -187,5 +223,5 @@ public class PrintData
 			e.printStackTrace();
 		}
 		return null;
-	}
+	}	
 }
