@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.ui,
  org.swtchart.ext,
  edu.rice.cs.hpc.common;bundle-version="5.5.1",
  edu.rice.cs.hpc.data;bundle-version="5.5.1",
- edu.rice.cs.hpc.filter;bundle-version="5.5.1"
+ edu.rice.cs.hpc.filter;bundle-version="5.5.1",
+ org.apache.commons.lang3
 Bundle-ActivationPolicy: lazy
 Import-Package: 
  com.graphbuilder.math,

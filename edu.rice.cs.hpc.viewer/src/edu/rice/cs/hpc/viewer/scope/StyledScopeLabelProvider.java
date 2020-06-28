@@ -1,5 +1,6 @@
 package edu.rice.cs.hpc.viewer.scope;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
@@ -10,7 +11,6 @@ import edu.rice.cs.hpc.data.experiment.scope.CallSiteScope;
 import edu.rice.cs.hpc.data.experiment.scope.CallSiteScopeCallerView;
 import edu.rice.cs.hpc.data.experiment.scope.ProcedureScope;
 import edu.rice.cs.hpc.data.experiment.scope.Scope;
-import edu.rice.cs.hpc.data.util.string.StringUtil;
 import edu.rice.cs.hpc.viewer.util.Utilities;
 import edu.rice.cs.hpc.viewer.window.ViewerWindow;
 import edu.rice.cs.hpc.viewer.window.ViewerWindowManager;
@@ -52,7 +52,9 @@ public class StyledScopeLabelProvider extends DelegatingStyledCellLabelProvider
 			
 			String scopeName = ((Scope)element).getName();
 			if (scopeName.length() > minLengthForToolTip) {
-				return StringUtil.wrapScopeName(scopeName, toolTipDesiredLineLength);
+				String text = WordUtils.wrap(scopeName, toolTipDesiredLineLength, "\n", true);
+				return text;
+				//return StringUtil.wrapScopeName(scopeName, toolTipDesiredLineLength);
 			}
 		}
 		return null; // no tool tip for this cell

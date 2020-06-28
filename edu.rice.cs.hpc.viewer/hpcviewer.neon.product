@@ -46,7 +46,6 @@ Release 2020.06  (C) Copyright 2020, Rice University.
       </win>
    </launcher>
 
-
    <vm>
    </vm>
 
@@ -99,6 +98,7 @@ if advised of the possibility of such damage.
       <plugin id="org.apache.batik.util"/>
       <plugin id="org.apache.batik.util.gui"/>
       <plugin id="org.apache.commons.jxpath"/>
+      <plugin id="org.apache.commons.lang3"/>
       <plugin id="org.apache.xerces"/>
       <plugin id="org.apache.xml.resolver"/>
       <plugin id="org.apache.xml.serializer"/>
