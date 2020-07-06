@@ -35,7 +35,7 @@ import edu.rice.cs.hpc.data.util.*;
 public class FileScope extends Scope
 {
 
-
+public static final String UNKNOWN_FILE = "<unknown file>";
 
 
 //////////////////////////////////////////////////////////////////////////

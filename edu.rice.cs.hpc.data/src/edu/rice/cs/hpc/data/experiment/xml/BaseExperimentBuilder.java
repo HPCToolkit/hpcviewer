@@ -1215,8 +1215,9 @@ public class BaseExperimentBuilder extends Builder {
 	{
 		SourceFile sourceFile=hashSourceFileTable.get(keyFile);
 		if (sourceFile == null) {
-			File filename = new File(fileLine);
-			sourceFile = new FileSystemSourceFile(experiment, filename, keyFile);
+			String filename = (fileLine.length() == 0 ? FileScope.UNKNOWN_FILE : fileLine);
+			File file = new File(filename);
+			sourceFile = new FileSystemSourceFile(experiment, file, keyFile);
 			this.hashSourceFileTable.put(Integer.valueOf(keyFile), sourceFile);
 		}  
 
