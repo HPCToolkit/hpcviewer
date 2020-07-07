@@ -244,7 +244,10 @@ public final class MetricValue
 	{
 		int result;
 
-		if( MetricValue.isAvailable(left) && MetricValue.isAvailable(right) )
+		boolean availableLeft  = MetricValue.isAvailable(left);
+		boolean availableRight = MetricValue.isAvailable(right);
+		
+		if( availableLeft && availableRight )
 		{
 			if( left.value > right.value )
 				result = +1;
@@ -253,9 +256,9 @@ public final class MetricValue
 			else
 				result = 0;
 		}
-		else if( MetricValue.isAvailable(left) )
+		else if( availableLeft )
 			result = +1;
-		else if( MetricValue.isAvailable(right) )
+		else if( availableRight )
 			result = -1;
 		else
 			result = 0;

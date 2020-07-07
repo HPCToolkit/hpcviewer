@@ -41,11 +41,11 @@ public class ScopeComparator implements Comparator<Object>
 		
 		Scope node1 = (Scope) n1;
 		Scope node2 = (Scope) n2;
-		
+
 		// dirty solution: if the column position is 0 then we sort
 		// according to its element name
 		// otherwise, sort according to the metric
-		if(metric == null) {
+		if(metric == null || n1 == null || n2 == null) {
 			return direction * this.doCompare(node1, node2);
 		}
 		
@@ -57,7 +57,11 @@ public class ScopeComparator implements Comparator<Object>
 			return iRet;
 
 		// if the two values are equal, look at the text of the tree node
-		return direction * this.doCompare(node1, node2);
+		// this comparison is more consistent than using doCompare() method for certain database
+		
+		final String text1 = node1.getName();
+		final String text2 = node2.getName();
+		return text1.compareTo(text2);
 	}
 
 
