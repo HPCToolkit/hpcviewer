@@ -8,6 +8,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -30,10 +32,14 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 {		
 	static private final int TICK_X_PIXEL = 110;
 	static private final int MINIMUM_PIXEL_BETWEEN_TICKS = 10;
+	static private final int TICK_BIG   = 4;
+	static private final int TICK_SMALL = 2;
 	
 	final private DecimalFormat formatTime;
 
 	final private Color bgColor;
+	
+	private Font fontX;
 	
 	/***
 	 * Constructor of time axis canvas.
@@ -50,7 +56,14 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 	}
 
 	
-
+	@Override
+	public void dispose() {
+		if (fontX != null && !fontX.isDisposed()) {
+			fontX.dispose();
+		}
+		super.dispose();
+	}
+	
 	
 	@Override
 	public void paintControl(PaintEvent e) {
@@ -63,12 +76,33 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
         if (data == null)
         	return;
         
+        
+        // try to adapt automatically the font height if the height of the canvas isn't sufficient
+        // Theoretically, the height is always constant in the beginning of the first appearance. 
+        // However, during the view creation, SWT returns the size of height and width are both zero.
+        // So Apparently the best way is to compute the height during the paint control :-(
+        
+		FontData []fd = e.gc.getFont().getFontData();
+		int height = fd[0].getHeight();
+		
+		if (e.height > 0 && height > e.height-7) {
+			int heightAdapt = Math.min(e.height-7, height);
+			if (heightAdapt > 1) {
+				fd[0].setHeight(heightAdapt);
+				if (fontX != null && !fontX.isDisposed()) {
+					fontX.dispose();
+				}
+				fontX = new Font(e.display, fd);
+				e.gc.setFont(fontX);
+			}
+		}
+
 		final ImageTraceAttributes attribute = data.getAttributes();
 
 		final Rectangle area = getClientArea();
 		
 		// --------------------------------------------------------------------------
-		// finding some HINTs of number of ticks, and distance between ticks 
+		// finding some HINTs of number of ticks, and distance between ticks 	
 		// --------------------------------------------------------------------------
 		
 		int numAxisLabel = area.width / TICK_X_PIXEL;
@@ -182,16 +216,16 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 			else if (position_x + textArea.x > area.width) {
 				position_x = axis_x_pos - textArea.x;
 			}
-			int axis_tick_mark_height = position_y+2;
+			int axis_tick_mark_height = position_y+TICK_SMALL;
 			
 			// draw the label only if we have space
 			if (i==0 || prevPositionX+prevTextArea.x + 10 < position_x) {
-				e.gc.drawText(strTime, position_x, position_y + 5);
+				e.gc.drawText(strTime, position_x, position_y + TICK_BIG+1);
 
 				prevTextArea.x = textArea.x;
 				prevPositionX  = position_x;
 				
-				axis_tick_mark_height+=4;
+				axis_tick_mark_height+=TICK_BIG;
 			}
 			// always draw the ticks
 			e.gc.drawLine(axis_x_pos, position_y, axis_x_pos, axis_tick_mark_height);
