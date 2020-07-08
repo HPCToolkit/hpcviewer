@@ -46,7 +46,7 @@ public class ImageTraceAttributes
 		mapUnitToString.put(TimeUnit.MICROSECONDS, "us");
 		mapUnitToString.put(TimeUnit.MILLISECONDS, "ms");
 		mapUnitToString.put(TimeUnit.SECONDS, "s");
-		mapUnitToString.put(TimeUnit.MINUTES, "mnt");
+		mapUnitToString.put(TimeUnit.MINUTES, "min");
 		mapUnitToString.put(TimeUnit.HOURS, "hr");
 	}
 
