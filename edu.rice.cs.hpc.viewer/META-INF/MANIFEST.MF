@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.ui,
  edu.rice.cs.hpc.common;bundle-version="5.5.1",
  edu.rice.cs.hpc.data;bundle-version="5.5.1",
  edu.rice.cs.hpc.filter;bundle-version="5.5.1",
- org.apache.commons.lang3
+ org.apache.commons.lang
 Bundle-ActivationPolicy: lazy
 Import-Package: 
  com.graphbuilder.math,
@@ -42,4 +42,3 @@ Bundle-ClassPath: hpcviewer.jar,
  org.swtchart,
  org.swtchart.ext
 Automatic-Module-Name: edu.rice.cs.hpc.viewer
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8

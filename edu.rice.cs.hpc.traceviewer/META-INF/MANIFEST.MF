@@ -41,4 +41,3 @@ Import-Package: com.jcraft.jsch;version="0.1.44",
  org.osgi.framework
 Bundle-ClassPath: hpctraceviewer.jar
 Automatic-Module-Name: edu.rice.cs.hpc.traceviewer
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
