@@ -52,7 +52,7 @@ public class TimeAxisCanvas extends AbstractAxisCanvas
 		
 		bgColor = parent.getBackground();
 		
-		formatTime = new DecimalFormat("###,###,###");
+		formatTime = new DecimalFormat("###,###,###,###,###");
 	}
 
 	
