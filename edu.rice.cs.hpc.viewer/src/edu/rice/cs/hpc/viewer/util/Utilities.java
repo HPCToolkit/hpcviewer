@@ -603,7 +603,9 @@ public class Utilities
     	FontData []fd = font.getFontData();
     	
     	if (fd != null) {
-    		return fd[0].name;
+    		// Windows doesn't recognize direct field "name" of the font.
+    		// we need to indirectly get the name via getName() method.
+    		return fd[0].getName();
     	}
 
 		// we don't find any font supported by the system.
