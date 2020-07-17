@@ -467,7 +467,7 @@ public abstract class BaseMetric {
 			try {
 				period = Double.parseDouble(sPeriod);
 			} catch (java.lang.NumberFormatException e) {
-				System.err.println("The sample period is incorrect :" + sPeriod);
+				System.err.println("The sample period is incorrect: " + sPeriod);
 			}
 		}
 		return period;
