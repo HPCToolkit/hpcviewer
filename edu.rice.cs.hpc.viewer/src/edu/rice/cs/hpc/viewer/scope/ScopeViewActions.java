@@ -300,7 +300,7 @@ public abstract class ScopeViewActions /*extends ScopeActions /* implements IToo
 			
 			treeViewer.setSelection(new StructuredSelection(objHotPath.path), true);
 
-			if(!is_found) {
+			if(!is_found && objHotPath.node.hasChildren()) {
 				this.showErrorMessage("No hot child.");
 			}
 		} else {
